@@ -1,0 +1,3 @@
+name: vtelem
+version: {{major}}.{{minor}}.{{patch}}
+description: "A real-time telemetry library."
