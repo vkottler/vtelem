@@ -32,13 +32,13 @@ jobs:
         mk PYTHON_VERSION=${{matrix.python-version}} venv
     - name: lint
       run: |
-        mk PYTHON_VERSION=${{matrix.python-version}} lint
+        mk PYTHON_VERSION=${{matrix.python-version}} python-lint
     - name: sa
       run: |
-        mk PYTHON_VERSION=${{matrix.python-version}} sa
+        mk PYTHON_VERSION=${{matrix.python-version}} python-sa
     - name: test
       run: |
-        mk PYTHON_VERSION=${{matrix.python-version}} test
+        mk PYTHON_VERSION=${{matrix.python-version}} python-test
     - name: dist
       run: |
-        mk PYTHON_VERSION=${{matrix.python-version}} dist
+        mk PYTHON_VERSION=${{matrix.python-version}} python-dist
