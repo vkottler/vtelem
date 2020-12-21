@@ -12,3 +12,4 @@ def test_entry():
     """ Test some basic command-line argument scenarios. """
 
     assert vt_main([PKG_NAME]) == 0
+    assert vt_main([PKG_NAME, "bad_arg"]) != 0
