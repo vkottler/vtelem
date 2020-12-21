@@ -44,5 +44,7 @@ def test_byte_buffer_basic():
     c_pos = type_a.size() + type_b.size()
     assert abs(type_c.get() - type_c.read(buf, c_pos)) < 0.001
 
+    buf.append(bytearray(10), 10)
+
     immut_buf = ByteBuffer(mutable=False)
     assert not immut_buf.write(Primitive.BOOL, False)

@@ -16,7 +16,7 @@ from . import ENUM_TYPE
 class UserEnum(dict):
     """ A container for runtime, user-defined enumerations. """
 
-    def __init__(self, name: str, values: Dict[int, str]):
+    def __init__(self, name: str, values: Dict[int, str]) -> None:
         """ Build a runtime enumeration. """
 
         super().__init__()
