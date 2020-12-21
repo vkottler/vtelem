@@ -4,79 +4,34 @@ vtelem - Contains a class for managing known type primitives.
 """
 
 # built-in
-from collections import defaultdict
-import json
-from typing import Tuple, Optional, Dict, List
-import threading
+from typing import Tuple, Optional, List
 
 # internal
 from vtelem.enums.primitive import Primitive, PrimitiveEncoder, get_name
+from .registry import Registry
 
 
-class TypeRegistry:
+class TypeRegistry(Registry[Primitive]):
     """
     A class for managing types that can be registered and referenced by a
     name and an integer identifier.
     """
 
-    def __init__(self, initial_types: List[Tuple[str, Primitive]] = None):
+    def __init__(self,
+                 initial_types: List[Tuple[str, Primitive]] = None) -> None:
         """ Construct a new type registry, optionally add initial types. """
 
-        self.data: Dict[str, dict] = {}
-        types: Dict[int, Optional[Primitive]] = defaultdict(lambda: None)
-        mappings: Dict[str, Optional[int]] = defaultdict(lambda: None)
-        self.data["types"] = types
-        self.data["mappings"] = mappings
-
-        self.curr_id = 0
-        self.lock = threading.RLock()
-
-        # optionally register a set of initial types
-        if initial_types is not None:
-            for elem in initial_types:
-                self.add(elem[0], elem[1])
+        super().__init__("types", initial_types)
 
     def get_type(self, type_id: int) -> Optional[Primitive]:
         """ Obtain a type's data by its integer identifier. """
 
-        with self.lock:
-            result = self.data["types"][type_id]
-        return result
-
-    def get_id(self, name: str) -> Optional[int]:
-        """
-        Determine the integer identifier for a named type, if it can be found.
-        """
-
-        with self.lock:
-            result = self.data["mappings"][name]
-        return result
-
-    def add(self, name: str, data: Primitive) -> Tuple[bool, int]:
-        """
-        Register a named type, rejects duplicate names. Returns status
-        of success and the integer identifier associated with this type.
-        """
-
-        with self.lock:
-            if self.get_id(name) is not None:
-                result = (False, -1)
-            else:
-                self.data["types"][self.curr_id] = data
-                self.data["mappings"][name] = self.curr_id
-                result = (True, self.curr_id)
-                self.curr_id += 1
-
-        return result
+        return self.get_item(type_id)
 
     def describe(self, indented: bool = False) -> str:
-        """ Obtain a JSON String of the registry's current state. """
+        """ Obtain a JSON String of the type registry's current state. """
 
-        indent = 4 if indented else None
-        with self.lock:
-            result = json.dumps(self.data, indent=indent, cls=PrimitiveEncoder,
-                                sort_keys=True)
-        return result
+        return self.describe_raw(indented, PrimitiveEncoder)
 
 
 def get_default() -> TypeRegistry:

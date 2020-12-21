@@ -19,3 +19,6 @@ def test_type_registry_basic():
 
     assert registry.get_type(0) is not None
     assert registry.get_type(1) is not None
+    assert registry.get_id("boolean") is not None
+    assert registry.get_id("float") is not None
+    assert registry.get_id("double") is not None
