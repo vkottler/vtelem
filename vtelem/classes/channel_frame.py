@@ -6,7 +6,7 @@ vtelem - A module that implements storage for channel data, restricted by
 
 # built-in
 import math
-from typing import Any, Dict
+from typing import Any, Dict, Tuple
 
 # internal
 from vtelem.enums.primitive import Primitive, get_size
@@ -67,6 +67,12 @@ class ChannelFrame:
         self.finalized = True
         return self.used
 
+    def raw(self) -> Tuple[bytearray, int]:
+        """ Obtain the raw buffer, and its size, from this frame. """
+
+        assert self.finalized
+        return self.buffer.data, self.used
+
     def add_event(self, chan_id: int, chan_type: Primitive, prev: EventType,
                   curr: EventType) -> bool:
         """ Add event data into this frame. """
@@ -88,15 +94,15 @@ class ChannelFrame:
 
         # write 'prev'
         data_prim.set(prev[0])
-        self.used += data_prim.write(self.buffer)
+        self.used += data_prim.write(self.elem_buffer)
         time_prim.set(time_to_int(prev[1]))
-        self.used += time_prim.write(self.buffer)
+        self.used += time_prim.write(self.elem_buffer)
 
         # write 'curr'
         data_prim.set(curr[0])
-        self.used += data_prim.write(self.buffer)
+        self.used += data_prim.write(self.elem_buffer)
         time_prim.set(time_to_int(curr[1]))
-        self.used += time_prim.write(self.buffer)
+        self.used += time_prim.write(self.elem_buffer)
 
         self.count["value"] += 1
         return True

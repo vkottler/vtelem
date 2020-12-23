@@ -20,6 +20,26 @@ def test_create_environment():
     TelemetryEnvironment(2 ** 8, start_time)
 
 
+def test_create_many_channels():
+    """ Test an environment with many channels. """
+
+    start_time = time.time()
+    env = TelemetryEnvironment(2 ** 8, start_time)
+
+    chan_ids = []
+    for i in range(1000):
+        chan_ids.append(env.add_channel("chan{}".format(i), Primitive.FLOAT,
+                                        0.1))
+
+    # set all channels and dispatch
+    for _ in range(5):
+        for chan in chan_ids:
+            env.set_now(chan, start_time)
+        start_time += 0.1
+        env.advance_time(0.1)
+        env.dispatch_now()
+
+
 def test_telemetry_environment_basic():
     """ Exercise some basic telemetry-environment operations. """
 

@@ -11,10 +11,13 @@ import threading
 
 # internal
 from vtelem.enums.primitive import Primitive
+from vtelem.parsing import parse_data_frame, parse_event_frame
+from . import TIMESTAMP_PRIM, COUNT_PRIM, ENUM_TYPE
+from .byte_buffer import ByteBuffer
 from .channel import Channel
 from .channel_registry import ChannelRegistry
 from .channel_frame import ChannelFrame
-from .channel_framer import ChannelFramer
+from .channel_framer import ChannelFramer, FRAME_TYPES
 from .event_queue import EventQueue
 
 LOG = logging.getLogger(__name__)
@@ -73,6 +76,25 @@ class ChannelEnvironment:
         """ Get the next available frame from the queue. """
 
         return self.frame_queue.get()
+
+    def decode_frame(self, data: bytearray, size: int) -> dict:
+        """ Unpack a frame from an array of bytes. """
+
+        result = {}
+        buf = ByteBuffer(data, False, size)
+
+        # read header
+        result["type"] = FRAME_TYPES.get_str(buf.read(ENUM_TYPE))
+        result["timestamp"] = buf.read(TIMESTAMP_PRIM)
+        result["size"] = buf.read(COUNT_PRIM)
+
+        # read channel IDs
+        if result["type"] == "DATA":
+            parse_data_frame(result, buf, self.channel_registry)
+        elif result["type"] == "EVENT":
+            parse_event_frame(result, buf, self.channel_registry)
+
+        return result
 
     def dispatch_events(self, time: float) -> Tuple[int, int]:
         """ Process all queued events (build frames). """
