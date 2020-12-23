@@ -6,11 +6,12 @@ vtelem - Implements an object for storing a runtime enumeration.
 # built-in
 from collections import defaultdict
 import json
-from typing import Dict
+from typing import Dict, Callable, Optional
 
 # internal
 from vtelem.enums.primitive import get_size
 from . import ENUM_TYPE
+from .type_primitive import TypePrimitive
 
 
 class UserEnum(dict):
@@ -25,10 +26,34 @@ class UserEnum(dict):
         self.name = name
         assert len(self.enum) <= (2 ** (get_size(ENUM_TYPE) * 8))
 
+        # maintain a reverse mapping for convenience
+        self.strings: Dict[str, Optional[int]] = defaultdict(lambda: None)
+        for key, val in self.enum.items():
+            self.strings[val] = key
+
     def get_str(self, val: int) -> str:
         """ Look up the String represented by the integer enum value. """
 
         return self.enum[val]
+
+    def get_value(self, val: str) -> int:
+        """ Get the integer value of an enum String. """
+
+        result = self.strings[val]
+        assert result is not None
+        return result
+
+    def get_primitive(self, value: str,
+                      changed_cb: Callable = None) -> TypePrimitive:
+        """
+        Create a new primitive with an initial value from this enum definition.
+        """
+
+        result = TypePrimitive(ENUM_TYPE, changed_cb)
+        val = self.strings[value]
+        assert val is not None
+        assert result.set(val)
+        return result
 
     def describe(self, indented: bool = False) -> str:
         """ Describe this enumeration as a JSON String. """

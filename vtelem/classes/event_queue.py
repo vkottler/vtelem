@@ -7,7 +7,10 @@ vtelem - A queue that stores change events that can be completely drained on
 # built-in
 from queue import Queue
 import threading
-from typing import Any, List, Tuple
+from typing import List, Tuple
+
+# internal
+from . import EventType
 
 
 class EventQueue:
@@ -19,13 +22,13 @@ class EventQueue:
         self.queue: Queue = Queue()
         self.lock = threading.Lock()
 
-    def enqueue(self, prev: Tuple[Any, float],
-                curr: Tuple[Any, float]) -> None:
+    def enqueue(self, channel: str, prev: EventType,
+                curr: EventType) -> None:
         """ Put an event into the queue. """
 
-        self.queue.put((prev, curr))
+        self.queue.put((channel, prev, curr))
 
-    def consume(self) -> List[Tuple[Tuple[Any, float], Tuple[Any, float]]]:
+    def consume(self) -> List[Tuple[str, EventType, EventType]]:
         """ Get all of the current events in the queue as a list. """
 
         result = []

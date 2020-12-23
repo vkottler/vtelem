@@ -4,12 +4,15 @@ vtelem - A generic element that can be read from and written to buffers.
 """
 
 # built-in
+import logging
 from typing import Any, Callable
 import threading
 
 # internal
 from vtelem.enums.primitive import Primitive, default_val, get_size
 from .byte_buffer import ByteBuffer
+
+LOG = logging.getLogger(__name__)
 
 
 class TypePrimitive:
@@ -34,7 +37,8 @@ class TypePrimitive:
         if time is None:
             time = float()
 
-        if isinstance(data, self.type.value["type"]):
+        expected_type = self.type.value["type"]
+        if isinstance(data, expected_type):
             with self.lock:
                 # setup changed-callback if necessary
                 if self.changed_cb is not None:
@@ -42,7 +46,7 @@ class TypePrimitive:
                     prev_data = self.data
 
                 # set the new value
-                self.data = self.type.value["type"](data)
+                self.data = expected_type(data)
                 if time is not None:
                     self.last_set = time
 
@@ -51,6 +55,8 @@ class TypePrimitive:
                 self.changed_cb(*cb_args)
             return True
 
+        LOG.warning("can't assign '%s', expected type '%s' got '%s'",
+                    str(data), type(data), expected_type)
         return False
 
     def get(self) -> Any:

@@ -20,14 +20,14 @@ class ByteBuffer:
     """
 
     def __init__(self, data: bytearray = None, mutable: bool = True,
-                 order: str = "!") -> None:
+                 size: int = 0, order: str = "!") -> None:
         """ Construct a new, managed buffer """
 
         if data is None:
             data = bytearray()
         self.data = data
         self.pos: int = 0
-        self.size: int = 0
+        self.size = size
         self.mutable = mutable
         self.order = order
         self.lock = threading.RLock()
@@ -89,10 +89,12 @@ class ByteBuffer:
         """ Read a primitive out of a buffer, at its current position. """
 
         with self.lock:
-            end_pos = self.get_pos() + get_size(inst)
+            elem_size = get_size(inst)
+            assert self.get_pos() + elem_size <= self.size
+            end_pos = self.get_pos() + elem_size
             buffer_slice = self.data[self.get_pos():end_pos]
             result = struct.unpack(self.fstring(inst), buffer_slice)[0]
-            self.advance(get_size(inst))
+            self.advance(elem_size)
         return result
 
     def append(self, other: bytearray, data_len: int) -> None:

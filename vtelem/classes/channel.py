@@ -8,6 +8,7 @@ from typing import Any, Optional
 
 # internal
 from vtelem.enums.primitive import Primitive
+from . import EventType
 from .type_primitive import TypePrimitive
 from .event_queue import EventQueue
 
@@ -30,7 +31,11 @@ class Channel(TypePrimitive):
         # nothing
         changed_cb = None
         if event_queue is not None:
-            changed_cb = event_queue.enqueue
+            def new_changed_cb(prev: EventType, curr: EventType) -> None:
+                """ Create a function specific to this channel. """
+                assert event_queue is not None
+                event_queue.enqueue(name, prev, curr)
+            changed_cb = new_changed_cb
 
         super().__init__(instance, changed_cb)
         self.name = name

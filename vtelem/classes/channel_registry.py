@@ -7,6 +7,7 @@ vtelem - A module for managing channel registrations.
 from typing import List, Tuple
 
 # internal
+from vtelem.enums.primitive import Primitive
 from .channel import Channel
 from .registry import Registry
 
@@ -24,6 +25,13 @@ class ChannelRegistry(Registry[Channel]):
         if initial_channels is not None:
             for channel in initial_channels:
                 self.add_channel(channel)
+
+    def get_channel_type(self, chan_id: int) -> Primitive:
+        """ Get a channel's primitive type by its integer identifier. """
+
+        channel = self.get_item(chan_id)
+        assert channel is not None
+        return channel.type
 
     def add_channel(self, channel: Channel) -> Tuple[bool, int]:
         """ Attempt to register a channel. """
