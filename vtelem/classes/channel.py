@@ -42,6 +42,12 @@ class Channel(TypePrimitive):
         self.rate = rate
         self.last_emitted: float = float()
 
+    def set_rate(self, rate: float) -> None:
+        """ Set a channel's rate post-initialization. """
+
+        with self.lock:
+            self.rate = rate
+
     def emit(self, time: float) -> Optional[Any]:
         """
         If the provided time indicates that this channel should be emitted

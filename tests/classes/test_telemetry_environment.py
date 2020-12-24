@@ -4,6 +4,7 @@ vtelem - Test the telemetry environment's correctness.
 """
 
 # built-in
+from enum import Enum
 import time
 
 # module under test
@@ -11,6 +12,38 @@ from vtelem.classes.channel import Channel
 from vtelem.classes.telemetry_environment import TelemetryEnvironment
 from vtelem.classes.user_enum import UserEnum
 from vtelem.enums.primitive import Primitive
+
+
+def test_environment_with_metrics():
+    """ Test that metrics channels are present when initialized. """
+
+    start_time = time.time()
+    env = TelemetryEnvironment(2 ** 8, start_time, 1.0)
+    env.dispatch_now()
+    env.advance_time(1.0)
+    env.dispatch_now()
+    frame = env.get_next_frame().raw()
+    frame_data = env.decode_frame(frame[0], frame[1])
+    assert frame_data["type"] == "DATA"
+
+    # make sure all the metrics can be found in the frame
+    expected_metrics = ["metrics_rate", "channel_count", "frames_created",
+                        "frames_consumed", "events_captured", "emits_captured"]
+    for metric in expected_metrics:
+        found = False
+        for chan in frame_data["channels"]:
+            if metric == chan["channel"].name:
+                found = True
+                break
+        assert found
+
+    class EnumA(Enum):
+        """ Sample enumeration. """
+        A = 0
+        B = 1
+        C = 2
+
+    assert env.add_from_enum(EnumA) >= 0
 
 
 def test_create_environment():
@@ -46,7 +79,7 @@ def test_telemetry_environment_basic():
     start_time = time.time()
     chan_1 = Channel("chan_1", Primitive.BOOL, 0.5)
     chan_2 = Channel("chan_2", Primitive.FLOAT, 0.25)
-    env = TelemetryEnvironment(2 ** 8, start_time, [chan_1, chan_2])
+    env = TelemetryEnvironment(2 ** 8, start_time, None, [chan_1, chan_2])
 
     # add some basic enums
     env.add_enum(UserEnum("a", {0: "a", 1: "b", 2: "c"}))

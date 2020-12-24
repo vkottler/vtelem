@@ -5,14 +5,16 @@ vtelem - An environment that supports management of telemetry.
 
 # built-in
 from collections import defaultdict
-from typing import Any, List, Dict
+from enum import Enum
+from typing import Any, List, Dict, Type
 
 # internal
+from vtelem.enums.primitive import Primitive
 from . import ENUM_TYPE
 from .channel import Channel
 from .channel_environment import ChannelEnvironment
 from .enum_registry import EnumRegistry
-from .user_enum import UserEnum
+from .user_enum import UserEnum, from_enum
 from .type_registry import get_default
 
 
@@ -23,17 +25,23 @@ class TelemetryEnvironment(ChannelEnvironment):
     """
 
     def __init__(self, mtu: int, init_time: float = None,
+                 metrics_rate: float = None,
                  initial_channels: List[Channel] = None,
                  initial_enums: List[UserEnum] = None) -> None:
         """ Construct a new telemetry environment. """
 
-        super().__init__(mtu, initial_channels)
+        super().__init__(mtu, initial_channels, metrics_rate)
         self.time: float = init_time if init_time is not None else float()
         self.enum_registry = EnumRegistry(initial_enums)
         self.type_registry = get_default()
         assert self.enum_registry.add_enum(self.framer.get_types())[0]
         self.enum_registry.export(self.type_registry)
         self.enum_channel_types: Dict[int, int] = defaultdict(lambda: -1)
+        if self.metrics is not None:
+            self.add_metric("enum_count", Primitive.UINT32, True,
+                            (self.enum_registry.count(), init_time))
+            self.add_metric("type_count", Primitive.UINT32, True,
+                            (self.type_registry.count(), init_time))
 
     def add_enum_channel(self, name: str, enum_name: str, rate: float,
                          track_change: bool = False) -> int:
@@ -66,6 +74,11 @@ class TelemetryEnvironment(ChannelEnvironment):
         with self.lock:
             self.time += amount
 
+    def add_from_enum(self, enum_class: Type[Enum]) -> int:
+        """ Add an enumeration from an enum class. """
+
+        return self.add_enum(from_enum(enum_class))
+
     def add_enum(self, enum: UserEnum) -> int:
         """ Add a user enumeration to this environment's management. """
 
@@ -73,6 +86,9 @@ class TelemetryEnvironment(ChannelEnvironment):
             result = self.enum_registry.add_enum(enum)
             assert result[0]
             assert self.enum_registry.export(self.type_registry)
+            if self.metrics is not None:
+                self.set_metric("enum_count", self.enum_registry.count())
+                self.set_metric("type_count", self.type_registry.count())
         return result[1]
 
     def dispatch_now(self, should_log: bool = True) -> int:

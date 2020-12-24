@@ -5,8 +5,9 @@ vtelem - Implements an object for storing a runtime enumeration.
 
 # built-in
 from collections import defaultdict
+from enum import Enum
 import json
-from typing import Dict, Callable, Optional
+from typing import Dict, Callable, Optional, Type
 
 # internal
 from vtelem.enums.primitive import get_size
@@ -60,3 +61,15 @@ class UserEnum(dict):
 
         indent = 4 if indented else None
         return json.dumps(self.enum, indent=indent, sort_keys=True)
+
+
+def from_enum(enum_class: Type[Enum]) -> UserEnum:
+    """ From an enum class, create a user enum. """
+
+    name = enum_class.__name__.lower()
+    values = {}
+    for inst in enum_class:
+        assert isinstance(inst.value, int)
+        assert inst.value not in values
+        values[inst.value] = inst.name.lower()
+    return UserEnum(name, values)

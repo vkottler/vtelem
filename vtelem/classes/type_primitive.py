@@ -31,6 +31,13 @@ class TypePrimitive:
         self.last_set: float = float()
         self.lock = threading.RLock()
 
+    def add(self, data: Any, time: float = None) -> bool:
+        """ Safely add some amount to the primitive. """
+
+        with self.lock:
+            result = self.set(self.get() + data, time)
+        return result
+
     def set(self, data: Any, time: float = None) -> bool:
         """ Set this primitive's data manually. """
 

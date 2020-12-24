@@ -37,6 +37,11 @@ class Registry(Generic[TYP]):
             for item in initial_data:
                 self.add(item[0], item[1])
 
+    def count(self) -> int:
+        """ Get a count of the number of elements in this registry. """
+
+        return self.curr_id
+
     def get_item(self, item_id: int) -> Optional[TYP]:
         """ Obtain an item's data by its integer identifier. """
 
