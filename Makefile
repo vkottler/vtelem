@@ -12,6 +12,4 @@ endif
 
 .DEFAULT_GOAL := all
 
-all:
-	+@echo "TODO"
-	+@echo $(MAKE)
+all: python-lint python-sa python-test mk-todo
