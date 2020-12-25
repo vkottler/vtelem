@@ -6,7 +6,7 @@ vtelem - An environment that supports management of telemetry.
 # built-in
 from collections import defaultdict
 from enum import Enum
-from typing import Any, List, Dict, Type
+from typing import Any, List, Dict, Type, Tuple, Optional
 
 # internal
 from vtelem.enums.primitive import Primitive
@@ -30,8 +30,7 @@ class TelemetryEnvironment(ChannelEnvironment):
                  initial_enums: List[UserEnum] = None) -> None:
         """ Construct a new telemetry environment. """
 
-        super().__init__(mtu, initial_channels, metrics_rate)
-        self.time: float = init_time if init_time is not None else float()
+        super().__init__(mtu, initial_channels, metrics_rate, init_time)
         self.enum_registry = EnumRegistry(initial_enums)
         self.type_registry = get_default()
         assert self.enum_registry.add_enum(self.framer.get_types())[0]
@@ -44,14 +43,62 @@ class TelemetryEnvironment(ChannelEnvironment):
                             (self.type_registry.count(), init_time))
 
     def add_enum_channel(self, name: str, enum_name: str, rate: float,
-                         track_change: bool = False) -> int:
+                         track_change: bool = False,
+                         initial: Tuple[str, Optional[float]] = None) -> int:
         """ Add a channel that stores an enumeration value."""
 
         new_chan = self.add_channel(name, ENUM_TYPE, rate, track_change)
         enum_type = self.enum_registry.get_id(enum_name)
         assert enum_type is not None
         self.enum_channel_types[new_chan] = enum_type
+        if initial is not None:
+            chan = self.channel_registry.get_item(new_chan)
+            assert chan is not None
+            enum_def = self.enum_registry.get_item(enum_type)
+            assert enum_def is not None
+            assert chan.set(enum_def.get_value(initial[0]), initial[1])
         return new_chan
+
+    def add_enum_metric(self, name: str, enum_name: str,
+                        track_change: bool = False,
+                        initial: Tuple[str, Optional[float]] = None) -> None:
+        """ Add a metric based on an enumeration definition. """
+
+        assert self.metrics is not None
+        assert name not in self.metrics
+        self.metrics[name] = self.add_enum_channel(name, enum_name, float(),
+                                                   track_change, initial)
+        self.set_metric_rate(name, self.get_metric("metrics_rate"))
+
+    def set_enum_metric(self, name: str, data: str,
+                        time: float = None) -> None:
+        """ Set the value for an enumeration metric. """
+
+        assert self.metrics is not None
+        if name in self.metrics:
+            chan = self.channel_registry.get_item(self.metrics[name])
+            assert chan is not None
+            enum_type = self.enum_channel_types[self.metrics[name]]
+            enum_def = self.enum_registry.get_item(enum_type)
+            assert enum_def is not None
+            assert chan.set(enum_def.get_value(data), time)
+
+    def get_enum_metric(self, name: str) -> str:
+        """ Get the currently-held enum String of a metric channel by name. """
+
+        assert self.metrics is not None
+        enum_type = self.enum_channel_types[self.metrics[name]]
+        enum_def = self.enum_registry.get_item(enum_type)
+        assert enum_def is not None
+        return enum_def.get_str(self.get_metric(name))
+
+    def get_enum_value(self, chan_id: int) -> str:
+        """ Get the String value currently held by an enum channel. """
+
+        enum_type = self.enum_channel_types[chan_id]
+        enum_def = self.enum_registry.get_item(enum_type)
+        assert enum_def is not None
+        return enum_def.get_str(self.get_value(chan_id))
 
     def set_enum_now(self, channel_id: int, data: str) -> None:
         """ Set an enum channel with the provided value, assign time. """
@@ -66,13 +113,7 @@ class TelemetryEnvironment(ChannelEnvironment):
 
         chan = self.channel_registry.get_item(channel_id)
         assert chan is not None
-        assert chan.set(data, self.time)
-
-    def advance_time(self, amount: float) -> None:
-        """ Advance environment-time by a specified amount. """
-
-        with self.lock:
-            self.time += amount
+        assert chan.set(data, self.get_time())
 
     def add_from_enum(self, enum_class: Type[Enum]) -> int:
         """ Add an enumeration from an enum class. """
@@ -94,4 +135,4 @@ class TelemetryEnvironment(ChannelEnvironment):
     def dispatch_now(self, should_log: bool = True) -> int:
         """ Dispatch telemetry at the current time. """
 
-        return self.dispatch(self.time, should_log)
+        return self.dispatch(self.get_time(), should_log)

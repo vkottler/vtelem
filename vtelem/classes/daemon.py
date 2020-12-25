@@ -69,7 +69,8 @@ class Daemon:
             if self.state == state:
                 return
             if self.function["state_change"] is not None:
-                self.function["state_change"](self.state, state)
+                self.function["state_change"](self.state, state,
+                                              self.function["time"]())
             self.state = state
 
     def get_state(self) -> DaemonState:
@@ -77,6 +78,11 @@ class Daemon:
 
         with self.lock:
             return self.state
+
+    def get_state_str(self) -> str:
+        """ Get the current state as a String. """
+
+        return self.get_state().name.lower()
 
     def run(self, *args, **kwargs) -> None:
         """ Runs this daemon's thread, until stop is requested. """

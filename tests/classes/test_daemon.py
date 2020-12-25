@@ -10,14 +10,8 @@ import time
 from vtelem.classes.daemon import DaemonState, Daemon
 
 
-def basic_task():
-    """ Sample daemon task. """
-
-    print("test!")
-
-
 def test_daemon_callbacks():
-    """ TODO """
+    """ Test the daemon's callback functions. """
 
     curr_time = float()
     task_rate = 0.1
@@ -59,7 +53,8 @@ def test_daemon_callbacks():
         nonlocal task_rate
         assert rate == task_rate
 
-    def state_change(prev_state: DaemonState, curr_state: DaemonState) -> None:
+    def state_change(prev_state: DaemonState, curr_state: DaemonState,
+                     _: float) -> None:
         """ Example state-change callback. """
         assert prev_state != curr_state
 
@@ -71,6 +66,12 @@ def test_daemon_callbacks():
     assert daemon.start(*args, **kwargs)
     time.sleep(0.5)
     assert daemon.stop()
+
+
+def basic_task():
+    """ Sample daemon task. """
+
+    print("test!")
 
 
 def test_daemon_basic():

@@ -7,7 +7,6 @@ vtelem - Exposes a runtime environment for managing sets of channels.
 import logging
 from typing import Any, List, Tuple, Dict, Optional
 from queue import Queue
-import threading
 
 # internal
 from vtelem.enums.primitive import Primitive
@@ -19,20 +18,22 @@ from .channel_registry import ChannelRegistry
 from .channel_frame import ChannelFrame
 from .channel_framer import ChannelFramer, FRAME_TYPES
 from .event_queue import EventQueue
+from .time_entity import TimeEntity
 
 LOG = logging.getLogger(__name__)
 
 
-class ChannelEnvironment:
+class ChannelEnvironment(TimeEntity):
     """
     An environment for managing channels and building outgoing event and data
     frames.
     """
 
     def __init__(self, mtu: int, initial_channels: List[Channel] = None,
-                 metrics_rate: float = None) -> None:
+                 metrics_rate: float = None, init_time: float = None) -> None:
         """ Construct a new channel environment. """
 
+        super().__init__(init_time)
         self.channel_registry = ChannelRegistry(initial_channels)
         if initial_channels is None:
             initial_channels = []
@@ -40,7 +41,6 @@ class ChannelEnvironment:
                                     initial_channels)
         self.event_queue = EventQueue()
         self.frame_queue: Queue = Queue()
-        self.lock = threading.RLock()
 
         self.metrics: Optional[Dict[str, int]] = None
         if metrics_rate is not None:
@@ -76,7 +76,12 @@ class ChannelEnvironment:
         """ Get the value from a metrics channel. """
 
         assert self.metrics is not None
-        chan = self.channel_registry.get_item(self.metrics[name])
+        return self.get_value(self.metrics[name])
+
+    def get_value(self, chan_id: int) -> Any:
+        """ Get the current value of a channel, by integer identifier. """
+
+        chan = self.channel_registry.get_item(chan_id)
         assert chan is not None
         return chan.get()
 
@@ -84,7 +89,7 @@ class ChannelEnvironment:
         """ Set the rate of a metrics channel. """
 
         assert self.metrics is not None
-        self.set_rate(self.metrics[name], rate)
+        self.set_channel_rate(self.metrics[name], rate)
 
     def set_metric(self, name: str, data: Any, time: float = None) -> None:
         """ Set a metric channel to a specific value """
@@ -104,7 +109,7 @@ class ChannelEnvironment:
             assert chan is not None
             assert chan.add(data, time)
 
-    def set_rate(self, chan_id: int, rate: float) -> None:
+    def set_channel_rate(self, chan_id: int, rate: float) -> None:
         """ Set the update-rate of a channel. """
 
         chan = self.channel_registry.get_item(chan_id)

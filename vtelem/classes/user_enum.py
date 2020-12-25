@@ -11,6 +11,7 @@ from typing import Dict, Callable, Optional, Type
 
 # internal
 from vtelem.enums.primitive import get_size
+from vtelem.names import to_snake, class_to_snake
 from . import ENUM_TYPE
 from .type_primitive import TypePrimitive
 
@@ -24,7 +25,7 @@ class UserEnum(dict):
         super().__init__()
         self.enum: Dict[int, str] = defaultdict(lambda: "UNKNOWN")
         self.enum.update(values)
-        self.name = name
+        self.name = to_snake(name)
         assert len(self.enum) <= (2 ** (get_size(ENUM_TYPE) * 8))
 
         # maintain a reverse mapping for convenience
@@ -66,10 +67,9 @@ class UserEnum(dict):
 def from_enum(enum_class: Type[Enum]) -> UserEnum:
     """ From an enum class, create a user enum. """
 
-    name = enum_class.__name__.lower()
     values = {}
     for inst in enum_class:
         assert isinstance(inst.value, int)
         assert inst.value not in values
         values[inst.value] = inst.name.lower()
-    return UserEnum(name, values)
+    return UserEnum(class_to_snake(enum_class), values)

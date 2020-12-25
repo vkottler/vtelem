@@ -45,6 +45,10 @@ def test_environment_with_metrics():
 
     assert env.add_from_enum(EnumA) >= 0
 
+    chan = env.add_enum_channel("enum_chan", "enum_a", 1.0, True,
+                                ("b", float()))
+    assert env.get_enum_value(chan) == "b"
+
 
 def test_create_environment():
     """ Test that an environment can be created successfully. """
