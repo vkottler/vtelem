@@ -44,6 +44,12 @@ class ChannelEnvironment(TimeEntity):
 
         self.metrics: Optional[Dict[str, int]] = None
         if metrics_rate is not None:
+            self.register_base_metrics(metrics_rate)
+
+    def register_base_metrics(self, metrics_rate: float) -> None:
+        """ Register standard environment metric channels. """
+
+        if self.metrics is None:
             self.metrics = {}
             self.add_metric("metrics_rate", Primitive.FLOAT, False,
                             (metrics_rate, None))
@@ -61,16 +67,20 @@ class ChannelEnvironment(TimeEntity):
                             (0, None))
             self.set_metric("channel_count", self.channel_registry.count())
 
+    def has_metric(self, name: str) -> bool:
+        """ Check if a metric by a given name has already been registered. """
+
+        return self.metrics is not None and name in self.metrics
+
     def add_metric(self, name: str, instance: Primitive,
                    track_change: bool = False,
                    initial: Tuple[Any, Optional[float]] = None) -> None:
         """ Add a new, named metric channel """
 
-        assert self.metrics is not None
-        assert name not in self.metrics
-        self.metrics[name] = self.add_channel(name, instance, float(),
-                                              track_change, initial)
-        self.set_metric_rate(name, self.get_metric("metrics_rate"))
+        if self.metrics is not None and not self.has_metric(name):
+            self.metrics[name] = self.add_channel(name, instance, float(),
+                                                  track_change, initial)
+            self.set_metric_rate(name, self.get_metric("metrics_rate"))
 
     def get_metric(self, name: str) -> Any:
         """ Get the value from a metrics channel. """

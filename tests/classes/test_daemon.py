@@ -53,13 +53,8 @@ def test_daemon_callbacks():
         nonlocal task_rate
         assert rate == task_rate
 
-    def state_change(prev_state: DaemonState, curr_state: DaemonState,
-                     _: float) -> None:
-        """ Example state-change callback. """
-        assert prev_state != curr_state
-
-    daemon = Daemon(daemon_task, task_rate, time_fn, sleep, "test",
-                    iter_overrun, iter_metrics, state_change)
+    daemon = Daemon("test", daemon_task, task_rate, time_fn, sleep,
+                    iter_overrun, iter_metrics)
     assert daemon.get_state() == DaemonState.IDLE
     args = ["arg1", "arg2", "arg3"]
     kwargs = {"kwarg1": 1, "kwarg2": 2, "kwarg3": 3}
@@ -77,7 +72,7 @@ def basic_task():
 def test_daemon_basic():
     """ Test basic daemon functionality. """
 
-    daemon = Daemon(basic_task, 0.10, time.time, time.sleep, "test")
+    daemon = Daemon("test", basic_task, 0.10, time.time, time.sleep)
     assert daemon.get_state() == DaemonState.IDLE
     daemon.set_state(DaemonState.IDLE)
     assert daemon.start()

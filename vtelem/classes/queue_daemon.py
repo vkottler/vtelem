@@ -14,8 +14,8 @@ from .daemon_base import DaemonBase
 class QueueDaemon(DaemonBase):
     """ Implements a daemon thread for servicing queues. """
 
-    def __init__(self, input_stream: Queue, elem_handle: Callable,
-                 name: str = None) -> None:
+    def __init__(self, name: str, input_stream: Queue,
+                 elem_handle: Callable) -> None:
         """ Construct a new queue daemon. """
 
         super().__init__(name)

@@ -30,8 +30,8 @@ class TimeKeeper(Daemon):
 
         self.time_function = time_fn
         self.sleep_function = sleep_fn
-        super().__init__(self.iteration, rate, self.time_function,
-                         self.sleep_function, "time")
+        super().__init__("time", self.iteration, rate, self.time_function,
+                         self.sleep_function)
         self.slaves: List[TimeEntity] = []
         self.scalar = real_scalar
         assert self.scalar >= 0.0

@@ -13,10 +13,11 @@ def test_telemetry_daemon_basic():
 
     keeper = TimeKeeper(0.05)
     daemon = TelemetryDaemon(2 ** 8, 0.5, keeper, 1.0)
+    assert daemon.env is not None
     assert keeper.start()
     assert daemon.start()
     keeper.sleep(1.0)
-    assert daemon.get_enum_metric("daemon") == "running"
+    assert daemon.get_enum_metric(daemon.get_metric_name("state")) == "running"
     keeper.sleep(1.0)
     assert daemon.stop()
     assert keeper.stop()

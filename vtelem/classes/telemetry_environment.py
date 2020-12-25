@@ -64,11 +64,11 @@ class TelemetryEnvironment(ChannelEnvironment):
                         initial: Tuple[str, Optional[float]] = None) -> None:
         """ Add a metric based on an enumeration definition. """
 
-        assert self.metrics is not None
-        assert name not in self.metrics
-        self.metrics[name] = self.add_enum_channel(name, enum_name, float(),
-                                                   track_change, initial)
-        self.set_metric_rate(name, self.get_metric("metrics_rate"))
+        if self.metrics is not None and not self.has_metric(name):
+            self.metrics[name] = self.add_enum_channel(name, enum_name,
+                                                       float(), track_change,
+                                                       initial)
+            self.set_metric_rate(name, self.get_metric("metrics_rate"))
 
     def set_enum_metric(self, name: str, data: str,
                         time: float = None) -> None:

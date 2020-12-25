@@ -23,7 +23,7 @@ def test_queue_daemon_basic():
         count += queue_elem
 
     test_queue = Queue()
-    daemon = QueueDaemon(test_queue, handle_elem, "queue_test")
+    daemon = QueueDaemon("queue_test", test_queue, handle_elem)
     assert daemon.start()
     test_queue.put(1)
     test_queue.put(2)
