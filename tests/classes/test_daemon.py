@@ -8,6 +8,7 @@ import time
 
 # module under test
 from vtelem.classes.daemon import DaemonState, Daemon
+from vtelem.classes.daemon_base import DaemonOperation
 
 
 def test_daemon_callbacks():
@@ -87,3 +88,13 @@ def test_daemon_basic():
     time.sleep(0.2)
     assert daemon.stop()
     assert not daemon.stop()
+    assert daemon.start()
+    time.sleep(0.2)
+    assert daemon.restart()
+    time.sleep(0.2)
+    assert daemon.stop()
+    assert not daemon.restart()
+
+    assert daemon.perform(DaemonOperation.START)
+    time.sleep(0.2)
+    assert daemon.perform(DaemonOperation.STOP)

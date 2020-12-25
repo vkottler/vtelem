@@ -26,6 +26,17 @@ class DaemonState(Enum):
     STOPPING = 5
 
 
+class DaemonOperation(Enum):
+    """ A declaration of the actions that can be performed on a daemon. """
+
+    NONE = 0
+    START = 1
+    STOP = 2
+    PAUSE = 3
+    UNPAUSE = 4
+    RESTART = 5
+
+
 class DaemonBase:
     """ A base class for building worker threads. """
 
@@ -61,6 +72,29 @@ class DaemonBase:
                                      class_to_snake(DaemonState), True)
 
         self.set_state(DaemonState.IDLE)
+
+        # set up the actions data
+        default: dict = defaultdict(lambda: {"action": lambda: False,
+                                             "takes_args": False})
+        self.daemon_ops: Dict[DaemonOperation, dict] = default
+        self.daemon_ops[DaemonOperation.START] = {"action": self.start,
+                                                  "takes_args": True}
+        self.daemon_ops[DaemonOperation.STOP] = {"action": self.stop,
+                                                 "takes_args": False}
+        self.daemon_ops[DaemonOperation.PAUSE] = {"action": self.pause,
+                                                  "takes_args": False}
+        self.daemon_ops[DaemonOperation.UNPAUSE] = {"action": self.unpause,
+                                                    "takes_args": False}
+        self.daemon_ops[DaemonOperation.RESTART] = {"action": self.restart,
+                                                    "takes_args": True}
+
+    def perform(self, action: DaemonOperation, *args, **kwargs) -> bool:
+        """ Perform an action by enum. """
+
+        operation = self.daemon_ops[action]
+        if not operation["takes_args"]:
+            return operation["action"]()
+        return operation["action"](*args, **kwargs)
 
     def get_metric_name(self, channel_name: str) -> str:
         """ Build the name of a metric channel for this daemon. """
@@ -196,6 +230,13 @@ class DaemonBase:
                 except KeyError:
                     pass
                 return True
+        return False
+
+    def restart(self, *args, **kwargs) -> bool:
+        """ Attempt to restart this daemon. """
+
+        if self.stop():
+            return self.start(*args, **kwargs)
         return False
 
     def stop(self) -> bool:

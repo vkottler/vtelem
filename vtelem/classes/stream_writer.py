@@ -48,7 +48,7 @@ class StreamWriter(QueueDaemon):
             result = self.curr_id
             self.streams[result] = stream
             self.curr_id += 1
-            self.increment_metric("stream_count")
+        self.increment_metric("stream_count")
         return result
 
     def remove_stream(self, stream_id: int) -> bool:
@@ -58,5 +58,6 @@ class StreamWriter(QueueDaemon):
             result = stream_id in self.streams
             if result:
                 del self.streams[stream_id]
+        if result:
             self.decrement_metric("stream_count")
         return result
