@@ -79,7 +79,7 @@ class TimeKeeper(Daemon):
 
         with self.lock:
             delta = self.time_function() - self.time_raw
-            self.time_raw = delta * self.scalar
+            self.time_raw += delta * self.scalar
             return self.time_raw
 
     def sleep(self, amount: float) -> None:

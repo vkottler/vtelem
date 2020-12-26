@@ -245,15 +245,19 @@ class DaemonBase:
         """
 
         # make sure we're in the correct state to attempt a stop
+        should_stop = False
         with self.lock:
             if self.state == DaemonState.RUNNING:
                 self.set_state(DaemonState.STOPPING)
-                try:
-                    self.function["inject_stop"]()
-                except KeyError:
-                    pass
-                return True
-        return False
+                should_stop = True
+
+        if should_stop:
+            try:
+                self.function["inject_stop"]()
+            except KeyError:
+                pass
+
+        return should_stop
 
     def restart(self, *args, **kwargs) -> bool:
         """ Attempt to restart this daemon. """
