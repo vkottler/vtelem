@@ -14,7 +14,8 @@ class TimeEntity:
         """ Construct a new time entity. """
 
         self.time: float = init_time if init_time is not None else float()
-        self.lock = threading.RLock()
+        if not hasattr(self, "lock"):
+            self.lock = threading.RLock()
 
     def advance_time(self, amount: float) -> None:
         """ Advance this entity's time by a specified amount. """

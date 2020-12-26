@@ -12,7 +12,7 @@ def test_telemetry_daemon_basic():
     """ Test basic starting-up of a telemetry daemon. """
 
     keeper = TimeKeeper(0.05)
-    daemon = TelemetryDaemon(2 ** 8, 0.5, keeper, 1.0)
+    daemon = TelemetryDaemon("test_telemetry", 2 ** 8, 0.5, keeper, 1.0)
     assert daemon.env is not None
     assert keeper.start()
     assert daemon.start()

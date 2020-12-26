@@ -37,6 +37,20 @@ class DaemonOperation(Enum):
     RESTART = 5
 
 
+def operation_str(operation: DaemonOperation) -> str:
+    """ Convert an operation enum to a String. """
+    return operation.name.lower()
+
+
+def str_to_operation(operation: str) -> Optional[DaemonOperation]:
+    """ Find an operation enum based on the provided stream. """
+
+    for known_op in DaemonOperation:
+        if operation_str(known_op) == operation.lower():
+            return known_op
+    return None
+
+
 class DaemonBase:
     """ A base class for building worker threads. """
 
@@ -55,7 +69,8 @@ class DaemonBase:
         self.function["track_metric_changes"] = False
         self.function["time"] = get_time_fn
         self.function["metrics_data"] = defaultdict(lambda: 0)
-        self.lock = threading.RLock()
+        if not hasattr(self, "lock"):
+            self.lock = threading.RLock()
         self.thread: Optional[threading.Thread] = None
 
         # register and reset standard metrics
@@ -95,6 +110,14 @@ class DaemonBase:
         if not operation["takes_args"]:
             return operation["action"]()
         return operation["action"](*args, **kwargs)
+
+    def perform_str(self, action: str, *args, **kwargs) -> bool:
+        """ Perform an action on this daemon by String. """
+
+        operation = str_to_operation(action)
+        if operation is None:
+            return False
+        return self.perform(operation, *args, **kwargs)
 
     def get_metric_name(self, channel_name: str) -> str:
         """ Build the name of a metric channel for this daemon. """

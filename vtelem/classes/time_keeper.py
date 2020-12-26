@@ -5,7 +5,6 @@ vtelem - A class for managing application time.
 
 # built-in
 import time
-import threading
 from typing import Callable, List
 
 # internal
@@ -35,7 +34,6 @@ class TimeKeeper(Daemon):
         self.slaves: List[TimeEntity] = []
         self.scalar = real_scalar
         assert self.scalar >= 0.0
-        self.lock = threading.RLock()
         self.time_raw = self.time_function()
 
     def iteration(self) -> None:

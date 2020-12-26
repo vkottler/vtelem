@@ -17,8 +17,8 @@ from .user_enum import UserEnum
 class TelemetryDaemon(TelemetryEnvironment, Daemon):
     """ Wraps the telemetry-environment capability into a runtime daemon. """
 
-    def __init__(self, mtu: int, rate: float, time_keeper: TimeKeeper,
-                 metrics_rate: float = None,
+    def __init__(self, name: str, mtu: int, rate: float,
+                 time_keeper: TimeKeeper, metrics_rate: float = None,
                  initial_channels: List[Channel] = None,
                  initial_enums: List[UserEnum] = None) -> None:
         """ Construct a new telemetry daemon. """
@@ -32,5 +32,5 @@ class TelemetryDaemon(TelemetryEnvironment, Daemon):
         # metrics function
 
         # initialize the daemon
-        Daemon.__init__(self, "telemetry", self.dispatch_now, rate,
-                        self.get_time, time_keeper.sleep, None, None, self)
+        Daemon.__init__(self, name, self.dispatch_now, rate, self.get_time,
+                        time_keeper.sleep, None, None, self)
