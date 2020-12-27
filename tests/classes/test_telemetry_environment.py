@@ -4,7 +4,6 @@ vtelem - Test the telemetry environment's correctness.
 """
 
 # built-in
-from enum import Enum
 import time
 
 # module under test
@@ -12,6 +11,9 @@ from vtelem.classes.channel import Channel
 from vtelem.classes.telemetry_environment import TelemetryEnvironment
 from vtelem.classes.user_enum import UserEnum
 from vtelem.enums.primitive import Primitive
+
+# internal
+from . import EnumA
 
 
 def test_environment_with_metrics():
@@ -36,12 +38,6 @@ def test_environment_with_metrics():
                 found = True
                 break
         assert found
-
-    class EnumA(Enum):
-        """ Sample enumeration. """
-        A = 0
-        B = 1
-        C = 2
 
     assert env.add_from_enum(EnumA) >= 0
 

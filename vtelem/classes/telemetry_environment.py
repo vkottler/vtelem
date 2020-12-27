@@ -6,7 +6,7 @@ vtelem - An environment that supports management of telemetry.
 # built-in
 from collections import defaultdict
 from enum import Enum
-from typing import Any, List, Dict, Type, Tuple, Optional
+from typing import List, Dict, Type, Tuple, Optional
 
 # internal
 from vtelem.enums.primitive import Primitive
@@ -108,13 +108,6 @@ class TelemetryEnvironment(ChannelEnvironment):
         assert enum_def is not None
         self.set_now(channel_id, enum_def.get_value(data))
 
-    def set_now(self, channel_id: int, data: Any) -> None:
-        """ set a channel with the provided value, assign time. """
-
-        chan = self.channel_registry.get_item(channel_id)
-        assert chan is not None
-        assert chan.set(data, self.get_time())
-
     def add_from_enum(self, enum_class: Type[Enum]) -> int:
         """ Add an enumeration from an enum class. """
 
@@ -131,8 +124,3 @@ class TelemetryEnvironment(ChannelEnvironment):
                 self.set_metric("enum_count", self.enum_registry.count())
                 self.set_metric("type_count", self.type_registry.count())
         return result[1]
-
-    def dispatch_now(self, should_log: bool = True) -> int:
-        """ Dispatch telemetry at the current time. """
-
-        return self.dispatch(self.get_time(), should_log)

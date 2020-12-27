@@ -88,6 +88,13 @@ class ChannelEnvironment(TimeEntity):
         assert self.metrics is not None
         return self.get_value(self.metrics[name])
 
+    def set_now(self, channel_id: int, data: Any) -> None:
+        """ set a channel with the provided value, assign time. """
+
+        chan = self.channel_registry.get_item(channel_id)
+        assert chan is not None
+        assert chan.set(data, self.get_time())
+
     def get_value(self, chan_id: int) -> Any:
         """ Get the current value of a channel, by integer identifier. """
 
@@ -208,3 +215,8 @@ class ChannelEnvironment(TimeEntity):
             self.metric_add("frames_created", result[0], time)
             self.metric_add("emits_captured", result[1], time)
         return result
+
+    def dispatch_now(self, should_log: bool = True) -> int:
+        """ Dispatch telemetry at the current time. """
+
+        return self.dispatch(self.get_time(), should_log)

@@ -19,19 +19,26 @@ from .type_primitive import TypePrimitive
 class UserEnum(dict):
     """ A container for runtime, user-defined enumerations. """
 
-    def __init__(self, name: str, values: Dict[int, str]) -> None:
+    def __init__(self, name: str, values: Dict[int, str],
+                 default: str = None) -> None:
         """ Build a runtime enumeration. """
 
         super().__init__()
         self.enum: Dict[int, str] = defaultdict(lambda: "UNKNOWN")
         self.enum.update(values)
         self.name = to_snake(name)
-        assert len(self.enum) <= (2 ** (get_size(ENUM_TYPE) * 8))
+        assert len(self.enum.keys()) <= (2 ** (get_size(ENUM_TYPE) * 8))
+        assert len(self.enum.keys()) > 0
 
         # maintain a reverse mapping for convenience
         self.strings: Dict[str, Optional[int]] = defaultdict(lambda: None)
         for key, val in self.enum.items():
             self.strings[val] = key
+
+        # set a viable default value
+        val = default if default is not None else list(self.strings.keys())[0]
+        assert val is not None
+        self.default_val = val
 
     def get_str(self, val: int) -> str:
         """ Look up the String represented by the integer enum value. """
@@ -44,6 +51,11 @@ class UserEnum(dict):
         result = self.strings[val]
         assert result is not None
         return result
+
+    def default(self) -> str:
+        """ Get the default value for this enum. """
+
+        return self.default_val
 
     def get_primitive(self, value: str,
                       changed_cb: Callable = None) -> TypePrimitive:
