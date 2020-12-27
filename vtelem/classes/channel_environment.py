@@ -6,7 +6,6 @@ vtelem - Exposes a runtime environment for managing sets of channels.
 # built-in
 import logging
 from typing import Any, List, Tuple, Dict, Optional
-from queue import Queue
 
 # internal
 from vtelem.enums.primitive import Primitive
@@ -18,6 +17,7 @@ from .channel_registry import ChannelRegistry
 from .channel_frame import ChannelFrame
 from .channel_framer import ChannelFramer, FRAME_TYPES
 from .event_queue import EventQueue
+from .metered_queue import MeteredQueue
 from .time_entity import TimeEntity
 
 LOG = logging.getLogger(__name__)
@@ -39,12 +39,12 @@ class ChannelEnvironment(TimeEntity):
             initial_channels = []
         self.framer = ChannelFramer(mtu, self.channel_registry,
                                     initial_channels)
-        self.event_queue = EventQueue()
-        self.frame_queue: Queue = Queue()
 
         self.metrics: Optional[Dict[str, int]] = None
+        self.event_queue = EventQueue()
         if metrics_rate is not None:
             self.register_base_metrics(metrics_rate)
+        self.frame_queue: MeteredQueue = MeteredQueue("frame", self)
 
     def register_base_metrics(self, metrics_rate: float) -> None:
         """ Register standard environment metric channels. """
@@ -54,10 +54,6 @@ class ChannelEnvironment(TimeEntity):
             self.add_metric("metrics_rate", Primitive.FLOAT, False,
                             (metrics_rate, None))
             self.add_metric("channel_count", Primitive.UINT32, True,
-                            (0, None))
-            self.add_metric("frames_created", Primitive.UINT32, True,
-                            (0, None))
-            self.add_metric("frames_consumed", Primitive.UINT32, True,
                             (0, None))
             self.add_metric("events_captured", Primitive.UINT32, True,
                             (0, None))
@@ -105,14 +101,13 @@ class ChannelEnvironment(TimeEntity):
     def set_metric_rate(self, name: str, rate: float) -> None:
         """ Set the rate of a metrics channel. """
 
-        assert self.metrics is not None
-        self.set_channel_rate(self.metrics[name], rate)
+        if self.metrics is not None:
+            self.set_channel_rate(self.metrics[name], rate)
 
     def set_metric(self, name: str, data: Any, time: float = None) -> None:
         """ Set a metric channel to a specific value """
 
-        assert self.metrics is not None
-        if name in self.metrics:
+        if self.metrics is not None and name in self.metrics:
             chan = self.channel_registry.get_item(self.metrics[name])
             assert chan is not None
             assert chan.set(data, time)
@@ -120,8 +115,7 @@ class ChannelEnvironment(TimeEntity):
     def metric_add(self, name: str, data: Any, time: float = None) -> None:
         """ Add a value to a metric channel. """
 
-        assert self.metrics is not None
-        if name in self.metrics:
+        if self.metrics is not None and name in self.metrics:
             chan = self.channel_registry.get_item(self.metrics[name])
             assert chan is not None
             assert chan.add(data, time)
@@ -149,8 +143,8 @@ class ChannelEnvironment(TimeEntity):
             result = self.channel_registry.add_channel(new_chan)
             assert result[0]
             self.framer.add_channel(new_chan)
-        if self.metrics is not None:
-            self.metric_add("channel_count", 1)
+
+        self.metric_add("channel_count", 1)
         return result[1]
 
     def dispatch(self, time: float, should_log: bool = True) -> int:
@@ -159,8 +153,8 @@ class ChannelEnvironment(TimeEntity):
         with self.lock:
             data = self.dispatch_data(time)
             events = self.dispatch_events(time)
-            if self.metrics is not None:
-                self.metric_add("dispatch_count", 1)
+            self.metric_add("dispatch_count", 1)
+
         if data[1] and should_log:
             LOG.debug("%.3f: %d emits", time, data[1])
         if events[1] and should_log:
@@ -174,8 +168,6 @@ class ChannelEnvironment(TimeEntity):
         """ Get the next available frame from the queue. """
 
         frame = self.frame_queue.get()
-        if self.metrics is not None:
-            self.metric_add("frames_consumed", 1)
         return frame
 
     def decode_frame(self, data: bytearray, size: int) -> dict:
@@ -202,18 +194,14 @@ class ChannelEnvironment(TimeEntity):
 
         result = self.framer.build_event_frames(time, self.event_queue,
                                                 self.frame_queue)
-        if self.metrics is not None:
-            self.metric_add("frames_created", result[0], time)
-            self.metric_add("events_captured", result[1], time)
+        self.metric_add("events_captured", result[1], time)
         return result
 
     def dispatch_data(self, time: float) -> Tuple[int, int]:
         """ Process all channel emissions for the specified, absolute time. """
 
         result = self.framer.build_data_frames(time, self.frame_queue)
-        if self.metrics is not None:
-            self.metric_add("frames_created", result[0], time)
-            self.metric_add("emits_captured", result[1], time)
+        self.metric_add("emits_captured", result[1], time)
         return result
 
     def dispatch_now(self, should_log: bool = True) -> int:

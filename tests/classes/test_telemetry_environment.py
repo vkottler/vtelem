@@ -29,8 +29,13 @@ def test_environment_with_metrics():
     assert frame_data["type"] == "DATA"
 
     # make sure all the metrics can be found in the frame
-    expected_metrics = ["metrics_rate", "channel_count", "frames_created",
-                        "frames_consumed", "events_captured", "emits_captured"]
+    expected_metrics = ["metrics_rate",
+                        "channel_count",
+                        "events_captured",
+                        "emits_captured",
+                        "frame_queue.elements",
+                        "frame_queue.total_enqueued",
+                        "frame_queue.total_dequeued"]
     for metric in expected_metrics:
         found = False
         for chan in frame_data["channels"]:
