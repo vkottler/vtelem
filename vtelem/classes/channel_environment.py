@@ -33,7 +33,7 @@ class ChannelEnvironment(TimeEntity):
                  metrics_rate: float = None, init_time: float = None) -> None:
         """ Construct a new channel environment. """
 
-        super().__init__(init_time)
+        TimeEntity.__init__(self, init_time)
         self.channel_registry = ChannelRegistry(initial_channels)
         if initial_channels is None:
             initial_channels = []

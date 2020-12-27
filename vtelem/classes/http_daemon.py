@@ -8,11 +8,12 @@ vtelem - Exposes a base class for building http services that can be managed
 from http.server import (
     BaseHTTPRequestHandler, ThreadingHTTPServer, SimpleHTTPRequestHandler
 )
-from typing import Type, Callable, Tuple
+from typing import Type, Tuple
 
 # internal
 from .daemon_base import DaemonBase, DaemonState
 from .telemetry_environment import TelemetryEnvironment
+from .time_keeper import TimeKeeper
 
 
 class HttpDaemon(DaemonBase):
@@ -20,8 +21,8 @@ class HttpDaemon(DaemonBase):
 
     def __init__(self, name: str, address: Tuple[str, int] = None,
                  handler_class: Type[BaseHTTPRequestHandler] = None,
-                 get_time_fn: Callable = None,
-                 env: TelemetryEnvironment = None):
+                 env: TelemetryEnvironment = None,
+                 time_keeper: TimeKeeper = None):
         """
         Construct a new HTTP daemon, which is a wrapper for the built-in
         server.
@@ -34,7 +35,7 @@ class HttpDaemon(DaemonBase):
         if handler_class is None:
             handler_class = SimpleHTTPRequestHandler
 
-        super().__init__(name, get_time_fn, env)
+        super().__init__(name, env, time_keeper)
         self.server = ThreadingHTTPServer(address, handler_class)
         self.closed = False
 

@@ -23,13 +23,13 @@ class DaemonManager:
 
         self.daemons: Dict[str, DaemonBase] = {}
 
-    def add_daemon(self, name: str, daemon: DaemonBase) -> bool:
+    def add_daemon(self, daemon: DaemonBase) -> bool:
         """ Add a daemon to this manager. """
 
+        name = daemon.name
         if name in self.daemons:
             LOG.error("can't register daemon '%s', name is registered.", name)
             return False
-
         self.daemons[name] = daemon
         return True
 

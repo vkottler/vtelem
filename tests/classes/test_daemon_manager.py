@@ -13,10 +13,10 @@ def test_daemon_manager_basic():
     """ Test management of basic tasks. """
 
     manager = DaemonManager()
-    manager.add_daemon("test1", TimeKeeper(0.05))
-    manager.add_daemon("test2", TimeKeeper(0.05))
-    manager.add_daemon("test3", TimeKeeper(0.05))
-    assert not manager.add_daemon("test3", TimeKeeper(0.05))
+    manager.add_daemon(TimeKeeper("test1", 0.05))
+    manager.add_daemon(TimeKeeper("test2", 0.05))
+    manager.add_daemon(TimeKeeper("test3", 0.05))
+    assert not manager.add_daemon(TimeKeeper("test3", 0.05))
     assert manager.perform_all(DaemonOperation.START)
     assert manager.perform_all(DaemonOperation.STOP)
     assert not manager.perform_all(DaemonOperation.STOP)

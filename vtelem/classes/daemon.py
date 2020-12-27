@@ -4,7 +4,8 @@ vtelem - Implements management of a synchronous task.
 """
 
 # built-in
-from typing import Callable
+import time
+from typing import Callable, Any
 
 # internal
 from .daemon_base import DaemonBase, DaemonState
@@ -18,18 +19,21 @@ class Daemon(DaemonBase):
     """
 
     def __init__(self, name: str, task: Callable, rate: float,
-                 get_time_fn: Callable, sleep_fn: Callable,
                  iter_overrun_cb: Callable = None,
                  state_change_cb: Callable = None,
-                 env: TelemetryEnvironment = None) -> None:
+                 env: TelemetryEnvironment = None,
+                 time_keeper: Any = None) -> None:
         """ Create a new daemon. """
 
-        super().__init__(name, get_time_fn, env)
+        super().__init__(name, env, time_keeper)
         self.function["task"] = task
-        self.function["sleep"] = sleep_fn
+        self.function["sleep"] = time.sleep
+        if time_keeper is not None:
+            self.function["sleep"] = time_keeper.sleep
         self.function["rate"] = rate
         self.function["overrun"] = iter_overrun_cb
-        self.function["state_change"] = state_change_cb
+        if state_change_cb is not None:
+            self.function["state_change"] = state_change_cb
 
     def run(self, *args, **kwargs) -> None:
         """ Runs this daemon's thread, until stop is requested. """
@@ -44,12 +48,12 @@ class Daemon(DaemonBase):
                 continue
 
             # run the iteration
-            iter_start = self.function["time"]()
+            iter_start = self.get_time()
             self.function["task"](*args, **kwargs)
-            iter_end = self.function["time"]()
+            iter_end = self.get_time()
 
             # await the next iteration
-            sleep_amount = rate - (self.function["time"]() - iter_start)
+            sleep_amount = rate - (self.get_time() - iter_start)
             if sleep_amount > 0.0:
                 self.function["sleep"](sleep_amount)
             elif self.function["overrun"] is not None:

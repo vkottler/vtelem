@@ -6,13 +6,18 @@ vtelem - A base for building runtime tasks.
 # built-in
 from collections import defaultdict
 from enum import Enum
+import logging
 import threading
-from typing import Any, Callable, Dict, Optional
+import time
+from typing import Any, Dict, Optional
 
 # internal
 from vtelem.names import class_to_snake
 from . import METRIC_PRIM
 from .telemetry_environment import TelemetryEnvironment
+from .time_entity import TimeEntity
+
+LOG = logging.getLogger(__name__)
 
 
 class DaemonState(Enum):
@@ -51,26 +56,26 @@ def str_to_operation(operation: str) -> Optional[DaemonOperation]:
     return None
 
 
-class DaemonBase:
+class DaemonBase(TimeEntity):
     """ A base class for building worker threads. """
 
-    def __init__(self, name: str, get_time_fn: Callable = None,
-                 env: TelemetryEnvironment = None):
+    def __init__(self, name: str, env: TelemetryEnvironment = None,
+                 time_keeper: Any = None):
         """
         Construct a base daemon, supports implementations of tasks that can
         be started, stopped, paused etc. at runtime.
         """
 
+        super().__init__()
+        if time_keeper is not None:
+            time_keeper.add_slave(self)
         self.state: DaemonState = DaemonState.ERROR
         assert name != ""
         self.name = name
         self.env = env
         self.function: Dict[str, Any] = {}
         self.function["track_metric_changes"] = False
-        self.function["time"] = get_time_fn
         self.function["metrics_data"] = defaultdict(lambda: 0)
-        if not hasattr(self, "lock"):
-            self.lock = threading.RLock()
         self.thread: Optional[threading.Thread] = None
 
         # register and reset standard metrics
@@ -79,6 +84,14 @@ class DaemonBase:
         self.reset_metric("pauses")
         self.reset_metric("unpauses")
         self.reset_metric("count")
+
+        def default_state_change(prev_state: DaemonState, state: DaemonState,
+                                 time_val: float) -> None:
+            """ By default, log state changes for a daemon. """
+            LOG.info("%s: %s -> %s", time.ctime(time_val),
+                     prev_state.name.lower(), state.name.lower())
+
+        self.function["state_change"] = default_state_change
 
         # add a metric channel for the overall state
         if self.env is not None:
@@ -130,33 +143,23 @@ class DaemonBase:
         with self.lock:
             if self.state == state:
                 return
-            try:
-                self.function["state_change"](self.state, state,
-                                              self.function["time"]())
-            except (KeyError, TypeError):
-                pass
+            self.function["state_change"](self.state, state, self.get_time())
             self.state = state
 
             # set the metric channel
             if self.env is not None:
-                time: Optional[float] = None
-                if "time" in self.function:
-                    time = self.function["time"]()
                 self.env.set_enum_metric(self.get_metric_name("state"),
-                                         self.get_state_str(), time)
+                                         self.get_state_str(), self.get_time())
 
     def set_env_metric(self, name: str, value: Any) -> None:
         """ Set a metric channel value if an environment is registered. """
 
         if self.env is not None:
-            time: Optional[float] = None
-            if "time" in self.function:
-                time = self.function["time"]()
             metric_name = self.get_metric_name(name)
             if not self.env.has_metric(metric_name):
                 self.env.add_metric(metric_name, METRIC_PRIM,
                                     self.function["track_metric_changes"])
-            self.env.set_metric(metric_name, value, time)
+            self.env.set_metric(metric_name, value, self.get_time())
 
     def reset_metric(self, name: str) -> None:
         """ Set a metric back to zero. """

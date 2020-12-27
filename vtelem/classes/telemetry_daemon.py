@@ -23,14 +23,11 @@ class TelemetryDaemon(TelemetryEnvironment, Daemon):
                  initial_enums: List[UserEnum] = None) -> None:
         """ Construct a new telemetry daemon. """
 
-        TelemetryEnvironment.__init__(self, mtu, time_keeper.time(),
+        TelemetryEnvironment.__init__(self, mtu, time_keeper.get_time(),
                                       metrics_rate, initial_channels,
                                       initial_enums)
-        time_keeper.add_slave(self)
 
         # overrun function
-        # metrics function
 
-        # initialize the daemon
-        Daemon.__init__(self, name, self.dispatch_now, rate, self.get_time,
-                        time_keeper.sleep, None, None, self)
+        Daemon.__init__(self, name, self.dispatch_now, rate, None, None, self,
+                        time_keeper)

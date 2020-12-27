@@ -9,24 +9,14 @@ import time
 # module under test
 from vtelem.classes.daemon import DaemonState, Daemon
 from vtelem.classes.daemon_base import DaemonOperation
+from vtelem.classes.time_keeper import TimeKeeper
 
 
 def test_daemon_callbacks():
     """ Test the daemon's callback functions. """
 
-    curr_time = float()
-    task_rate = 0.1
-
-    def sleep(sleep_time: float) -> None:
-        """ Example sleep function. """
-        nonlocal curr_time
-        curr_time += sleep_time
-        time.sleep(0.1)
-
-    def time_fn() -> float:
-        """ Example time-get function. """
-
-        return curr_time
+    keeper = TimeKeeper("time", 0.05)
+    assert keeper.start()
 
     def daemon_task(*args, **kwargs) -> None:
         """ Example daemon task. """
@@ -36,9 +26,14 @@ def test_daemon_callbacks():
         assert kwargs["kwarg1"] == 1
         assert kwargs["kwarg2"] == 2
         assert kwargs["kwarg3"] == 3
-        nonlocal curr_time
-        curr_time += 0.2
-        time.sleep(0.2)
+        keeper.sleep(0.2)
+
+    def state_change_cb(prev_state: DaemonState, state: DaemonState,
+                        _: float) -> None:
+        """ Example state-change function. """
+        assert prev_state != state
+
+    task_rate = 0.05
 
     def iter_overrun(start: float, end: float, rate: float,
                      _: dict) -> None:
@@ -47,21 +42,15 @@ def test_daemon_callbacks():
         nonlocal task_rate
         assert rate == task_rate
 
-    def iter_metrics(start: float, end: float, rate: float,
-                     _: dict) -> None:
-        """ Example metrics consumer. """
-        assert end >= start
-        nonlocal task_rate
-        assert rate == task_rate
-
-    daemon = Daemon("test", daemon_task, task_rate, time_fn, sleep,
-                    iter_overrun, iter_metrics)
+    daemon = Daemon("test", daemon_task, task_rate, iter_overrun,
+                    state_change_cb, time_keeper=keeper)
     assert daemon.get_state() == DaemonState.IDLE
     args = ["arg1", "arg2", "arg3"]
     kwargs = {"kwarg1": 1, "kwarg2": 2, "kwarg3": 3}
     assert daemon.start(*args, **kwargs)
-    time.sleep(0.5)
+    keeper.sleep(0.5)
     assert daemon.stop()
+    assert keeper.stop()
 
 
 def basic_task():
@@ -73,7 +62,9 @@ def basic_task():
 def test_daemon_basic():
     """ Test basic daemon functionality. """
 
-    daemon = Daemon("test", basic_task, 0.10, time.time, time.sleep)
+    keeper = TimeKeeper("time", 0.05)
+    assert keeper.start()
+    daemon = Daemon("test", basic_task, 0.10, time.sleep, time_keeper=keeper)
     assert daemon.get_state() == DaemonState.IDLE
     daemon.set_state(DaemonState.IDLE)
     assert daemon.start()
@@ -81,6 +72,7 @@ def test_daemon_basic():
     time.sleep(0.1)
     assert daemon.pause()
     assert not daemon.pause()
+    time.sleep(0.1)
     daemon.set_rate(0.05)
     time.sleep(0.1)
     assert daemon.unpause()
@@ -103,3 +95,4 @@ def test_daemon_basic():
     time.sleep(0.1)
     assert daemon.perform_str("stop")
     assert not daemon.perform_str("not_an_op")
+    assert keeper.stop()
