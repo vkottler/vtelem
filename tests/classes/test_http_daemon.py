@@ -6,6 +6,9 @@ vtelem - Test the http daemon's correctness.
 # built-in
 from http.server import SimpleHTTPRequestHandler
 
+# third-party
+import requests
+
 # module under test
 from vtelem.classes.http_daemon import HttpDaemon
 
@@ -16,6 +19,8 @@ def test_http_daemon_basic():
     daemon = HttpDaemon("test_daemon", ("0.0.0.0", 0),
                         SimpleHTTPRequestHandler)
     assert daemon.start()
+    result = requests.get(daemon.get_base_url())
+    assert result.status_code == requests.codes["ok"]
     assert daemon.stop()
     assert daemon.close()
     assert not daemon.close()

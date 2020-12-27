@@ -35,6 +35,12 @@ class HttpDaemon(DaemonBase):
 
         self.function["inject_stop"] = stop_injector
 
+    def get_base_url(self) -> str:
+        """ Get this server's root url as a String. """
+
+        return "http://{}:{}/".format(self.server.server_address[0],
+                                      self.server.server_address[1])
+
     def close(self) -> bool:
         """ Close the server and clean up its resources. """
 
