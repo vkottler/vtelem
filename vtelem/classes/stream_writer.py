@@ -34,6 +34,7 @@ class StreamWriter(QueueDaemon):
                 for stream in self.streams.values():
                     stream.write(raw_frame)
                     self.increment_metric("stream_writes")
+                    self.increment_metric("bytes_written", size)
 
         super().__init__(name, frame_queue, frame_handle)
 

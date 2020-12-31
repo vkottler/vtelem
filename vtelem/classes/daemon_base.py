@@ -168,18 +168,18 @@ class DaemonBase(TimeEntity):
             self.function["metrics_data"][name] = 0
             self.set_env_metric(name, self.function["metrics_data"][name])
 
-    def increment_metric(self, name: str) -> None:
+    def increment_metric(self, name: str, value: int = 1) -> None:
         """ Increment a named metric. """
 
         with self.lock:
-            self.function["metrics_data"][name] += 1
+            self.function["metrics_data"][name] += value
             self.set_env_metric(name, self.function["metrics_data"][name])
 
-    def decrement_metric(self, name: str) -> None:
+    def decrement_metric(self, name: str, value: int = 1) -> None:
         """ Decrement a named metric. """
 
         with self.lock:
-            self.function["metrics_data"][name] -= 1
+            self.function["metrics_data"][name] -= value
             self.set_env_metric(name, self.function["metrics_data"][name])
 
     def get_state(self) -> DaemonState:
