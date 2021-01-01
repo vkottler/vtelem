@@ -70,8 +70,8 @@ class ByteBuffer:
 
         with self.lock:
             self.set_pos(self.get_pos() + amount)
-            if inc_size:
-                self.size += amount
+            if inc_size and (self.get_pos() > self.size):
+                self.size += self.get_pos() - self.size
 
     def get_pos(self) -> int:
         """ Obtain the current buffer position. """
@@ -101,7 +101,7 @@ class ByteBuffer:
         """ Add raw data to the end of this set. """
 
         with self.lock:
-            self.data = self.data[0:self.size] + other
+            self.data = self.data[0:self.size] + other[0:data_len]
             self.size += data_len
 
     def write(self, inst: Primitive, data: Any) -> int:

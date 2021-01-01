@@ -33,7 +33,7 @@ def test_daemon_callbacks():
         """ Example state-change function. """
         assert prev_state != state
 
-    task_rate = 0.05
+    task_rate = 0.1
 
     def iter_overrun(start: float, end: float, rate: float,
                      _: dict) -> None:
@@ -43,12 +43,12 @@ def test_daemon_callbacks():
         assert rate == task_rate
 
     daemon = Daemon("test", daemon_task, task_rate, iter_overrun,
-                    state_change_cb, time_keeper=keeper)
+                    state_change_cb, None, keeper)
     assert daemon.get_state() == DaemonState.IDLE
     args = ["arg1", "arg2", "arg3"]
     kwargs = {"kwarg1": 1, "kwarg2": 2, "kwarg3": 3}
     assert daemon.start(*args, **kwargs)
-    keeper.sleep(0.5)
+    keeper.sleep(1.0)
     assert daemon.stop()
     assert keeper.stop()
 

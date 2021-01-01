@@ -8,6 +8,7 @@ from queue import Queue
 from typing import Dict, Tuple, List
 
 # internal
+from vtelem.enums.primitive import Primitive
 from . import TIMESTAMP_PRIM
 from .channel import Channel
 from .channel_frame import ChannelFrame, time_to_int
@@ -145,3 +146,16 @@ class ChannelFramer:
             frame_count += 1
 
         return (frame_count, emit_count)
+
+
+def build_dummy_frame(overall_size: int) -> ChannelFrame:
+    """ Build an empty frame of a specified size. """
+
+    frame = ChannelFrame(overall_size, FRAME_TYPES.get_primitive("INVALID"),
+                         TypePrimitive(TIMESTAMP_PRIM))
+
+    while frame.add(0, Primitive.BOOL, False):
+        pass
+
+    assert frame.finalize() == overall_size
+    return frame

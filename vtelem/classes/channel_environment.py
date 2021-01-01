@@ -4,13 +4,14 @@ vtelem - Exposes a runtime environment for managing sets of channels.
 """
 
 # built-in
+from collections import defaultdict
 import logging
 from typing import Any, List, Tuple, Dict, Optional
 
 # internal
 from vtelem.enums.primitive import Primitive
 from vtelem.parsing import parse_data_frame, parse_event_frame
-from . import TIMESTAMP_PRIM, COUNT_PRIM, ENUM_TYPE
+from . import TIMESTAMP_PRIM, COUNT_PRIM, ENUM_TYPE, LOG_PERIOD
 from .byte_buffer import ByteBuffer
 from .channel import Channel
 from .channel_registry import ChannelRegistry
@@ -45,6 +46,14 @@ class ChannelEnvironment(TimeEntity):
         if metrics_rate is not None:
             self.register_base_metrics(metrics_rate)
         self.frame_queue: MeteredQueue = MeteredQueue("frame", self)
+        self.log_data: dict = defaultdict(lambda: 0.0)
+
+    def handle_new_mtu(self, new_mtu: int) -> None:
+        """ Set a new maximum transmission-unit size if necessary. """
+
+        with self.lock:
+            if new_mtu < self.framer.mtu:
+                self.framer.mtu = new_mtu
 
     def register_base_metrics(self, metrics_rate: float) -> None:
         """ Register standard environment metric channels. """
@@ -155,13 +164,22 @@ class ChannelEnvironment(TimeEntity):
             events = self.dispatch_events(time)
             self.metric_add("dispatch_count", 1)
 
-        if data[1] and should_log:
-            LOG.debug("%.3f: %d emits", time, data[1])
-        if events[1] and should_log:
-            LOG.debug("%.3f: %d events", time, events[1])
         total = data[0] + events[0]
-        if total and should_log:
-            LOG.debug("%.3f: %d frames", time, total)
+
+        self.log_data["emits"] += data[1]
+        self.log_data["events"] += events[1]
+        self.log_data["frames"] += total
+
+        if should_log:
+            if time - self.log_data["last_log"] >= LOG_PERIOD:
+                LOG.info("%.3f: %d emits, %d events, %d frames", time,
+                         self.log_data["emits"], self.log_data["events"],
+                         self.log_data["frames"])
+                self.log_data["emits"] = 0
+                self.log_data["events"] = 0
+                self.log_data["frames"] = 0
+                self.log_data["last_log"] = time
+
         return total
 
     def get_next_frame(self) -> ChannelFrame:

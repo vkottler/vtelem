@@ -29,10 +29,9 @@ class StreamWriter(QueueDaemon):
         def frame_handle(frame: ChannelFrame) -> None:
             """ Write this frame to all registered streams. """
             array, size = frame.raw()
-            raw_frame = array[0:size]
             with self.lock:
                 for stream in self.streams.values():
-                    stream.write(raw_frame)
+                    stream.write(array)
                     self.increment_metric("stream_writes")
                     self.increment_metric("bytes_written", size)
 

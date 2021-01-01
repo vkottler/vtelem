@@ -26,8 +26,5 @@ class TelemetryDaemon(TelemetryEnvironment, Daemon):
         TelemetryEnvironment.__init__(self, mtu, time_keeper.get_time(),
                                       metrics_rate, initial_channels,
                                       initial_enums)
-
-        # overrun function
-
         Daemon.__init__(self, name, self.dispatch_now, rate, None, None, self,
                         time_keeper)

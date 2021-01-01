@@ -12,6 +12,7 @@ import time
 from typing import Any, Dict, Optional
 
 # internal
+from vtelem.enums.primitive import Primitive
 from vtelem.names import class_to_snake
 from . import METRIC_PRIM
 from .telemetry_environment import TelemetryEnvironment
@@ -88,7 +89,7 @@ class DaemonBase(TimeEntity):
         def default_state_change(prev_state: DaemonState, state: DaemonState,
                                  time_val: float) -> None:
             """ By default, log state changes for a daemon. """
-            LOG.info("%s: %s -> %s", time.ctime(time_val),
+            LOG.info("%-10s - %s: %s -> %s", self.name, time.ctime(time_val),
                      prev_state.name.lower(), state.name.lower())
 
         self.function["state_change"] = default_state_change
@@ -151,13 +152,14 @@ class DaemonBase(TimeEntity):
                 self.env.set_enum_metric(self.get_metric_name("state"),
                                          self.get_state_str(), self.get_time())
 
-    def set_env_metric(self, name: str, value: Any) -> None:
+    def set_env_metric(self, name: str, value: Any,
+                       prim: Primitive = METRIC_PRIM) -> None:
         """ Set a metric channel value if an environment is registered. """
 
         if self.env is not None:
             metric_name = self.get_metric_name(name)
             if not self.env.has_metric(metric_name):
-                self.env.add_metric(metric_name, METRIC_PRIM,
+                self.env.add_metric(metric_name, prim,
                                     self.function["track_metric_changes"])
             self.env.set_metric(metric_name, value, self.get_time())
 
@@ -168,14 +170,14 @@ class DaemonBase(TimeEntity):
             self.function["metrics_data"][name] = 0
             self.set_env_metric(name, self.function["metrics_data"][name])
 
-    def increment_metric(self, name: str, value: int = 1) -> None:
+    def increment_metric(self, name: str, value: Any = 1) -> None:
         """ Increment a named metric. """
 
         with self.lock:
             self.function["metrics_data"][name] += value
             self.set_env_metric(name, self.function["metrics_data"][name])
 
-    def decrement_metric(self, name: str, value: int = 1) -> None:
+    def decrement_metric(self, name: str, value: Any = 1) -> None:
         """ Decrement a named metric. """
 
         with self.lock:
@@ -198,10 +200,14 @@ class DaemonBase(TimeEntity):
         Execute 'run' and ensure that the correct state transitions occur.
         """
 
-        self.set_state(DaemonState.RUNNING)
-        self.run(*args, **kwargs)
-        self.increment_metric("count")
-        self.set_state(DaemonState.IDLE)
+        try:
+            self.set_state(DaemonState.RUNNING)
+            self.run(*args, **kwargs)
+        except KeyboardInterrupt:
+            LOG.warning("%s: interrupted", self.name)
+        finally:
+            self.increment_metric("count")
+            self.set_state(DaemonState.IDLE)
 
     def run(self, *_, **__) -> None:
         """ To be implemented by parent. """

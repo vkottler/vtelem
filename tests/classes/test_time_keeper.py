@@ -3,9 +3,28 @@
 vtelem - Test the time keeper's correctness.
 """
 
+# built-in
+from multiprocessing import Process
+import os
+import signal
+import time
+
 # module under test
+from vtelem.classes.daemon_base import DaemonState
 from vtelem.classes.time_keeper import TimeKeeper
 from vtelem.classes.time_entity import TimeEntity
+
+
+def test_time_keeper_interrupted():
+    """ Test that daemons handle interrupts correctly. """
+
+    keeper = TimeKeeper("time", 0.05)
+    proc = Process(target=keeper.run_harness)
+    proc.start()
+    time.sleep(0.2)
+    os.kill(proc.pid, signal.SIGINT)
+    proc.join()
+    assert keeper.get_state() == DaemonState.IDLE
 
 
 def test_time_keeper_basic():

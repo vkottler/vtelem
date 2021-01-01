@@ -16,3 +16,5 @@ COUNT_PRIM = METRIC_PRIM
 ID_PRIM = Primitive.UINT16
 
 EventType = Tuple[Any, float]
+
+LOG_PERIOD: float = 0.25

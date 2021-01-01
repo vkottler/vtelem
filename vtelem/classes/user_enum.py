@@ -33,7 +33,7 @@ class UserEnum(dict):
         # maintain a reverse mapping for convenience
         self.strings: Dict[str, Optional[int]] = defaultdict(lambda: None)
         for key, val in self.enum.items():
-            self.strings[val] = key
+            self.strings[val.lower()] = key
 
         # set a viable default value
         val = default if default is not None else list(self.strings.keys())[0]
@@ -48,7 +48,7 @@ class UserEnum(dict):
     def get_value(self, val: str) -> int:
         """ Get the integer value of an enum String. """
 
-        result = self.strings[val]
+        result = self.strings[val.lower()]
         assert result is not None
         return result
 
@@ -64,7 +64,7 @@ class UserEnum(dict):
         """
 
         result = TypePrimitive(ENUM_TYPE, changed_cb)
-        val = self.strings[value]
+        val = self.strings[value.lower()]
         assert val is not None
         assert result.set(val)
         return result

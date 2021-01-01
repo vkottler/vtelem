@@ -30,6 +30,15 @@ class EnumRegistry(Registry[UserEnum]):
             for enum in initial_enums:
                 self.add_enum(enum)
 
+    def get_enum(self, enum: UserEnum) -> Tuple[bool, int]:
+        """ Get an enum identifier if it has been registered. """
+
+        result = (False, -1)
+        id_candidate = self.get_id(enum.name)
+        if id_candidate is not None:
+            result = (True, id_candidate)
+        return result
+
     def add_from_enum(self, enum_class: Type[Enum]) -> Tuple[bool, int]:
         """ Attempt to register an enumeration from an enum class. """
 

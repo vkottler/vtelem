@@ -38,9 +38,9 @@ class TelemetryEnvironment(ChannelEnvironment):
         self.enum_channel_types: Dict[int, int] = defaultdict(lambda: -1)
         if self.metrics is not None:
             self.add_metric("enum_count", Primitive.UINT32, True,
-                            (self.enum_registry.count(), init_time))
+                            (self.enum_registry.count(), self.get_time()))
             self.add_metric("type_count", Primitive.UINT32, True,
-                            (self.type_registry.count(), init_time))
+                            (self.type_registry.count(), self.get_time()))
 
     def add_enum_channel(self, name: str, enum_name: str, rate: float,
                          track_change: bool = False,
@@ -117,6 +117,8 @@ class TelemetryEnvironment(ChannelEnvironment):
         """ Add a user enumeration to this environment's management. """
 
         with self.lock:
+            if self.enum_registry.get_enum(enum)[0]:
+                return self.enum_registry.get_enum(enum)[1]
             result = self.enum_registry.add_enum(enum)
             assert result[0]
             assert self.enum_registry.export(self.type_registry)

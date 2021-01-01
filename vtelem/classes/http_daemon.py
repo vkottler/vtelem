@@ -8,12 +8,15 @@ vtelem - Exposes a base class for building http services that can be managed
 from http.server import (
     BaseHTTPRequestHandler, ThreadingHTTPServer, SimpleHTTPRequestHandler
 )
+import logging
 from typing import Type, Tuple
 
 # internal
 from .daemon_base import DaemonBase, DaemonState
 from .telemetry_environment import TelemetryEnvironment
 from .time_keeper import TimeKeeper
+
+LOG = logging.getLogger(__name__)
 
 
 class HttpDaemon(DaemonBase):
@@ -37,6 +40,8 @@ class HttpDaemon(DaemonBase):
 
         super().__init__(name, env, time_keeper)
         self.server = ThreadingHTTPServer(address, handler_class)
+        host = self.server.server_address
+        LOG.info("'%s' daemon bound to %s:%d", self.name, host[0], host[1])
         self.closed = False
 
         def stop_injector() -> None:

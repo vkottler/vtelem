@@ -32,7 +32,7 @@ class ChannelFrame:
         self.mtu = mtu
         self.used: int = 0
         self.buffer = ByteBuffer(bytearray(self.mtu))
-        self.elem_buffer = ByteBuffer()
+        self.elem_buffer = ByteBuffer(bytearray(self.mtu))
         self.id_primitive = TypePrimitive(ID_PRIM)
         self.finalized = False
 
@@ -65,6 +65,7 @@ class ChannelFrame:
         # add the element buffer to the end of our current frame buffer
         self.buffer.append(self.elem_buffer.data, self.elem_buffer.size)
         self.finalized = True
+        assert len(self.buffer.data) == self.used
         return self.used
 
     def raw(self) -> Tuple[bytearray, int]:
