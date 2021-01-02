@@ -157,5 +157,11 @@ def build_dummy_frame(overall_size: int) -> ChannelFrame:
     while frame.add(0, Primitive.BOOL, False):
         pass
 
+    # add padding if necessary
+    size = frame.finalize()
+    delta = overall_size - size
+    frame.buffer.append(bytearray(delta), delta)
+    frame.used += delta
+
     assert frame.finalize() == overall_size
     return frame

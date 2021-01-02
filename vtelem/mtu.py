@@ -14,6 +14,7 @@ from typing import Tuple
 from .classes.channel_framer import build_dummy_frame
 
 LOG = logging.getLogger(__name__)
+DEFAULT_MTU = 1500 - (60 + 8)
 
 
 class SocketConstants(IntEnum):
@@ -36,7 +37,7 @@ def create_udp_socket(host: Tuple[str, int]) -> socket.SocketType:
 
 
 def discover_mtu(sock: socket.SocketType,
-                 probe_size: int = 2 ** 15 - 1) -> int:
+                 probe_size: int = DEFAULT_MTU) -> int:
     """
     Send a large frame and indicate that we want to perform mtu discovery, and
     not fragment any frames.
@@ -44,6 +45,8 @@ def discover_mtu(sock: socket.SocketType,
 
     # see ip(7), force the don't-fragment flag and perform mtu discovery
     # such that the socket object can be queried for actual mtu upon error
+    orig_val = sock.getsockopt(socket.IPPROTO_IP,
+                               SocketConstants.IP_MTU_DISCOVER)
     sock.setsockopt(socket.IPPROTO_IP, SocketConstants.IP_MTU_DISCOVER,
                     SocketConstants.IP_PMTUDISC_DO)
 
@@ -53,11 +56,15 @@ def discover_mtu(sock: socket.SocketType,
     except OSError:
         pass
 
+    # restore the original value
+    sock.setsockopt(socket.IPPROTO_IP, SocketConstants.IP_MTU_DISCOVER,
+                    orig_val)
+
     return sock.getsockopt(socket.IPPROTO_IP, SocketConstants.IP_MTU)
 
 
 def discover_ipv4_mtu(host: Tuple[str, int],
-                      probe_size: int = 2 ** 15 - 1) -> int:
+                      probe_size: int = DEFAULT_MTU) -> int:
     """
     Determine the maximum transmission unit for an IPv4 payload to a provided
     host.

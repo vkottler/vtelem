@@ -1,6 +1,6 @@
 
 """
-vtelem - TODO.
+vtelem - An interface for setting up and tearing down outgoing udp streams.
 """
 
 # built-in
@@ -11,16 +11,21 @@ from typing import Dict, Tuple, Any
 # internal
 from vtelem.mtu import create_udp_socket, discover_mtu
 from .stream_writer import StreamWriter
+from .time_entity import LockEntity
 
 LOG = logging.getLogger(__name__)
 
 
-class UdpClientManager:
-    """ TODO """
+class UdpClientManager(LockEntity):
+    """ A class for managing outgoing udp streams. """
 
     def __init__(self, writer: StreamWriter) -> None:
-        """ TODO """
+        """
+        Construct a new client manager, which will produce streams to the
+        provided stream-writer.
+        """
 
+        super().__init__()
         self.writer = writer
 
         self.clients: Dict[int, Tuple[socket.SocketType, Any]] = {}
@@ -34,12 +39,13 @@ class UdpClientManager:
             identifier.
             """
 
-            sock, sock_file = self.clients[stream_id]
+            with self.lock:
+                sock, sock_file = self.clients[stream_id]
+                del self.clients[stream_id]
             name = sock.getsockname()
             LOG.info("closing stream client '%s:%d'", name[0], name[1])
             sock_file.close()
             sock.close()
-            del self.clients[stream_id]
 
         self.closer = closer
         self.writer.error_handle = self.closer
@@ -49,15 +55,19 @@ class UdpClientManager:
 
         sock = create_udp_socket(host)
         mtu = discover_mtu(sock)
+        mtu -= (60 + 8)  # subtract ip and udp header space
         sock_file = sock.makefile("wb")
-        sock_id = self.writer.add_stream(sock_file)
-        self.clients[sock_id] = (sock, sock_file)
-        name = sock.getsockname()
+        sock_file.flush()
+        with self.lock:
+            sock_id = self.writer.add_stream(sock_file)
+            self.clients[sock_id] = (sock, sock_file)
+            name = sock.getsockname()
         LOG.info("adding stream client '%s:%d'", name[0], name[1])
         return sock_id, mtu
 
     def remove_client(self, sock_id: int) -> None:
         """ Remove a client connection by integer identifier, closes it. """
 
-        if self.writer.remove_stream(sock_id):
-            self.closer(sock_id)
+        with self.lock:
+            if self.writer.remove_stream(sock_id):
+                self.closer(sock_id)

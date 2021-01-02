@@ -43,9 +43,10 @@ class StreamWriter(QueueDaemon):
                         self.increment_metric("stream_writes")
                         self.increment_metric("bytes_written", size)
                     except OSError as exc:
-                        LOG.error("stream '%s' (%d) error: %s (%d)",
-                                  stream.name, stream_id, exc.strerror,
-                                  exc.errno)
+                        msg = ("stream '%s' (%d) error writing %d bytes: " +
+                               "%s (%d)")
+                        LOG.error(msg, stream.name, stream_id, len(array),
+                                  exc.strerror, exc.errno)
                         to_remove.append((stream_id, stream))
 
                 # remove streams that errored when writing

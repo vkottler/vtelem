@@ -10,10 +10,11 @@ from queue import Queue
 from vtelem.classes.channel_framer import build_dummy_frame
 from vtelem.classes.udp_client_manager import UdpClientManager
 from vtelem.classes.stream_writer import StreamWriter
+from vtelem.mtu import DEFAULT_MTU
 
 
 def test_udp_client_manager_basic():
-    """ TODO """
+    """ Test that adding clients and sending data is functional. """
 
     frame_queue = Queue()
     writer = StreamWriter("test_writer", frame_queue)
@@ -23,8 +24,11 @@ def test_udp_client_manager_basic():
         clients = []
 
         # add clients
-        mtu = 1500 - 8
+        mtu = DEFAULT_MTU
         for _ in range(5):
+            client = manager.add_client(("google.com", 0))
+            mtu = min(mtu, client[1])
+            clients.append(client[0])
             client = manager.add_client(("localhost", 0))
             mtu = min(mtu, client[1])
             clients.append(client[0])
