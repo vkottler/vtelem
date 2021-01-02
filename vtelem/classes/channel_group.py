@@ -19,10 +19,11 @@ class ChannelGroup:
     environment.
     """
 
-    def __init__(self, env: TelemetryEnvironment) -> None:
+    def __init__(self, name: str, env: TelemetryEnvironment) -> None:
         """ Construct a new channel group. """
 
         self.env = env
+        self.name = name
         self.channels: Dict[str, Dict[str, Any]] = {}
 
     def add_channel(self, name: str, instance: Primitive, rate: float,
@@ -34,7 +35,9 @@ class ChannelGroup:
         # the environment should catch duplicate channel names for us
         try:
             val = default_val(instance)
-            chan_id = self.env.add_channel(name, instance, rate, track_change,
+            real_name = "{}.{}".format(self.name, name)
+            chan_id = self.env.add_channel(real_name, instance, rate,
+                                           track_change,
                                            (val, self.env.get_time()))
         except AssertionError:
             return False
@@ -61,7 +64,8 @@ class ChannelGroup:
 
         # the environment should catch duplicate channel names for us
         try:
-            chan_id = self.env.add_enum_channel(name, enum_name, rate,
+            real_name = "{}.{}".format(self.name, name)
+            chan_id = self.env.add_enum_channel(real_name, enum_name, rate,
                                                 track_change,
                                                 (val, self.env.get_time()))
         except AssertionError:

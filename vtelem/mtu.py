@@ -24,18 +24,23 @@ class SocketConstants(IntEnum):
     IP_PMTUDISC_DO = 2
 
 
-def discover_ipv4_mtu(host: Tuple[str, int],
-                      probe_size: int = 2 ** 15 - 1) -> int:
-    """
-    Determine the maximum transmission unit for an IPv4 payload to a provided
-    host.
-    """
+def create_udp_socket(host: Tuple[str, int]) -> socket.SocketType:
+    """ Create a UDP socket, set to a requested peer address. """
 
     assert sys.platform == "linux"
 
     # create a udp socket and set it to the host
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.connect(host)
+    return sock
+
+
+def discover_mtu(sock: socket.SocketType,
+                 probe_size: int = 2 ** 15 - 1) -> int:
+    """
+    Send a large frame and indicate that we want to perform mtu discovery, and
+    not fragment any frames.
+    """
 
     # see ip(7), force the don't-fragment flag and perform mtu discovery
     # such that the socket object can be queried for actual mtu upon error
@@ -45,11 +50,21 @@ def discover_ipv4_mtu(host: Tuple[str, int],
     try:
         count = sock.send(build_dummy_frame(probe_size).raw()[0])
         LOG.info("mtu probe successfully sent %d bytes", count)
-    except socket.error:
+    except OSError:
         pass
 
-    # determine mtu
-    result = sock.getsockopt(socket.IPPROTO_IP, SocketConstants.IP_MTU)
+    return sock.getsockopt(socket.IPPROTO_IP, SocketConstants.IP_MTU)
+
+
+def discover_ipv4_mtu(host: Tuple[str, int],
+                      probe_size: int = 2 ** 15 - 1) -> int:
+    """
+    Determine the maximum transmission unit for an IPv4 payload to a provided
+    host.
+    """
+
+    sock = create_udp_socket(host)
+    result = discover_mtu(sock, probe_size)
     name = sock.getsockname()
     LOG.info("discovered mtu to (%s:%d -> %s:%d) is %d (probe size: %d)",
              host[0], host[1], name[0], name[1], result, probe_size)

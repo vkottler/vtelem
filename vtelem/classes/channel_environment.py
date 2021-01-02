@@ -136,6 +136,12 @@ class ChannelEnvironment(TimeEntity):
         assert chan is not None
         chan.set_rate(rate)
 
+    def has_channel(self, name: str) -> bool:
+        """ A quick check that this environmentl has a named channel. """
+
+        chan_id = self.channel_registry.get_id(name)
+        return chan_id is not None
+
     def add_channel(self, name: str, instance: Primitive, rate: float,
                     track_change: bool = False,
                     initial: Tuple[Any, Optional[float]] = None) -> int:

@@ -10,6 +10,7 @@ from typing import Tuple
 
 # internal
 from vtelem.mtu import discover_ipv4_mtu
+from .channel_group_registry import ChannelGroupRegistry
 from .daemon_base import DaemonOperation
 from .daemon_manager import DaemonManager
 from .http_daemon import HttpDaemon
@@ -41,6 +42,7 @@ class TelemetryServer(HttpDaemon):
                                 discover_ipv4_mtu((socket.getfqdn(), 0)) - 8,
                                 telem_rate, self.time_keeper, metrics_rate)
         telem.handle_new_mtu(1500 - 8)
+        self.channel_groups = ChannelGroupRegistry(telem)
         assert self.daemons.add_daemon(telem)
 
         # add the telemetry-stream writer

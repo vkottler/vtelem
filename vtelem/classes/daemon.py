@@ -63,6 +63,11 @@ class Daemon(DaemonBase):
         self.set_env_metric("uptime", 0.0, Primitive.FLOAT)
         self.set_env_metric("cycle_time", 0.0, Primitive.FLOAT)
 
+    def get_rate(self) -> float:
+        """ Get the current daemon-iteration rate. """
+
+        return self.function["rate"]
+
     def run(self, *args, **kwargs) -> None:
         """ Runs this daemon's thread, until stop is requested. """
 
@@ -97,5 +102,6 @@ class Daemon(DaemonBase):
     def set_rate(self, rate: float) -> None:
         """ Set the rate for the daemon. """
 
-        with self.lock:
-            self.function["rate"] = rate
+        if rate > 0.0:
+            with self.lock:
+                self.function["rate"] = rate

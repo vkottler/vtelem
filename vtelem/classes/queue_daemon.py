@@ -34,4 +34,6 @@ class QueueDaemon(DaemonBase):
         elem = self.queue.get()
         while elem is not None:
             self.handle(elem)
+            self.queue.task_done()
             elem = self.queue.get()
+        self.queue.task_done()

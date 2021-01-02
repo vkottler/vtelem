@@ -16,7 +16,7 @@ def test_channel_group_basic():
     """ Test basic channel-group operations. """
 
     env = TelemetryEnvironment(2 ** 8)
-    group = ChannelGroup(env)
+    group = ChannelGroup("test_group", env)
     assert env.add_from_enum(EnumA) >= 0
     assert group.add_channel("test_chan", Primitive.UINT32, 1.0)
     assert not group.add_channel("test_chan", Primitive.UINT32, 1.0)
@@ -31,3 +31,6 @@ def test_channel_group_basic():
     with group.data() as data:
         assert data["test_chan"] == 1
         assert data["test_enum"] == "b"
+
+    assert env.has_channel("test_group.test_chan")
+    assert env.has_channel("test_group.test_enum")

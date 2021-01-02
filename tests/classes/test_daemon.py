@@ -44,6 +44,7 @@ def test_daemon_callbacks():
 
     daemon = Daemon("test", daemon_task, task_rate, iter_overrun,
                     state_change_cb, None, keeper)
+    assert daemon.get_rate() == task_rate
     assert daemon.get_state() == DaemonState.IDLE
     args = ["arg1", "arg2", "arg3"]
     kwargs = {"kwarg1": 1, "kwarg2": 2, "kwarg3": 3}
@@ -77,7 +78,8 @@ def test_daemon_basic():
     time.sleep(0.1)
     assert daemon.unpause()
     assert not daemon.unpause()
-    time.sleep(0.1)
+    with daemon.paused():
+        time.sleep(0.1)
     assert daemon.stop()
     assert not daemon.stop()
     assert daemon.start()

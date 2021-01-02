@@ -5,11 +5,12 @@ vtelem - A base for building runtime tasks.
 
 # built-in
 from collections import defaultdict
+from contextlib import contextmanager
 from enum import Enum
 import logging
 import threading
 import time
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Iterator
 
 # internal
 from vtelem.enums.primitive import Primitive
@@ -212,6 +213,19 @@ class DaemonBase(TimeEntity):
     def run(self, *_, **__) -> None:
         """ To be implemented by parent. """
 
+    @contextmanager
+    def booted(self, *args, **kwargs) -> Iterator[None]:
+        """
+        Provide a context manager that yields when this daemon is running and
+        automatically stops it.
+        """
+
+        try:
+            assert self.start(*args, **kwargs)
+            yield
+        finally:
+            assert self.stop()
+
     def start(self, *args, **kwargs) -> bool:
         """ Attempt to start the daemon. """
 
@@ -227,6 +241,16 @@ class DaemonBase(TimeEntity):
 
         self.thread.start()
         return True
+
+    @contextmanager
+    def paused(self) -> Iterator[None]:
+        """ Exposes pausing and unpausing while yielded. """
+
+        try:
+            assert self.pause()
+            yield
+        finally:
+            assert self.unpause()
 
     def pause(self) -> bool:
         """ Attempt to pause the daemon. """
