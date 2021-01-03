@@ -25,8 +25,8 @@ def time_to_int(time: float, precision: int = 1000) -> int:
 class ChannelFrame:
     """ A channel-data storage that respects a maximum size. """
 
-    def __init__(self, mtu: int, frame_type: TypePrimitive,
-                 timestamp: TypePrimitive) -> None:
+    def __init__(self, mtu: int, frame_id: TypePrimitive,
+                 frame_type: TypePrimitive, timestamp: TypePrimitive) -> None:
         """ Construct an empty channel frame. """
 
         self.mtu = mtu
@@ -36,7 +36,8 @@ class ChannelFrame:
         self.id_primitive = TypePrimitive(ID_PRIM)
         self.finalized = False
 
-        # write frame header: type, timestamp
+        # write frame header: (application) id, type, timestamp
+        self.used += frame_id.write(self.buffer)
         self.used += frame_type.write(self.buffer)
         self.used += timestamp.write(self.buffer)
 
@@ -67,6 +68,26 @@ class ChannelFrame:
         self.finalized = True
         assert len(self.buffer.data) == self.used
         return self.used
+
+    def pad(self, num_bytes: int) -> int:
+        """
+        Attempt to add padding bytes at the end of a frame, return the actual
+        amout of padding added.
+        """
+
+        # only allow padding at the end of a frame
+        assert self.finalized
+
+        # don't allow more padding outside the mtu
+        pad_amt = min(num_bytes, self.mtu - self.used)
+        self.buffer.append(bytearray(pad_amt), pad_amt)
+        self.used += pad_amt
+        return pad_amt
+
+    def pad_to_mtu(self) -> None:
+        """ Attempt to pad this frame to the full mtu size. """
+
+        self.pad(self.mtu - self.used)
 
     def raw(self) -> Tuple[bytearray, int]:
         """ Obtain the raw buffer, and its size, from this frame. """

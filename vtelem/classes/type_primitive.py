@@ -46,6 +46,13 @@ class TypePrimitive:
 
         expected_type = self.type.value["type"]
         if isinstance(data, expected_type):
+
+            # validate the desired value
+            if not self.type.value["validate"](self.type, data):
+                LOG.warning("value '%s' not valid for type '%s'", data,
+                            self.type)
+                return False
+
             with self.lock:
                 # setup changed-callback if necessary
                 if self.changed_cb is not None:

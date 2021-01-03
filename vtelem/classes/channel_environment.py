@@ -11,7 +11,7 @@ from typing import Any, List, Tuple, Dict, Optional
 # internal
 from vtelem.enums.primitive import Primitive
 from vtelem.parsing import parse_data_frame, parse_event_frame
-from . import TIMESTAMP_PRIM, COUNT_PRIM, ENUM_TYPE, LOG_PERIOD
+from . import TIMESTAMP_PRIM, COUNT_PRIM, ENUM_TYPE, LOG_PERIOD, ID_PRIM
 from .byte_buffer import ByteBuffer
 from .channel import Channel
 from .channel_registry import ChannelRegistry
@@ -31,7 +31,8 @@ class ChannelEnvironment(TimeEntity):
     """
 
     def __init__(self, mtu: int, initial_channels: List[Channel] = None,
-                 metrics_rate: float = None, init_time: float = None) -> None:
+                 metrics_rate: float = None, init_time: float = None,
+                 app_id_basis: float = None) -> None:
         """ Construct a new channel environment. """
 
         TimeEntity.__init__(self, init_time)
@@ -39,7 +40,7 @@ class ChannelEnvironment(TimeEntity):
         if initial_channels is None:
             initial_channels = []
         self.framer = ChannelFramer(mtu, self.channel_registry,
-                                    initial_channels)
+                                    initial_channels, app_id_basis)
 
         self.metrics: Optional[Dict[str, int]] = None
         self.event_queue = EventQueue()
@@ -201,6 +202,7 @@ class ChannelEnvironment(TimeEntity):
         buf = ByteBuffer(data, False, size)
 
         # read header
+        result["app_id"] = buf.read(ID_PRIM)
         result["type"] = FRAME_TYPES.get_str(buf.read(ENUM_TYPE))
         result["timestamp"] = buf.read(TIMESTAMP_PRIM)
         result["size"] = buf.read(COUNT_PRIM)

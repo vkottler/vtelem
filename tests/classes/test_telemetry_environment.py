@@ -8,12 +8,19 @@ import time
 
 # module under test
 from vtelem.classes.channel import Channel
+from vtelem.classes.channel_framer import create_app_id
 from vtelem.classes.telemetry_environment import TelemetryEnvironment
 from vtelem.classes.user_enum import UserEnum
 from vtelem.enums.primitive import Primitive
 
 # internal
 from . import EnumA
+
+
+def test_app_id_from_basis():
+    """ Test application-identifer creation. """
+
+    create_app_id(2.0)
 
 
 def test_environment_with_metrics():

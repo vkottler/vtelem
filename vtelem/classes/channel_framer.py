@@ -4,12 +4,13 @@ vtelem - A module for building frames of channel data from emissions.
 """
 
 # built-in
+import logging
 from queue import Queue
 from typing import Dict, Tuple, List
 
 # internal
-from vtelem.enums.primitive import Primitive
-from . import TIMESTAMP_PRIM
+from vtelem.enums.primitive import Primitive, random_integer
+from . import TIMESTAMP_PRIM, ID_PRIM
 from .channel import Channel
 from .channel_frame import ChannelFrame, time_to_int
 from .channel_registry import ChannelRegistry
@@ -17,8 +18,36 @@ from .event_queue import EventQueue
 from .type_primitive import TypePrimitive
 from .user_enum import UserEnum
 
+LOG = logging.getLogger(__name__)
 FRAME_TYPES = UserEnum("frame_type",
                        {0: "INVALID", 1: "DATA", 2: "EVENT"})
+
+
+def basis_to_int(basis: float) -> int:
+    """
+    Convert some basis floating-point number into a valid integer for an
+    application identifier.
+    """
+
+    basis = abs(basis)
+    if basis > 1.0:
+        basis = 1.0 / basis
+    return int(float(ID_PRIM.value["max"]) * basis)
+
+
+def create_app_id(basis: float = None) -> TypePrimitive:
+    """
+    Create a new application identifier, use a provided basis value if
+    provided.
+    """
+
+    result = TypePrimitive(ID_PRIM)
+    if basis is None:
+        new_id = random_integer(ID_PRIM)
+    else:
+        new_id = basis_to_int(basis)
+    assert result.set(new_id)
+    return result
 
 
 class ChannelFramer:
@@ -27,7 +56,7 @@ class ChannelFramer:
     """
 
     def __init__(self, mtu: int, registry: ChannelRegistry,
-                 channels: List[Channel]) -> None:
+                 channels: List[Channel], app_id_basis: float = None) -> None:
         """ Construct a new channel framer. """
 
         self.mtu = mtu
@@ -42,6 +71,9 @@ class ChannelFramer:
         for name in FRAME_TYPES.enum.values():
             self.timestamps[name] = TypePrimitive(TIMESTAMP_PRIM)
             self.primitives[name] = self.frame_types.get_primitive(name)
+        self.primitives["app_id"] = create_app_id(app_id_basis)
+        LOG.info("using application identifier '%d'",
+                 self.primitives["app_id"].get())
 
     def get_types(self) -> UserEnum:
         """ Get the frame-type enumeration. """
@@ -55,7 +87,8 @@ class ChannelFramer:
         timestamp = self.timestamps[frame_type]
         if set_time:
             assert timestamp.set(time_to_int(time))
-        return ChannelFrame(self.mtu, self.primitives[frame_type], timestamp)
+        return ChannelFrame(self.mtu, self.primitives["app_id"],
+                            self.primitives[frame_type], timestamp)
 
     def new_event_frame(self, time: float,
                         set_time: bool = True) -> ChannelFrame:
@@ -148,20 +181,18 @@ class ChannelFramer:
         return (frame_count, emit_count)
 
 
-def build_dummy_frame(overall_size: int) -> ChannelFrame:
+def build_dummy_frame(overall_size: int,
+                      app_id_basis: float = None) -> ChannelFrame:
     """ Build an empty frame of a specified size. """
 
-    frame = ChannelFrame(overall_size, FRAME_TYPES.get_primitive("INVALID"),
+    frame = ChannelFrame(overall_size, create_app_id(app_id_basis),
+                         FRAME_TYPES.get_primitive("INVALID"),
                          TypePrimitive(TIMESTAMP_PRIM))
 
     while frame.add(0, Primitive.BOOL, False):
         pass
 
-    # add padding if necessary
-    size = frame.finalize()
-    delta = overall_size - size
-    frame.buffer.append(bytearray(delta), delta)
-    frame.used += delta
-
+    frame.finalize()
+    frame.pad_to_mtu()
     assert frame.finalize() == overall_size
     return frame
