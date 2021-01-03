@@ -73,8 +73,6 @@ class TelemetryProxy(DaemonBase):
         except OSError as exc:
             if exc.errno != errno.EAGAIN:
                 LOG.error(exc)
-        except ValueError:
-            pass
 
         return False
 
@@ -92,8 +90,6 @@ class TelemetryProxy(DaemonBase):
         except OSError as exc:
             if exc.errno != errno.EAGAIN:
                 LOG.error(exc)
-        except ValueError:
-            pass
 
         return None
 
