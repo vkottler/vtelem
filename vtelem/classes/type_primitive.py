@@ -31,6 +31,18 @@ class TypePrimitive:
         self.last_set: float = float()
         self.lock = threading.RLock()
 
+    def __eq__(self, other) -> bool:
+        """ Generic equality check for primitives. """
+
+        if not self.type == other.type:
+            return False
+        return abs(float(self.data) - float(other.data)) < 0.001
+
+    def __str__(self) -> str:
+        """ Conver this type primitive into a String. """
+
+        return "({}) {}".format(self.type.name, self.data)
+
     def add(self, data: Any, time: float = None) -> bool:
         """ Safely add some amount to the primitive. """
 

@@ -48,6 +48,10 @@ class ChannelFrame:
         self.count["value"] = 0
         self.used += self.count["primitive"].write(self.buffer)
 
+        # reserve space for crc
+        self.crc = TypePrimitive(Primitive.UINT32)
+        self.used += self.crc.size()
+
         assert self.used < self.mtu
 
     def finalize(self) -> int:
@@ -65,8 +69,13 @@ class ChannelFrame:
 
         # add the element buffer to the end of our current frame buffer
         self.buffer.append(self.elem_buffer.data, self.elem_buffer.size)
+
+        # compute and write the crc
+        self.crc.set(self.buffer.crc32())
+        self.crc.write(self.buffer)
+
         self.finalized = True
-        assert len(self.buffer.data) == self.used
+        assert self.buffer.size == self.used
         return self.used
 
     def pad(self, num_bytes: int) -> int:

@@ -29,9 +29,11 @@ def test_udp_client_manager_basic():
             client = manager.add_client(("google.com", 0))
             mtu = min(mtu, client[1])
             clients.append(client[0])
+            assert manager.client_name(client[0])[1] != 0
             client = manager.add_client(("localhost", 0))
             mtu = min(mtu, client[1])
             clients.append(client[0])
+            assert manager.client_name(client[0])[1] != 0
 
         # add some frames
         for _ in range(100):

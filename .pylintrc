@@ -1,2 +1,3 @@
 [DESIGN]
 max-args=9
+max-attributes=8

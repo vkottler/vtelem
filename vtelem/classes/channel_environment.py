@@ -9,7 +9,7 @@ import logging
 from typing import Any, List, Tuple, Dict, Optional
 
 # internal
-from vtelem.enums.primitive import Primitive
+from vtelem.enums.primitive import Primitive, get_size
 from vtelem.parsing import parse_data_frame, parse_event_frame
 from . import TIMESTAMP_PRIM, COUNT_PRIM, ENUM_TYPE, LOG_PERIOD, ID_PRIM
 from .byte_buffer import ByteBuffer
@@ -212,6 +212,11 @@ class ChannelEnvironment(TimeEntity):
             parse_data_frame(result, buf, self.channel_registry)
         elif result["type"] == "EVENT":
             parse_event_frame(result, buf, self.channel_registry)
+
+        # read crc and check it
+        result["crc"] = buf.read(Primitive.UINT32)
+        buf.size -= get_size(Primitive.UINT32)
+        assert result["crc"] == buf.crc32()
 
         return result
 

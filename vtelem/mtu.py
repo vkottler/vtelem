@@ -25,14 +25,19 @@ class SocketConstants(IntEnum):
     IP_PMTUDISC_DO = 2
 
 
-def create_udp_socket(host: Tuple[str, int]) -> socket.SocketType:
+def create_udp_socket(host: Tuple[str, int],
+                      is_client: bool = True) -> socket.SocketType:
     """ Create a UDP socket, set to a requested peer address. """
 
     assert sys.platform == "linux"
 
     # create a udp socket and set it to the host
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sock.connect(host)
+    if is_client:
+        sock.connect(host)
+    else:
+        sock.bind(host)
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     return sock
 
 

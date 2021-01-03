@@ -53,3 +53,8 @@ def test_primitive_max_min():
     assert not unsigned_prim.set(-1)
     assert not signed_prim.set(128)
     assert not signed_prim.set(-129)
+    assert unsigned_prim.set(5)
+    assert signed_prim.set(5)
+    assert unsigned_prim == signed_prim
+    assert signed_prim.set(6)
+    assert unsigned_prim != signed_prim

@@ -50,6 +50,12 @@ class UdpClientManager(LockEntity):
         self.closer = closer
         self.writer.error_handle = self.closer
 
+    def client_name(self, sock_id: int) -> Tuple[str, int]:
+        """ Get the host and port of a client. """
+
+        assert sock_id in self.clients
+        return self.clients[sock_id][0].getsockname()
+
     def add_client(self, host: Tuple[str, int]) -> Tuple[int, int]:
         """ Add a new client connection by hostname and port. """
 

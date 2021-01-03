@@ -8,9 +8,17 @@ from contextlib import contextmanager
 import struct
 import threading
 from typing import Any, Iterator
+import zlib
 
 # internal
 from vtelem.enums.primitive import Primitive, get_size, get_fstring
+
+
+def primitive_from_buffer(buf: bytearray, inst: Primitive,
+                          order: str = "!") -> Any:
+    """ Read a primitive from a provided buffer. """
+
+    return struct.unpack(order + get_fstring(inst), buf)[0]
 
 
 class ByteBuffer:
@@ -25,9 +33,9 @@ class ByteBuffer:
 
         if data is None:
             data = bytearray()
+        self.size = size
         self.data = data
         self.pos: int = 0
-        self.size = size
         self.mutable = mutable
         self.order = order
         self.lock = threading.RLock()
@@ -62,7 +70,7 @@ class ByteBuffer:
 
         with self.lock:
             # extend the backing buffer if position
-            self.expand_to(pos + 1)
+            self.expand_to(pos)
             self.pos = pos
 
     def advance(self, amount: int, inc_size: bool = False) -> None:
@@ -102,7 +110,12 @@ class ByteBuffer:
 
         with self.lock:
             self.data = self.data[0:self.size] + other[0:data_len]
-            self.size += data_len
+            self.advance(data_len, True)
+
+    def crc32(self, initial_val: int = 0) -> int:
+        """ Compute this buffer's crc32. """
+
+        return zlib.crc32(self.data[0:self.size], initial_val)
 
     def write(self, inst: Primitive, data: Any) -> int:
         """
