@@ -42,7 +42,8 @@ def create_udp_socket(host: Tuple[str, int],
 
 
 def discover_mtu(sock: socket.SocketType,
-                 probe_size: int = DEFAULT_MTU) -> int:
+                 probe_size: int = DEFAULT_MTU,
+                 app_id_basis: float = None) -> int:
     """
     Send a large frame and indicate that we want to perform mtu discovery, and
     not fragment any frames.
@@ -56,7 +57,7 @@ def discover_mtu(sock: socket.SocketType,
                     SocketConstants.IP_PMTUDISC_DO)
 
     try:
-        count = sock.send(build_dummy_frame(probe_size).raw()[0])
+        count = sock.send(build_dummy_frame(probe_size, app_id_basis).raw()[0])
         LOG.info("mtu probe successfully sent %d bytes", count)
     except OSError:
         pass

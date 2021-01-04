@@ -19,8 +19,7 @@ from .type_primitive import TypePrimitive
 from .user_enum import UserEnum
 
 LOG = logging.getLogger(__name__)
-FRAME_TYPES = UserEnum("frame_type",
-                       {0: "INVALID", 1: "DATA", 2: "EVENT"})
+FRAME_TYPES = UserEnum("frame_type", {0: "invalid", 1: "data", 2: "event"})
 
 
 def basis_to_int(basis: float) -> int:
@@ -94,13 +93,13 @@ class ChannelFramer:
                         set_time: bool = True) -> ChannelFrame:
         """ Construct a new event-frame object. """
 
-        return self.new_frame("EVENT", time, set_time)
+        return self.new_frame("event", time, set_time)
 
     def new_data_frame(self, time: float,
                        set_time: bool = True) -> ChannelFrame:
         """ Construct a new data-frame object. """
 
-        return self.new_frame("DATA", time, set_time)
+        return self.new_frame("data", time, set_time)
 
     def add_channel(self, channel: Channel) -> None:
         """ Add another managed channel. """
@@ -108,7 +107,8 @@ class ChannelFramer:
         self.channels.append(channel)
 
     def build_event_frames(self, time: float, event_queue: EventQueue,
-                           queue: Queue) -> Tuple[int, int]:
+                           queue: Queue,
+                           write_crc: bool = True) -> Tuple[int, int]:
         """
         Consume the current event queue and build frames from the contained
         events.
@@ -127,7 +127,7 @@ class ChannelFramer:
             # add this event, start a new frame if necessary
             if not curr_frame.add_event(chan_id, chan_type, event[1],
                                         event[2]):
-                curr_frame.finalize()
+                curr_frame.finalize(write_crc)
                 queue.put(curr_frame)
                 frame_count += 1
                 curr_frame = self.new_event_frame(time, False)
@@ -136,13 +136,14 @@ class ChannelFramer:
 
         # finalize the last frame if necessary
         if event_count and not curr_frame.finalized:
-            curr_frame.finalize()
+            curr_frame.finalize(write_crc)
             queue.put(curr_frame)
             frame_count += 1
 
         return (frame_count, event_count)
 
-    def build_data_frames(self, time: float, queue: Queue) -> Tuple[int, int]:
+    def build_data_frames(self, time: float, queue: Queue,
+                          write_crc: bool = True) -> Tuple[int, int]:
         """
         For this step, gather up channel emissions into discrete frames for
         wire-level transport.
@@ -166,7 +167,7 @@ class ChannelFramer:
                 # if we failed to add this emit to the current frame, finalize
                 # it and start a new one
                 if not curr_frame.add(chan_id, channel.type, result):
-                    curr_frame.finalize()
+                    curr_frame.finalize(write_crc)
                     queue.put(curr_frame)
                     frame_count += 1
                     curr_frame = self.new_data_frame(time, False)
@@ -174,25 +175,25 @@ class ChannelFramer:
 
         # finalize the last frame if necessary
         if emit_count and not curr_frame.finalized:
-            curr_frame.finalize()
+            curr_frame.finalize(write_crc)
             queue.put(curr_frame)
             frame_count += 1
 
         return (frame_count, emit_count)
 
 
-def build_dummy_frame(overall_size: int,
-                      app_id_basis: float = None) -> ChannelFrame:
+def build_dummy_frame(overall_size: int, app_id_basis: float = None,
+                      bad_crc: bool = False) -> ChannelFrame:
     """ Build an empty frame of a specified size. """
 
     frame = ChannelFrame(overall_size, create_app_id(app_id_basis),
-                         FRAME_TYPES.get_primitive("INVALID"),
+                         FRAME_TYPES.get_primitive("invalid"),
                          TypePrimitive(TIMESTAMP_PRIM))
 
     while frame.add(0, Primitive.BOOL, False):
         pass
 
-    frame.finalize()
+    frame.finalize(not bad_crc)
     frame.pad_to_mtu()
     assert frame.finalize() == overall_size
     return frame

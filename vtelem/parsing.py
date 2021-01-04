@@ -15,7 +15,7 @@ def parse_data_frame(obj: dict, buf: ByteBuffer,
     From an object that contains frame-header data, parse the telemetry data.
     """
 
-    assert obj["type"] == "DATA"
+    assert obj["type"] == "data"
 
     # read channel IDs
     obj["channels"] = []
@@ -35,7 +35,7 @@ def parse_event_frame(obj: dict, buf: ByteBuffer,
     From an object that contains frame-header data, parse the event data.
     """
 
-    assert obj["type"] == "EVENT"
+    assert obj["type"] == "event"
 
     # read channel IDs
     obj["events"] = []

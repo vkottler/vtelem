@@ -14,13 +14,6 @@ import zlib
 from vtelem.enums.primitive import Primitive, get_size, get_fstring
 
 
-def primitive_from_buffer(buf: bytearray, inst: Primitive,
-                          order: str = "!") -> Any:
-    """ Read a primitive from a provided buffer. """
-
-    return struct.unpack(order + get_fstring(inst), buf)[0]
-
-
 class ByteBuffer:
     """
     A storage object useful for building network-transportable frames

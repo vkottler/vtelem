@@ -68,7 +68,8 @@ class UdpClientManager(LockEntity):
             sock_id = self.writer.add_stream(sock_file)
             self.clients[sock_id] = (sock, sock_file)
             name = sock.getsockname()
-        LOG.info("adding stream client '%s:%d'", name[0], name[1])
+        LOG.info("adding stream client '%s:%d' -> '%s:%d'", name[0], name[1],
+                 host[0], host[1])
         return sock_id, mtu
 
     def remove_client(self, sock_id: int) -> None:

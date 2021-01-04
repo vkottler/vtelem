@@ -24,8 +24,10 @@ class UserEnum(dict):
         """ Build a runtime enumeration. """
 
         super().__init__()
-        self.enum: Dict[int, str] = defaultdict(lambda: "UNKNOWN")
+        self.enum: Dict[int, str] = defaultdict(lambda: "unknown")
         self.enum.update(values)
+        for key, val in self.enum.items():
+            self.enum[key] = val.lower()
         self.name = to_snake(name)
         assert len(self.enum.keys()) <= (2 ** (get_size(ENUM_TYPE) * 8))
         assert len(self.enum.keys()) > 0

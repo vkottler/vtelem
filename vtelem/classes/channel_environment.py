@@ -20,6 +20,7 @@ from .channel_framer import ChannelFramer, FRAME_TYPES
 from .event_queue import EventQueue
 from .metered_queue import MeteredQueue
 from .time_entity import TimeEntity
+from .type_primitive import TypePrimitive
 
 LOG = logging.getLogger(__name__)
 
@@ -41,6 +42,7 @@ class ChannelEnvironment(TimeEntity):
             initial_channels = []
         self.framer = ChannelFramer(mtu, self.channel_registry,
                                     initial_channels, app_id_basis)
+        self.write_crc = True
 
         self.metrics: Optional[Dict[str, int]] = None
         self.event_queue = EventQueue()
@@ -195,28 +197,47 @@ class ChannelEnvironment(TimeEntity):
         frame = self.frame_queue.get()
         return frame
 
-    def decode_frame(self, data: bytearray, size: int) -> dict:
+    def decode_frame(self, data: bytearray, size: int,
+                     expected_id: Optional[TypePrimitive] = None) -> dict:
         """ Unpack a frame from an array of bytes. """
 
-        result = {}
+        result: dict = {}
         buf = ByteBuffer(data, False, size)
 
         # read header
+        result["valid"] = False
         result["app_id"] = buf.read(ID_PRIM)
+        id_valid = True
+        if expected_id is not None:
+            id_valid = result["app_id"] == expected_id.get()
         result["type"] = FRAME_TYPES.get_str(buf.read(ENUM_TYPE))
         result["timestamp"] = buf.read(TIMESTAMP_PRIM)
         result["size"] = buf.read(COUNT_PRIM)
 
         # read channel IDs
-        if result["type"] == "DATA":
+        if result["type"] == "data" and id_valid:
             parse_data_frame(result, buf, self.channel_registry)
-        elif result["type"] == "EVENT":
+            result["valid"] = True
+        elif result["type"] == "event" and id_valid:
             parse_event_frame(result, buf, self.channel_registry)
+            result["valid"] = True
+        elif not id_valid:
+            assert expected_id is not None
+            LOG.error("id mismatch: %d != %d", result["app_id"],
+                      expected_id.get())
+            return result
+        else:
+            LOG.warning("can't decode frame type '%s'", result["type"])
+            return result
 
         # read crc and check it
         result["crc"] = buf.read(Primitive.UINT32)
+        buf.size = buf.get_pos()
         buf.size -= get_size(Primitive.UINT32)
-        assert result["crc"] == buf.crc32()
+        result["valid"] = result["crc"] == buf.crc32()
+        if not result["valid"]:
+            LOG.error("invalid crc on frame: %d != %d", result["crc"],
+                      buf.crc32())
 
         return result
 
@@ -224,14 +245,16 @@ class ChannelEnvironment(TimeEntity):
         """ Process all queued events (build frames). """
 
         result = self.framer.build_event_frames(time, self.event_queue,
-                                                self.frame_queue)
+                                                self.frame_queue,
+                                                self.write_crc)
         self.metric_add("events_captured", result[1], time)
         return result
 
     def dispatch_data(self, time: float) -> Tuple[int, int]:
         """ Process all channel emissions for the specified, absolute time. """
 
-        result = self.framer.build_data_frames(time, self.frame_queue)
+        result = self.framer.build_data_frames(time, self.frame_queue,
+                                               self.write_crc)
         self.metric_add("emits_captured", result[1], time)
         return result
 

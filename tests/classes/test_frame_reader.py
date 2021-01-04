@@ -25,6 +25,8 @@ def test_read_frame_basic():
     # build some frames
     total_frames = 0
     for i in range(10):
+        if i > 8:
+            env.write_crc = False
         for chan in chan_ids:
             env.set_now(chan, i * (-1 ** i))
         env.advance_time(0.1)
@@ -40,5 +42,5 @@ def test_read_frame_basic():
 
     # check correctness of frames
     result = frames[0]
-    assert result["type"] == "DATA"
+    assert result["type"] == "data"
     assert result["size"] == len(chan_ids)

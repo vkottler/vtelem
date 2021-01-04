@@ -49,6 +49,8 @@ def test_primitive_max_min():
     # test validators
     unsigned_prim = TypePrimitive(Primitive.UINT8)
     signed_prim = TypePrimitive(Primitive.INT8)
+    assert str(unsigned_prim) is not None
+    assert str(signed_prim) is not None
     assert not unsigned_prim.set(256)
     assert not unsigned_prim.set(-1)
     assert not signed_prim.set(128)

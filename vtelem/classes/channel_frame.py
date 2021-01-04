@@ -9,7 +9,7 @@ import math
 from typing import Any, Dict, Tuple
 
 # internal
-from vtelem.enums.primitive import Primitive, get_size
+from vtelem.enums.primitive import Primitive, get_size, random_integer
 from . import COUNT_PRIM, ID_PRIM, TIMESTAMP_PRIM, EventType
 from .byte_buffer import ByteBuffer
 from .type_primitive import TypePrimitive
@@ -54,7 +54,7 @@ class ChannelFrame:
 
         assert self.used < self.mtu
 
-    def finalize(self) -> int:
+    def finalize(self, write_crc: bool = True) -> int:
         """
         Finalize this frame, making the underlying buffer ready for wire-level
         transport.
@@ -71,7 +71,10 @@ class ChannelFrame:
         self.buffer.append(self.elem_buffer.data, self.elem_buffer.size)
 
         # compute and write the crc
-        self.crc.set(self.buffer.crc32())
+        if write_crc:
+            self.crc.set(self.buffer.crc32())
+        else:
+            self.crc.set(random_integer(self.crc.type))
         self.crc.write(self.buffer)
 
         self.finalized = True

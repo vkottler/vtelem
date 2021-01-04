@@ -36,8 +36,9 @@ def test_udp_client_manager_basic():
             assert manager.client_name(client[0])[1] != 0
 
         # add some frames
-        for _ in range(100):
-            frame_queue.put(build_dummy_frame(mtu))
+        for i in range(100):
+            crc_type = i % 2 == 0
+            frame_queue.put(build_dummy_frame(mtu, None, crc_type))
 
     # remove clients
     for client in clients:

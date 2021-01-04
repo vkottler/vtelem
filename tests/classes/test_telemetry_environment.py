@@ -33,7 +33,7 @@ def test_environment_with_metrics():
     env.dispatch_now()
     frame = env.get_next_frame().raw()
     frame_data = env.decode_frame(frame[0], frame[1])
-    assert frame_data["type"] == "DATA"
+    assert frame_data["type"] == "data"
 
     # make sure all the metrics can be found in the frame
     expected_metrics = ["metrics_rate",
