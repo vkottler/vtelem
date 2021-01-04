@@ -39,9 +39,9 @@ class TelemetryServer(HttpDaemon):
         # dynamically build mtu, take the minimum of the system's loopback
         # interface, or a practical mtu based on a 1500-byte Ethernet II frame
         # (we will re-evalute mtu when we connect new clients)
-        telem = TelemetryDaemon("telemetry",
-                                discover_ipv4_mtu((socket.getfqdn(), 0)) - 8,
-                                telem_rate, self.time_keeper, metrics_rate)
+        mtu = discover_ipv4_mtu((socket.getfqdn(), 0)) - (60 + 8)
+        telem = TelemetryDaemon("telemetry", mtu, telem_rate, self.time_keeper,
+                                metrics_rate)
         telem.handle_new_mtu(DEFAULT_MTU)
         self.channel_groups = ChannelGroupRegistry(telem)
         assert self.daemons.add_daemon(telem)

@@ -13,6 +13,7 @@ from typing import Type, Tuple
 
 # internal
 from .daemon_base import DaemonBase, DaemonState
+from .http_request_mapper import HttpRequestMapper, RequestHandle
 from .telemetry_environment import TelemetryEnvironment
 from .time_keeper import TimeKeeper
 
@@ -40,6 +41,7 @@ class HttpDaemon(DaemonBase):
 
         super().__init__(name, env, time_keeper)
         self.server = ThreadingHTTPServer(address, handler_class)
+        self.server.mapper = HttpRequestMapper()  # type: ignore
         host = self.server.server_address
         LOG.info("'%s' daemon bound to %s:%d", self.name, host[0], host[1])
         self.closed = False
@@ -55,6 +57,16 @@ class HttpDaemon(DaemonBase):
 
         return "http://{}:{}/".format(self.server.server_address[0],
                                       self.server.server_address[1])
+
+    def add_handler(self, request_type: str, path: str, handle: RequestHandle,
+                    description: str = "no description",
+                    data: dict = None) -> None:
+        """ Add a handler for a specific request-type and path. """
+
+        mapper: HttpRequestMapper
+        mapper = self.server.mapper  # type: ignore
+        return mapper.add_handler(request_type, path, handle, description,
+                                  data)
 
     def close(self) -> bool:
         """ Close the server and clean up its resources. """
