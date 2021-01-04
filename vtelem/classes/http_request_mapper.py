@@ -40,8 +40,12 @@ class HttpRequestMapper:
             for method in self.requests.keys():
                 handles[method] = []
                 for path in self.requests[method].keys():
-                    handles[method].append(path)
-            return True, json.dumps(handles)
+                    handle_inst = self.handle_data[method][path]
+                    handle_data = {"path": path}
+                    if handle_inst is not None:
+                        handle_data["description"] = handle_inst["Description"]
+                    handles[method].append(handle_data)
+            return True, json.dumps(handles, indent=4)
 
         self.add_handler("GET", "", index_handler, "request index")
 

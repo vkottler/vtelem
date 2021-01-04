@@ -4,7 +4,6 @@ vtelem - An interface for creating telemetered applications.
 """
 
 # built-in
-from http.server import SimpleHTTPRequestHandler
 import socket
 from typing import Tuple
 
@@ -14,6 +13,7 @@ from .channel_group_registry import ChannelGroupRegistry
 from .daemon_base import DaemonOperation
 from .daemon_manager import DaemonManager
 from .http_daemon import HttpDaemon
+from .http_request_mapper import MapperAwareRequestHandler
 from .stream_writer import StreamWriter
 from .telemetry_daemon import TelemetryDaemon
 from .time_keeper import TimeKeeper
@@ -52,12 +52,25 @@ class TelemetryServer(HttpDaemon):
         assert self.daemons.add_daemon(writer)
 
         # add the http daemon
-        super().__init__("http", address, SimpleHTTPRequestHandler, telem,
+        super().__init__("http", address, MapperAwareRequestHandler, telem,
                          self.time_keeper)
 
     def scale_speed(self, scalar: float) -> None:
         """ Change the time scaling for the time keeper. """
 
-        assert self.daemons.perform_all(DaemonOperation.PAUSE)
+        self.daemons.perform_all(DaemonOperation.PAUSE)
         self.time_keeper.scale(scalar)
-        assert self.daemons.perform_all(DaemonOperation.UNPAUSE)
+        self.daemons.perform_all(DaemonOperation.UNPAUSE)
+
+    def start_all(self) -> None:
+        """ Start everything. """
+
+        self.daemons.perform_all(DaemonOperation.START)
+        self.start()
+
+    def stop_all(self) -> None:
+        """ Stop everything. """
+
+        self.daemons.perform_all(DaemonOperation.STOP)
+        self.stop()
+        self.close()
