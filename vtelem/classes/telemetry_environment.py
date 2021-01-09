@@ -113,11 +113,21 @@ class TelemetryEnvironment(ChannelEnvironment):
 
         return self.add_enum(from_enum(enum_class))
 
+    def has_enum(self, enum: UserEnum) -> bool:
+        """
+        Determine if this environment is already aware of a specific enum
+        definition.
+        """
+
+        with self.lock:
+            result = self.enum_registry.get_enum(enum)[0]
+        return result
+
     def add_enum(self, enum: UserEnum) -> int:
         """ Add a user enumeration to this environment's management. """
 
         with self.lock:
-            if self.enum_registry.get_enum(enum)[0]:
+            if self.has_enum(enum):
                 return self.enum_registry.get_enum(enum)[1]
             result = self.enum_registry.add_enum(enum)
             assert result[0]

@@ -8,9 +8,10 @@ import logging
 from typing import Dict
 
 # internal
-from .daemon_base import (
-    DaemonBase, DaemonOperation, str_to_operation, operation_str
+from vtelem.enums.daemon import (
+    DaemonOperation, str_to_operation, operation_str
 )
+from .daemon_base import DaemonBase
 
 LOG = logging.getLogger(__name__)
 

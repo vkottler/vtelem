@@ -6,60 +6,28 @@ vtelem - A base for building runtime tasks.
 # built-in
 from collections import defaultdict
 from contextlib import contextmanager
-from enum import Enum
 import logging
 import threading
 import time
 from typing import Any, Dict, Optional, Iterator
 
 # internal
+from vtelem.enums.daemon import DaemonState, DaemonOperation, str_to_operation
 from vtelem.enums.primitive import Primitive
 from vtelem.names import class_to_snake
 from . import METRIC_PRIM
 from .telemetry_environment import TelemetryEnvironment
 from .time_entity import TimeEntity
+from .user_enum import from_enum
 
 LOG = logging.getLogger(__name__)
 
 
-class DaemonState(Enum):
-    """ An enumeration of all valid daemon states. """
-
-    ERROR = 0
-    IDLE = 1
-    STARTING = 2
-    RUNNING = 3
-    PAUSED = 4
-    STOPPING = 5
-
-
-class DaemonOperation(Enum):
-    """ A declaration of the actions that can be performed on a daemon. """
-
-    NONE = 0
-    START = 1
-    STOP = 2
-    PAUSE = 3
-    UNPAUSE = 4
-    RESTART = 5
-
-
-def operation_str(operation: DaemonOperation) -> str:
-    """ Convert an operation enum to a String. """
-    return operation.name.lower()
-
-
-def str_to_operation(operation: str) -> Optional[DaemonOperation]:
-    """ Find an operation enum based on the provided stream. """
-
-    for known_op in DaemonOperation:
-        if operation_str(known_op) == operation.lower():
-            return known_op
-    return None
-
-
 class DaemonBase(TimeEntity):
     """ A base class for building worker threads. """
+
+    states = from_enum(DaemonState)
+    operations = from_enum(DaemonOperation)
 
     def __init__(self, name: str, env: TelemetryEnvironment = None,
                  time_keeper: Any = None):
@@ -79,6 +47,13 @@ class DaemonBase(TimeEntity):
         self.function["track_metric_changes"] = False
         self.function["metrics_data"] = defaultdict(lambda: 0)
         self.thread: Optional[threading.Thread] = None
+
+        # add daemon enum definitions to the environment
+        if self.env is not None:
+            if not self.env.has_enum(DaemonBase.states):
+                self.env.add_enum(DaemonBase.states)
+            if not self.env.has_enum(DaemonBase.operations):
+                self.env.add_enum(DaemonBase.operations)
 
         # register and reset standard metrics
         self.reset_metric("starts")
