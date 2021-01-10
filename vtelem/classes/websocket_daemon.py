@@ -44,6 +44,11 @@ class WebsocketDaemon(EventLoopDaemon):
             except (asyncio.CancelledError, GeneratorExit):
                 LOG.warning("closing client connection '%s'",
                             websocket.remote_address)
+
+            # handle closing this connection ourselves, because it's difficult
+            # to pend on otherwise
+            await websocket.close()
+
             with self.lock:
                 self.wait_count -= 1
             self.wait_poster.release()
