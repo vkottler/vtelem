@@ -12,8 +12,9 @@ import json
 import logging
 from typing import Dict, Callable, Tuple
 from typing import Optional as Opt
+import urllib
 
-RequestHandle = Callable[[BaseHTTPRequestHandler], Tuple[bool, str]]
+RequestHandle = Callable[[BaseHTTPRequestHandler, dict], Tuple[bool, str]]
 LOG = logging.getLogger(__name__)
 
 
@@ -30,7 +31,8 @@ class HttpRequestMapper:
         data: dict = defaultdict(lambda: defaultdict(lambda: None))
         self.handle_data: Dict[str, Dict[str, Opt[dict]]] = data
 
-        def index_handler(_: BaseHTTPRequestHandler) -> Tuple[bool, str]:
+        def index_handler(_: BaseHTTPRequestHandler,
+                          __: dict) -> Tuple[bool, str]:
             """
             A default handler that can be used to discover the implemented
             request handles.
@@ -64,7 +66,7 @@ class HttpRequestMapper:
         A default handler for displaying the list of registered handles.
         """
 
-        path = "/" + path
+        path = "/" + path.lower()
         self.requests[request_type][path] = handle
         handle_data = {}
         handle_data["Description"] = description
@@ -75,6 +77,7 @@ class HttpRequestMapper:
         self.handle_data[request_type][path] = handle_data
 
 
+# pylint: disable=attribute-defined-outside-init
 class MapperAwareRequestHandler(BaseHTTPRequestHandler):
     """ A request handler that integrates with the request mapper. """
 
@@ -97,6 +100,7 @@ class MapperAwareRequestHandler(BaseHTTPRequestHandler):
         self.send_error(HTTPStatus.NOT_IMPLEMENTED,
                         "no request-mapper configured")
         self.end_headers()
+        self.close_connection = True
 
     def _no_handle_response(self, command: str) -> None:
         """
@@ -106,9 +110,15 @@ class MapperAwareRequestHandler(BaseHTTPRequestHandler):
         msg = "no request-mapper for '{}' path '{}'".format(command, self.path)
         self.send_error(HTTPStatus.NOT_FOUND, msg)
         self.end_headers()
+        self.close_connection = True
 
-    def _handle(self) -> None:
+    def _handle(self, _data: dict = None) -> None:
         """ Handle an arbitrary request. """
+
+        if _data is None:
+            _data = {}
+        data: dict = defaultdict(lambda: None)
+        data.update(_data)
 
         if not hasattr(self.server, "mapper"):
             return self._no_mapper_response()
@@ -123,12 +133,13 @@ class MapperAwareRequestHandler(BaseHTTPRequestHandler):
             return self._no_handle_response(command)
 
         # run handler
-        success, content = handle(self)
+        success, content = handle(self, data)
         status = HTTPStatus.OK if success else HTTPStatus.BAD_REQUEST
 
         if not success:
             self.send_error(status, content)
             self.end_headers()
+            self.close_connection = True
             return None
 
         self.send_response(status)
@@ -152,4 +163,6 @@ class MapperAwareRequestHandler(BaseHTTPRequestHandler):
 
     def do_POST(self) -> None:  # pylint: disable=invalid-name
         """ Respond to a POST request. """
-        return self._handle()
+        length = int(self.headers["content-length"])
+        field_data = self.rfile.read(length)
+        return self._handle(urllib.parse.parse_qs(field_data))

@@ -20,7 +20,8 @@ def test_http_request_mapper_basic():
 
     daemon = HttpDaemon("test_daemon", handler_class=MapperAwareRequestHandler)
 
-    def error_handle(request: BaseHTTPRequestHandler) -> Tuple[bool, str]:
+    def error_handle(request: BaseHTTPRequestHandler,
+                     _: dict) -> Tuple[bool, str]:
         """ An example handle that always returns error. """
 
         fstr = "sample error handle ('{}', '{}')"

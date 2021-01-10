@@ -20,11 +20,12 @@ class TelemetryDaemon(TelemetryEnvironment, Daemon):
     def __init__(self, name: str, mtu: int, rate: float,
                  time_keeper: TimeKeeper, metrics_rate: float = None,
                  initial_channels: List[Channel] = None,
-                 initial_enums: List[UserEnum] = None) -> None:
+                 initial_enums: List[UserEnum] = None,
+                 app_id_basis: float = None) -> None:
         """ Construct a new telemetry daemon. """
 
         TelemetryEnvironment.__init__(self, mtu, time_keeper.get_time(),
                                       metrics_rate, initial_channels,
-                                      initial_enums)
+                                      initial_enums, app_id_basis)
         Daemon.__init__(self, name, self.dispatch_now, rate, None, None, self,
                         time_keeper)

@@ -27,10 +27,12 @@ class TelemetryEnvironment(ChannelEnvironment):
     def __init__(self, mtu: int, init_time: float = None,
                  metrics_rate: float = None,
                  initial_channels: List[Channel] = None,
-                 initial_enums: List[UserEnum] = None) -> None:
+                 initial_enums: List[UserEnum] = None,
+                 app_id_basis: float = None) -> None:
         """ Construct a new telemetry environment. """
 
-        super().__init__(mtu, initial_channels, metrics_rate, init_time)
+        super().__init__(mtu, initial_channels, metrics_rate, init_time,
+                         app_id_basis)
         self.enum_registry = EnumRegistry(initial_enums)
         self.type_registry = get_default()
         assert self.enum_registry.add_enum(self.framer.get_types())[0]

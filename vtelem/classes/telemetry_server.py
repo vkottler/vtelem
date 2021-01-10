@@ -4,6 +4,7 @@ vtelem - An interface for creating telemetered applications.
 """
 
 # built-in
+from http.server import BaseHTTPRequestHandler
 import socket
 from typing import Tuple
 
@@ -25,7 +26,8 @@ class TelemetryServer(HttpDaemon):
 
     def __init__(self, tick_length: float, telem_rate: float,
                  address: Tuple[str, int] = None,
-                 metrics_rate: float = None) -> None:
+                 metrics_rate: float = None,
+                 app_id_basis: float = None) -> None:
         """
         Construct a new telemetry server that can be commanded over http.
         """
@@ -41,7 +43,7 @@ class TelemetryServer(HttpDaemon):
         # (we will re-evalute mtu when we connect new clients)
         mtu = discover_ipv4_mtu((socket.getfqdn(), 0)) - (60 + 8)
         telem = TelemetryDaemon("telemetry", mtu, telem_rate, self.time_keeper,
-                                metrics_rate)
+                                metrics_rate, app_id_basis=app_id_basis)
         telem.handle_new_mtu(DEFAULT_MTU)
         self.channel_groups = ChannelGroupRegistry(telem)
         assert self.daemons.add_daemon(telem)
@@ -54,6 +56,35 @@ class TelemetryServer(HttpDaemon):
         # add the http daemon
         super().__init__("http", address, MapperAwareRequestHandler, telem,
                          self.time_keeper)
+
+        def app_id(_: BaseHTTPRequestHandler, __: dict) -> Tuple[bool, str]:
+            """ Provide the application identifier. """
+            return True, str(telem.app_id)
+
+        def shutdown(_: BaseHTTPRequestHandler,
+                     data: dict) -> Tuple[bool, str]:
+            """
+            Attemp to shut this server down, required the correct application
+            identifier.
+            """
+
+            our_id = telem.app_id
+            provided_id = data["app_id"]
+            if provided_id is None:
+                return False, "no 'app_id' argument provided"
+            if our_id.get() != int(provided_id):
+                msg = "'app_id' mismatch, expected '{}' got '{}'"
+                return False, msg.format(our_id.get(), int(provided_id))
+            self.stop_all()
+            self.stop()
+            self.close()
+            return True, "success"
+
+        # add request handlers
+        self.add_handler("GET", "id", app_id,
+                         ("get this telemetry instance's " +
+                          "application identifier"))
+        self.add_handler("POST", "shutdown", shutdown, "shutdown the server")
 
     def scale_speed(self, scalar: float) -> None:
         """ Change the time scaling for the time keeper. """

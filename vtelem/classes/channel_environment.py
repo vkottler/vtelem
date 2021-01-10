@@ -51,6 +51,12 @@ class ChannelEnvironment(TimeEntity):
         self.frame_queue: MeteredQueue = MeteredQueue("frame", self)
         self.log_data: dict = defaultdict(lambda: 0.0)
 
+    @property
+    def app_id(self) -> TypePrimitive:
+        """ Get this environment's application identifier. """
+
+        return self.framer.primitives["app_id"]
+
     def handle_new_mtu(self, new_mtu: int) -> None:
         """ Set a new maximum transmission-unit size if necessary. """
 
