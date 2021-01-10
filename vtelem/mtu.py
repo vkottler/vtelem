@@ -69,6 +69,20 @@ def discover_mtu(sock: socket.SocketType,
     return sock.getsockopt(socket.IPPROTO_IP, SocketConstants.IP_MTU)
 
 
+def get_free_tcp_port(interface_ip: str = "0.0.0.0") -> int:
+    """
+    Create a socket to determine an arbitrary port number that's available.
+    There is an inherent race condition using this strategy.
+    """
+
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.bind((interface_ip, 0))
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    _, port = sock.getsockname()
+    sock.close()
+    return port
+
+
 def discover_ipv4_mtu(host: Tuple[str, int],
                       probe_size: int = DEFAULT_MTU) -> int:
     """
