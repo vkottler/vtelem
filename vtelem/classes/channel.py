@@ -21,7 +21,8 @@ class Channel(TypePrimitive):
     """
 
     def __init__(self, name: str, instance: Primitive, rate: float,
-                 event_queue: EventQueue = None) -> None:
+                 event_queue: EventQueue = None,
+                 commandable: bool = True) -> None:
         """
         Construct a new channel of a provided primitive type that should be
         emitted at a specified rate.
@@ -40,7 +41,16 @@ class Channel(TypePrimitive):
         super().__init__(instance, changed_cb)
         self.name = name
         self.rate = rate
+        self.commandable = commandable
         self.last_emitted: float = float()
+
+    def command(self, value: Any, time: float = None) -> bool:
+        """ Attempt to command this channel to a new value """
+
+        if not self.commandable:
+            return False
+        with self.lock:
+            return self.set(value, time)
 
     def set_rate(self, rate: float) -> None:
         """ Set a channel's rate post-initialization. """

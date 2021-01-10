@@ -15,7 +15,7 @@ def test_channel_basic():
     queue = EventQueue()
     chan_a = Channel("a", Primitive.FLOAT, 1.0)
     chan_b = Channel("b", Primitive.UINT8, 1.0, queue)
-    chan_c = Channel("c", Primitive.BOOL, 1.0, queue)
+    chan_c = Channel("c", Primitive.BOOL, 1.0, queue, False)
 
     time = float()
 
@@ -35,3 +35,6 @@ def test_channel_basic():
 
     events = queue.consume()
     assert len(events) == 2
+
+    assert chan_b.command(1)
+    assert not chan_c.command(True)

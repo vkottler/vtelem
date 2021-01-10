@@ -87,7 +87,7 @@ class ChannelEnvironment(TimeEntity):
 
         if self.metrics is not None and not self.has_metric(name):
             self.metrics[name] = self.add_channel(name, instance, float(),
-                                                  track_change, initial)
+                                                  track_change, initial, False)
             self.set_metric_rate(name, self.get_metric("metrics_rate"))
 
     def get_metric(self, name: str) -> Any:
@@ -145,9 +145,26 @@ class ChannelEnvironment(TimeEntity):
         chan_id = self.channel_registry.get_id(name)
         return chan_id is not None
 
+    def command_channel_id(self, chan_id: int, value: Any) -> bool:
+        """ Attempt to command a channel, by its integer identifier. """
+
+        chan = self.channel_registry.get_item(chan_id)
+        assert chan is not None
+        return chan.command(value, self.get_time())
+
+    def command_channel(self, name: str, value: Any) -> bool:
+        """ Attempt to command a channel, by its name. """
+
+        if not self.has_channel(name):
+            return False
+        chan_id = self.channel_registry.get_id(name)
+        assert chan_id is not None
+        return self.command_channel_id(chan_id, value)
+
     def add_channel(self, name: str, instance: Primitive, rate: float,
                     track_change: bool = False,
-                    initial: Tuple[Any, Optional[float]] = None) -> int:
+                    initial: Tuple[Any, Optional[float]] = None,
+                    commandable: bool = True) -> int:
         """
         Register a channel with the environment, returns an integer identifier
         that can be used to set the channel's value through the environment.
@@ -155,7 +172,7 @@ class ChannelEnvironment(TimeEntity):
 
         with self.lock:
             queue = None if not track_change else self.event_queue
-            new_chan = Channel(name, instance, rate, queue)
+            new_chan = Channel(name, instance, rate, queue, commandable)
             if initial is not None:
                 assert new_chan.set(initial[0], initial[1])
             result = self.channel_registry.add_channel(new_chan)

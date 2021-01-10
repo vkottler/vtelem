@@ -4,3 +4,4 @@ extension-pkg-whitelist=netifaces
 [DESIGN]
 max-args=9
 max-attributes=8
+max-public-methods=21

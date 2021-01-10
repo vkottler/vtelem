@@ -17,6 +17,26 @@ from vtelem.enums.primitive import Primitive
 from . import EnumA
 
 
+def test_environment_commanding():
+    """ Test that channels can be commanded when expected to be. """
+
+    start_time = time.time()
+    env = TelemetryEnvironment(2 ** 8, start_time, 1.0)
+
+    env.add_channel("a", Primitive.FLOAT, 0.1)
+    env.add_channel("b", Primitive.FLOAT, 0.1)
+    env.add_channel("c", Primitive.FLOAT, 0.1, commandable=False)
+    assert env.command_channel("a", 1.0)
+    assert env.command_channel("b", 2.0)
+    assert not env.command_channel("c", 3.0)
+    assert not env.command_channel("d", 4.0)
+
+    assert env.add_from_enum(EnumA) >= 0
+    env.add_enum_channel("enum_chan", "enum_a", 1.0)
+    assert env.command_enum_channel("enum_chan", "b")
+    assert not env.command_enum_channel("enum_chan2", "b")
+
+
 def test_app_id_from_basis():
     """ Test application-identifer creation. """
 

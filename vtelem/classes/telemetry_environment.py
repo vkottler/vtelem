@@ -42,12 +42,31 @@ class TelemetryEnvironment(ChannelEnvironment):
             self.add_metric("type_count", Primitive.UINT32, True,
                             (self.type_registry.count(), self.get_time()))
 
+    def command_enum_channel_id(self, chan_id: int, value: str) -> bool:
+        """ Attempt to command an enum-based channel by integer identifier. """
+
+        enum_type = self.enum_channel_types[chan_id]
+        enum_def = self.enum_registry.get_item(enum_type)
+        assert enum_def is not None
+        return self.command_channel_id(chan_id, enum_def.get_value(value))
+
+    def command_enum_channel(self, name: str, value: str) -> bool:
+        """ Attempt to command an enum-based channel. """
+
+        if not self.has_channel(name):
+            return False
+        chan_id = self.channel_registry.get_id(name)
+        assert chan_id is not None
+        return self.command_enum_channel_id(chan_id, value)
+
     def add_enum_channel(self, name: str, enum_name: str, rate: float,
                          track_change: bool = False,
-                         initial: Tuple[str, Optional[float]] = None) -> int:
+                         initial: Tuple[str, Optional[float]] = None,
+                         commandable: bool = True) -> int:
         """ Add a channel that stores an enumeration value."""
 
-        new_chan = self.add_channel(name, ENUM_TYPE, rate, track_change)
+        new_chan = self.add_channel(name, ENUM_TYPE, rate, track_change, None,
+                                    commandable)
         enum_type = self.enum_registry.get_id(enum_name)
         assert enum_type is not None
         self.enum_channel_types[new_chan] = enum_type
@@ -67,7 +86,7 @@ class TelemetryEnvironment(ChannelEnvironment):
         if self.metrics is not None and not self.has_metric(name):
             self.metrics[name] = self.add_enum_channel(name, enum_name,
                                                        float(), track_change,
-                                                       initial)
+                                                       initial, False)
             self.set_metric_rate(name, self.get_metric("metrics_rate"))
 
     def set_enum_metric(self, name: str, data: str,
