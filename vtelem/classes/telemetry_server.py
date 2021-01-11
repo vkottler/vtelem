@@ -81,10 +81,18 @@ class TelemetryServer(HttpDaemon):
             self.stop_all()
             return True, "success"
 
+        def get_types(_: BaseHTTPRequestHandler,
+                      data: dict) -> Tuple[bool, str]:
+            """ Return the type-registry contents as JSON. """
+            indented = data["indent"] is not None
+            return True, telem.type_registry.describe(indented)
+
         # add request handlers
         self.add_handler("GET", "id", app_id,
                          ("get this telemetry instance's " +
                           "application identifier"))
+        self.add_handler("GET", "types", get_types,
+                         "get the numerical ""mappings for known types")
         self.add_handler("POST", "shutdown", shutdown, "shutdown the server")
 
     def scale_speed(self, scalar: float) -> None:

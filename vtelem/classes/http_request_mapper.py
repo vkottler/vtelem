@@ -120,6 +120,12 @@ class MapperAwareRequestHandler(BaseHTTPRequestHandler):
         data: dict = defaultdict(lambda: None)
         data.update(_data)
 
+        # parse the request uri
+        parsed = urllib.parse.urlparse(self.path)
+        self.path = parsed.path
+        if parsed.query:
+            data.update(urllib.parse.parse_qs(parsed.query))
+
         if not hasattr(self.server, "mapper"):
             return self._no_mapper_response()
         mapper: HttpRequestMapper
@@ -172,8 +178,6 @@ def get_post_request_data(request: BaseHTTPRequestHandler) -> dict:
     result = {}
     assert request.command == "POST"
 
-    LOG.info(request.headers)
-
     def form_parser(_: BaseHTTPRequestHandler) -> dict:
         """ Parse form data from a POST request. (RFC 7578) """
         return {}
@@ -194,7 +198,5 @@ def get_post_request_data(request: BaseHTTPRequestHandler) -> dict:
             if mtype in request.headers["Content-Type"].lower():
                 result = parser(request)
                 break
-
-    LOG.info(result)
 
     return result

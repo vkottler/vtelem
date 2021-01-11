@@ -27,6 +27,19 @@ def test_telemetry_server_basic():
     assert server.stop()
 
 
+def test_telemetry_server_get_types():
+    """ Test that the type manifest can be successfully requested. """
+
+    server = TelemetryServer(0.01, 0.10, ("0.0.0.0", 0), 0.25)
+    server.start_all()
+
+    # get app id
+    result = requests.get(server.get_base_url() + "types?indent=4").json()
+    assert all(key in result for key in ["mappings", "types"])
+
+    server.stop_all()
+
+
 def test_telemetry_server_stop_http():
     """ Test that the server can shutdown from an http request. """
 
