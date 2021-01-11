@@ -6,6 +6,7 @@ vtelem - An interface for creating telemetered applications.
 # built-in
 from http.server import BaseHTTPRequestHandler
 import socket
+import threading
 from typing import Tuple
 
 # internal
@@ -33,6 +34,7 @@ class TelemetryServer(HttpDaemon):
         """
 
         self.daemons = DaemonManager()
+        self.state_sem = threading.Semaphore(0)
 
         # add the ticker
         self.time_keeper = TimeKeeper("time", tick_length)
@@ -59,7 +61,7 @@ class TelemetryServer(HttpDaemon):
 
         def app_id(_: BaseHTTPRequestHandler, __: dict) -> Tuple[bool, str]:
             """ Provide the application identifier. """
-            return True, str(telem.app_id)
+            return True, str(telem.app_id.get())
 
         def shutdown(_: BaseHTTPRequestHandler,
                      data: dict) -> Tuple[bool, str]:
@@ -72,12 +74,11 @@ class TelemetryServer(HttpDaemon):
             provided_id = data["app_id"]
             if provided_id is None:
                 return False, "no 'app_id' argument provided"
+            provided_id = provided_id[0]
             if our_id.get() != int(provided_id):
                 msg = "'app_id' mismatch, expected '{}' got '{}'"
                 return False, msg.format(our_id.get(), int(provided_id))
             self.stop_all()
-            self.stop()
-            self.close()
             return True, "success"
 
         # add request handlers
@@ -98,6 +99,8 @@ class TelemetryServer(HttpDaemon):
 
         self.daemons.perform_all(DaemonOperation.START)
         self.start()
+        with self.lock:
+            self.state_sem.release()
 
     def stop_all(self) -> None:
         """ Stop everything. """
@@ -105,3 +108,18 @@ class TelemetryServer(HttpDaemon):
         self.daemons.perform_all(DaemonOperation.STOP)
         self.stop()
         self.close()
+        with self.lock:
+            self.state_sem.release()
+
+    def await_shutdown(self, timeout: float = None) -> None:
+        """
+        Wait for startup, then shutdown of this server. Otherwise attempt a
+        manual shutdown if this is interrupted.
+        """
+
+        try:
+            self.state_sem.acquire()
+            if not self.state_sem.acquire(True, timeout):  # type: ignore
+                self.stop_all()
+        except KeyboardInterrupt:
+            self.stop_all()

@@ -14,7 +14,7 @@ endif
 
 all: python-lint python-sa python-test mk-todo
 
-RUN_ARGS := -v -p 9000
+RUN_ARGS := -v -p 9000 -a 0.5
 
 run: $(VENV_CONC)
 	@$(PYTHON_BIN)/python $($(PROJ)_DIR)/dev.py $(RUN_ARGS)

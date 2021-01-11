@@ -6,7 +6,6 @@ vtelem - This package's command-line entry-point application.
 # built-in
 import argparse
 import socket
-import time
 
 # third-party
 import netifaces  # type: ignore
@@ -26,19 +25,14 @@ def entry(args: argparse.Namespace) -> int:
 
     # instantiate the server
     server = TelemetryServer(args.tick, args.telem_rate,
-                             (ip_address, args.port), args.metrics_rate)
+                             (ip_address, args.port), args.metrics_rate,
+                             args.app_id)
 
-    # run until interrupted
+    # run until the server shuts down because of timeout, external command, or
+    # interruption
     server.start_all()
     server.scale_speed(args.time_scale)
-    try:
-        time.sleep(1.0)
-    except KeyboardInterrupt:
-        pass
-    server.stop_all()
-
-    print(server)
-
+    server.await_shutdown(args.uptime)
     return 0
 
 
@@ -63,3 +57,10 @@ def add_app_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--time-scale", type=float,
                         help="scalar to apply to the progression of time",
                         default=1.0)
+    parser.add_argument("-a", "--app-id", type=float,
+                        help=("a value that forms the basis for the " +
+                              "application identifier"),
+                        required=False)
+    parser.add_argument("-u", "--uptime", type=float,
+                        help="specify a finite duration to run the server",
+                        required=False)

@@ -163,6 +163,38 @@ class MapperAwareRequestHandler(BaseHTTPRequestHandler):
 
     def do_POST(self) -> None:  # pylint: disable=invalid-name
         """ Respond to a POST request. """
-        length = int(self.headers["content-length"])
-        field_data = self.rfile.read(length)
-        return self._handle(urllib.parse.parse_qs(field_data))
+        return self._handle(get_post_request_data(self))
+
+
+def get_post_request_data(request: BaseHTTPRequestHandler) -> dict:
+    """ Obtain a dictionary of POST request data from a given request. """
+
+    result = {}
+    assert request.command == "POST"
+
+    LOG.info(request.headers)
+
+    def form_parser(_: BaseHTTPRequestHandler) -> dict:
+        """ Parse form data from a POST request. (RFC 7578) """
+        return {}
+
+    def url_encoded_parser(request: BaseHTTPRequestHandler) -> dict:
+        """ Parse url-encoded POST request data. """
+        field_data = request.rfile.read(length).decode("utf-8")
+        return urllib.parse.parse_qs(field_data)
+
+    parsers = {"multipart/form-data": form_parser,
+               "application/x-www-form-urlencoded": url_encoded_parser}
+
+    # if the request has content, attempt to parse it
+    keys = ["Content-Length", "Content-Type"]
+    if all(key in request.headers for key in keys):
+        length = int(request.headers["Content-Length"])
+        for mtype, parser in parsers.items():
+            if mtype in request.headers["Content-Type"].lower():
+                result = parser(request)
+                break
+
+    LOG.info(result)
+
+    return result
