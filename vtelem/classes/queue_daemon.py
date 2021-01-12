@@ -5,20 +5,23 @@ vtelem - Uses daemon machinery to make servicing queues in threads simple.
 
 # built-in
 from queue import Queue
-from typing import Callable
+from typing import Any, Callable
 
 # internal
 from .daemon_base import DaemonBase
+from .telemetry_environment import TelemetryEnvironment
 
 
 class QueueDaemon(DaemonBase):
     """ Implements a daemon thread for servicing queues. """
 
     def __init__(self, name: str, input_stream: Queue,
-                 elem_handle: Callable) -> None:
+                 elem_handle: Callable,
+                 env: TelemetryEnvironment = None,
+                 time_keeper: Any = None) -> None:
         """ Construct a new queue daemon. """
 
-        super().__init__(name)
+        super().__init__(name, env, time_keeper)
         self.queue = input_stream
         self.handle = elem_handle
 
