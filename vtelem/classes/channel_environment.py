@@ -102,12 +102,12 @@ class ChannelEnvironment(TimeEntity):
         assert self.metrics is not None
         return self.get_value(self.metrics[name])
 
-    def set_now(self, channel_id: int, data: Any) -> None:
+    def set_now(self, channel_id: int, data: Any) -> bool:
         """ set a channel with the provided value, assign time. """
 
         chan = self.channel_registry.get_item(channel_id)
         assert chan is not None
-        assert chan.set(data, self.get_time())
+        return chan.set(data, self.get_time())
 
     def get_value(self, chan_id: int) -> Any:
         """ Get the current value of a channel, by integer identifier. """

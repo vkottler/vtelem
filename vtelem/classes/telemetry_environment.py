@@ -6,11 +6,10 @@ vtelem - An environment that supports management of telemetry.
 # built-in
 from collections import defaultdict
 from enum import Enum
-from typing import Any, List, Dict, Type, Tuple, Optional
+from typing import List, Dict, Type, Tuple, Optional
 
 # internal
 from vtelem.enums.primitive import Primitive
-from vtelem.types.command_queue_daemon import ResultCbType
 from . import ENUM_TYPE
 from .channel import Channel
 from .channel_environment import ChannelEnvironment
@@ -62,41 +61,10 @@ class TelemetryEnvironment(ChannelEnvironment):
         assert chan_id is not None
         return self.command_enum_channel_id(chan_id, value)
 
-    def register_command_queue(self, daemon: Any,
-                               result_cb: ResultCbType = None) -> None:
-        """ Register a handler to a command queue, for this environment. """
+    def is_enum_channel(self, chan_id: int) -> bool:
+        """ Determine if a channel holds an enumeration value. """
 
-        def channel_commander(command: dict) -> Tuple[bool, str]:
-            """ Attempt to command a channel in this environment """
-
-            if "operation" not in command:
-                return False, "no operation supplied"
-
-            if "channel_name" not in command and "channel_id" not in command:
-                msg = "must provide either 'channel_name' or 'channel_id'"
-                return False, msg
-
-            if "channel_name" in command:
-                chan_name = command["channel_name"]
-                if not self.has_channel(chan_name):
-                    return False, "no channel '{}' known".format(chan_name)
-
-            # use either of name or id, whichever is provided
-            # lookup channel, see if we know of it
-            # if both channel and id provided, make sure they agree
-
-            # check the operation
-            supported_ops = ["set", "get"]
-            if command["operation"] not in supported_ops:
-                msg = "operation '{}' not supported"
-                return False, msg.format(command["operation"])
-
-            # attempt the operation on the channel (when do we validate data?)
-            # and return the result
-
-            return False, "work in progress"
-
-        daemon.register_consumer("channel", channel_commander, result_cb)
+        return self.enum_channel_types[chan_id] != -1
 
     def add_enum_channel(self, name: str, enum_name: str, rate: float,
                          track_change: bool = False,
@@ -158,13 +126,13 @@ class TelemetryEnvironment(ChannelEnvironment):
         assert enum_def is not None
         return enum_def.get_str(self.get_value(chan_id))
 
-    def set_enum_now(self, channel_id: int, data: str) -> None:
+    def set_enum_now(self, channel_id: int, data: str) -> bool:
         """ Set an enum channel with the provided value, assign time. """
 
         enum_type = self.enum_channel_types[channel_id]
         enum_def = self.enum_registry.get_item(enum_type)
         assert enum_def is not None
-        self.set_now(channel_id, enum_def.get_value(data))
+        return self.set_now(channel_id, enum_def.get_value(data))
 
     def add_from_enum(self, enum_class: Type[Enum]) -> int:
         """ Add an enumeration from an enum class. """

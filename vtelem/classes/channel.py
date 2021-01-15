@@ -44,13 +44,15 @@ class Channel(TypePrimitive):
         self.commandable = commandable
         self.last_emitted: float = float()
 
-    def command(self, value: Any, time: float = None) -> bool:
+    def command(self, value: Any, time: float = None,
+                add: bool = False) -> bool:
         """ Attempt to command this channel to a new value """
 
         if not self.commandable:
             return False
+        operation = self.add if add else self.set
         with self.lock:
-            return self.set(value, time)
+            return operation(value, time)
 
     def set_rate(self, rate: float) -> None:
         """ Set a channel's rate post-initialization. """
