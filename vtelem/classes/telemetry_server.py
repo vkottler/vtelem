@@ -4,7 +4,6 @@ vtelem - An interface for creating telemetered applications.
 """
 
 # built-in
-from http.server import BaseHTTPRequestHandler
 import socket
 import threading
 from typing import Tuple
@@ -12,6 +11,7 @@ from typing import Tuple
 # internal
 from vtelem.mtu import discover_ipv4_mtu, DEFAULT_MTU
 from vtelem.factories.telemetry_environment import create_channel_commander
+from vtelem.factories.telemetry_server import register_http_handlers
 from .channel_group_registry import ChannelGroupRegistry
 from .command_queue_daemon import CommandQueueDaemon
 from .daemon_base import DaemonOperation
@@ -60,42 +60,7 @@ class TelemetryServer(HttpDaemon):
         # add the http daemon
         super().__init__("http", address, MapperAwareRequestHandler, telem,
                          self.time_keeper)
-
-        def app_id(_: BaseHTTPRequestHandler, __: dict) -> Tuple[bool, str]:
-            """ Provide the application identifier. """
-            return True, str(telem.app_id.get())
-
-        def shutdown(_: BaseHTTPRequestHandler,
-                     data: dict) -> Tuple[bool, str]:
-            """
-            Attemp to shut this server down, required the correct application
-            identifier.
-            """
-
-            our_id = telem.app_id
-            provided_id = data["app_id"]
-            if provided_id is None:
-                return False, "no 'app_id' argument provided"
-            provided_id = provided_id[0]
-            if our_id.get() != int(provided_id):
-                msg = "'app_id' mismatch, expected '{}' got '{}'"
-                return False, msg.format(our_id.get(), int(provided_id))
-            self.stop_all()
-            return True, "success"
-
-        def get_types(_: BaseHTTPRequestHandler,
-                      data: dict) -> Tuple[bool, str]:
-            """ Return the type-registry contents as JSON. """
-            indented = data["indent"] is not None
-            return True, telem.type_registry.describe(indented)
-
-        # add request handlers
-        self.add_handler("GET", "id", app_id,
-                         ("get this telemetry instance's " +
-                          "application identifier"))
-        self.add_handler("GET", "types", get_types,
-                         "get the numerical ""mappings for known types")
-        self.add_handler("POST", "shutdown", shutdown, "shutdown the server")
+        register_http_handlers(self, telem)
 
         # add the command-queue daemon
         queue_daemon = CommandQueueDaemon("command", telem, self.time_keeper)
