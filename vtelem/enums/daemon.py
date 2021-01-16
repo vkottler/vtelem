@@ -35,6 +35,15 @@ def operation_str(operation: DaemonOperation) -> str:
     return operation.name.lower()
 
 
+def is_operation(operation: str) -> bool:
+    """ Check if a provided String is a valid daemon operation. """
+
+    for oper in DaemonOperation:
+        if operation == operation_str(oper):
+            return True
+    return False
+
+
 def str_to_operation(operation: str) -> Optional[DaemonOperation]:
     """ Find an operation enum based on the provided stream. """
 

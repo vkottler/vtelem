@@ -10,6 +10,7 @@ from typing import Tuple
 
 # internal
 from vtelem.mtu import discover_ipv4_mtu, DEFAULT_MTU
+from vtelem.factories.daemon_manager import create_daemon_manager_commander
 from vtelem.factories.telemetry_environment import create_channel_commander
 from vtelem.factories.telemetry_server import register_http_handlers
 from .channel_group_registry import ChannelGroupRegistry
@@ -66,6 +67,9 @@ class TelemetryServer(HttpDaemon):
         queue_daemon = CommandQueueDaemon("command", telem, self.time_keeper)
         create_channel_commander(telem, queue_daemon)
         assert self.daemons.add_daemon(queue_daemon)
+
+        # make the daemon-manager commandable
+        create_daemon_manager_commander(self.daemons, queue_daemon)
 
     def scale_speed(self, scalar: float) -> None:
         """ Change the time scaling for the time keeper. """

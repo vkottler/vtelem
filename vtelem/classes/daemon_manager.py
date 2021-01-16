@@ -14,6 +14,7 @@ from vtelem.enums.daemon import (
 from .daemon_base import DaemonBase
 
 LOG = logging.getLogger(__name__)
+NAME_DENYLIST = ["all"]
 
 
 class DaemonManager:
@@ -28,6 +29,7 @@ class DaemonManager:
         """ Add a daemon to this manager. """
 
         name = daemon.name
+        assert name not in NAME_DENYLIST
         if name in self.daemons:
             LOG.error("can't register daemon '%s', name is registered.", name)
             return False

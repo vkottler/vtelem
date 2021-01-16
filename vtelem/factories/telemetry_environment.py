@@ -76,7 +76,8 @@ def channel_decrement(chan: Tuple[Channel, int], cmd: dict,
 
 def create_channel_commander(env: TelemetryEnvironment,
                              daemon: CommandQueueDaemon,
-                             result_cb: ResultCbType = None) -> None:
+                             result_cb: ResultCbType = None,
+                             command_name: str = "channel") -> None:
     """ Register a handler to a command queue for a telemetry environment. """
 
     def channel_commander(cmd: dict) -> Tuple[bool, str]:
@@ -124,4 +125,4 @@ def create_channel_commander(env: TelemetryEnvironment,
         return supported_ops[cmd["operation"]]((chan, chan_id), cmd,
                                                env.get_time(), env)
 
-    daemon.register_consumer("channel", channel_commander, result_cb)
+    daemon.register_consumer(command_name, channel_commander, result_cb)

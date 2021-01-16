@@ -34,7 +34,11 @@ def create_udp_socket(host: Tuple[str, int],
     # create a udp socket and set it to the host
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     if is_client:
-        sock.connect(host)
+        try:
+            sock.connect(host)
+        except socket.gaierror as exc:
+            LOG.error("%s, falling back to 'localhost:%d'", exc, host[1])
+            sock.connect(("localhost", host[1]))
     else:
         sock.bind(host)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
