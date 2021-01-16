@@ -1,6 +1,6 @@
 
 """
-vtelem - TODO.
+vtelem - Test the telemetry-environment factory functions.
 """
 
 # built-in

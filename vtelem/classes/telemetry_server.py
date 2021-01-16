@@ -11,7 +11,9 @@ from typing import Tuple
 
 # internal
 from vtelem.mtu import discover_ipv4_mtu, DEFAULT_MTU
+from vtelem.factories.telemetry_environment import create_channel_commander
 from .channel_group_registry import ChannelGroupRegistry
+from .command_queue_daemon import CommandQueueDaemon
 from .daemon_base import DaemonOperation
 from .daemon_manager import DaemonManager
 from .http_daemon import HttpDaemon
@@ -94,6 +96,11 @@ class TelemetryServer(HttpDaemon):
         self.add_handler("GET", "types", get_types,
                          "get the numerical ""mappings for known types")
         self.add_handler("POST", "shutdown", shutdown, "shutdown the server")
+
+        # add the command-queue daemon
+        queue_daemon = CommandQueueDaemon("command", telem, self.time_keeper)
+        create_channel_commander(telem, queue_daemon)
+        assert self.daemons.add_daemon(queue_daemon)
 
     def scale_speed(self, scalar: float) -> None:
         """ Change the time scaling for the time keeper. """
