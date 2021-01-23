@@ -46,6 +46,21 @@ def test_telemetry_server_get_types():
     server.stop_all()
 
 
+async def ws_command(wsock, msg: str, expect: bool):
+    """ Test an individual websocket command. """
+
+    await wsock.send(msg)
+    rsp_data = json.loads(await wsock.recv())
+    assert rsp_data["success"] == expect
+    return rsp_data["message"]
+
+
+async def ws_command_dict(wsock, msg: dict, expect: bool):
+    """ Test a websocket command from dict data. """
+
+    return await ws_command(wsock, json.dumps(msg), expect)
+
+
 def test_telemetry_server_ws_commands():
     """ Test that websocket commands are supported by the server. """
 
@@ -61,16 +76,48 @@ def test_telemetry_server_ws_commands():
         async with websockets.connect(uri) as websocket:
 
             # test invalid json
-            msg = "{'command': 'help'}"
-            await websocket.send(msg)
-            rsp_data = json.loads(await websocket.recv())
-            assert not rsp_data["success"]
+            await ws_command(websocket, "{'command': 'help'}", False)
 
             # test valid json
-            cmd = {"command": "help"}
-            await websocket.send(json.dumps(cmd))
-            rsp_data = json.loads(await websocket.recv())
-            assert rsp_data["success"]
+            await ws_command_dict(websocket, {"command": "help"}, True)
+
+            # test udp client commands
+            data = {}
+            cmd = {"command": "udp", "data": data}
+            await ws_command_dict(websocket, cmd, False)
+            data["operation"] = "asdf"
+            await ws_command_dict(websocket, cmd, False)
+            data["operation"] = "list"
+            await ws_command_dict(websocket, cmd, True)
+
+            # add a client
+            data["operation"] = "add"
+            await ws_command_dict(websocket, cmd, False)
+            data["host"] = "localhost"
+            data["port"] = 0
+            await ws_command_dict(websocket, cmd, True)
+            del data["host"]
+            del data["port"]
+
+            # list the single client
+            data["operation"] = "list"
+            clients = json.loads(await ws_command_dict(websocket, cmd, True))
+            for client in clients:
+                data["id"] = int(client)
+                await ws_command_dict(websocket, cmd, True)
+            data["id"] = -1
+            await ws_command_dict(websocket, cmd, False)
+
+            # remove the clients
+            data["operation"] = "remove"
+            del data["id"]
+            await ws_command_dict(websocket, cmd, False)
+            data["id"] = -1
+            await ws_command_dict(websocket, cmd, False)
+
+            for client in clients:
+                data["id"] = int(client)
+                await ws_command_dict(websocket, cmd, True)
 
     asyncio.get_event_loop().run_until_complete(help_test())
 
