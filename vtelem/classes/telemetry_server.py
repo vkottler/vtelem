@@ -25,6 +25,7 @@ from .stream_writer import StreamWriter
 from .telemetry_daemon import TelemetryDaemon
 from .time_keeper import TimeKeeper
 from .udp_client_manager import UdpClientManager
+from .websocket_telemetry_daemon import WebsocketTelemetryDaemon
 
 
 class TelemetryServer(HttpDaemon):
@@ -34,7 +35,8 @@ class TelemetryServer(HttpDaemon):
                  http_address: Tuple[str, int] = None,
                  metrics_rate: float = None,
                  app_id_basis: float = None,
-                 websocket_cmd_address: Tuple[str, int] = None) -> None:
+                 websocket_cmd_address: Tuple[str, int] = None,
+                 websocket_tlm_address: Tuple[str, int] = None) -> None:
         """
         Construct a new telemetry server that can be commanded over http.
         """
@@ -60,6 +62,13 @@ class TelemetryServer(HttpDaemon):
         writer = StreamWriter("stream", telem.frame_queue)
         self.udp_clients = UdpClientManager(writer)
         assert self.daemons.add_daemon(writer)
+
+        # add the websocket-telemetry daemon
+        assert self.daemons.add_daemon(WebsocketTelemetryDaemon(
+            "websocket_telemetry", writer,
+            websocket_tlm_address, telem,
+            self.time_keeper
+        ))
 
         # add the http daemon
         super().__init__("http", http_address, MapperAwareRequestHandler,
