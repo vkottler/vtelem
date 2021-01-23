@@ -29,13 +29,22 @@ def test_command_queue_daemon_basic():
         assert result == (iteration % 2 == 0)
         assert str(iteration) == message
 
+    def cmd_cb(_: bool, __: str) -> None:
+        """ Stub callback. """
+
     # register handlers
     daemon.register_consumer("test", sample_handler, result_cb)
     daemon.register_consumer("test", sample_handler)
 
     with daemon.booted():
+
+        # test 'help' command
+        daemon.enqueue({"command": "help"})
+        daemon.enqueue({"command": "help", "data": {"command": "asdf"}})
+        daemon.enqueue({"command": "help", "data": {"command": "test"}})
+
         for _ in range(5):
-            daemon.enqueue({})
-            daemon.enqueue({"command": "test"})
-            daemon.enqueue({"command": "test_bad"})
-            daemon.enqueue({"command": "test", "data": {}})
+            daemon.enqueue({}, cmd_cb)
+            daemon.enqueue({"command": "test"}, cmd_cb)
+            daemon.enqueue({"command": "test_bad"}, cmd_cb)
+            daemon.enqueue({"command": "test", "data": {}}, cmd_cb)

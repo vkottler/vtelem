@@ -13,6 +13,7 @@ from vtelem.mtu import discover_ipv4_mtu, DEFAULT_MTU
 from vtelem.factories.daemon_manager import create_daemon_manager_commander
 from vtelem.factories.telemetry_environment import create_channel_commander
 from vtelem.factories.telemetry_server import register_http_handlers
+from vtelem.factories.websocket_daemon import commandable_websocket_daemon
 from .channel_group_registry import ChannelGroupRegistry
 from .command_queue_daemon import CommandQueueDaemon
 from .daemon_base import DaemonOperation
@@ -29,9 +30,10 @@ class TelemetryServer(HttpDaemon):
     """ A class for application-level telemetry integration. """
 
     def __init__(self, tick_length: float, telem_rate: float,
-                 address: Tuple[str, int] = None,
+                 http_address: Tuple[str, int] = None,
                  metrics_rate: float = None,
-                 app_id_basis: float = None) -> None:
+                 app_id_basis: float = None,
+                 websocket_cmd_address: Tuple[str, int] = None) -> None:
         """
         Construct a new telemetry server that can be commanded over http.
         """
@@ -59,14 +61,21 @@ class TelemetryServer(HttpDaemon):
         assert self.daemons.add_daemon(writer)
 
         # add the http daemon
-        super().__init__("http", address, MapperAwareRequestHandler, telem,
-                         self.time_keeper)
+        super().__init__("http", http_address, MapperAwareRequestHandler,
+                         telem, self.time_keeper)
         register_http_handlers(self, telem)
 
         # add the command-queue daemon
         queue_daemon = CommandQueueDaemon("command", telem, self.time_keeper)
         create_channel_commander(telem, queue_daemon)
         assert self.daemons.add_daemon(queue_daemon)
+
+        # add the websocket-command daemon
+        ws_cmd = commandable_websocket_daemon("websocket_command",
+                                              queue_daemon,
+                                              websocket_cmd_address, telem,
+                                              self.time_keeper)
+        assert self.daemons.add_daemon(ws_cmd)
 
         # make the daemon-manager commandable
         create_daemon_manager_commander(self.daemons, queue_daemon)
