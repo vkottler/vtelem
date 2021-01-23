@@ -10,7 +10,7 @@ from typing import List, Tuple
 # internal
 from vtelem.classes.command_queue_daemon import CommandQueueDaemon
 from vtelem.classes.daemon_manager import DaemonManager
-from vtelem.enums.daemon import is_operation
+from vtelem.enums.daemon import is_operation, DaemonOperation, operation_str
 from vtelem.types.command_queue_daemon import ResultCbType
 
 
@@ -53,4 +53,7 @@ def create_daemon_manager_commander(manager: DaemonManager,
 
         return False, "unknown 'operation' '{}'".format(oper)
 
-    daemon.register_consumer(command_name, daemon_commander, result_cb)
+    oper_strs = [operation_str(op) for op in DaemonOperation]
+    ops_str = ", ".join("'{}'".format(val) for val in oper_strs)
+    daemon.register_consumer(command_name, daemon_commander, result_cb,
+                             "{} daemons".format(ops_str))

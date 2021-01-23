@@ -13,6 +13,7 @@ from vtelem.mtu import discover_ipv4_mtu, DEFAULT_MTU
 from vtelem.factories.daemon_manager import create_daemon_manager_commander
 from vtelem.factories.telemetry_environment import create_channel_commander
 from vtelem.factories.telemetry_server import register_http_handlers
+from vtelem.factories.udp_client_manager import create_udp_client_commander
 from vtelem.factories.websocket_daemon import commandable_websocket_daemon
 from .channel_group_registry import ChannelGroupRegistry
 from .command_queue_daemon import CommandQueueDaemon
@@ -80,6 +81,9 @@ class TelemetryServer(HttpDaemon):
         # make the daemon-manager commandable
         create_daemon_manager_commander(self.daemons, queue_daemon)
 
+        # make the udp-client-manager commandable
+        create_udp_client_commander(self.udp_clients, queue_daemon)
+
     def scale_speed(self, scalar: float) -> None:
         """ Change the time scaling for the time keeper. """
 
@@ -101,6 +105,7 @@ class TelemetryServer(HttpDaemon):
         self.daemons.perform_all(DaemonOperation.STOP)
         self.stop()
         self.close()
+        self.udp_clients.remove_all()
         with self.lock:
             self.state_sem.release()
 

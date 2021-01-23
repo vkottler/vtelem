@@ -12,17 +12,19 @@ from vtelem.enums.daemon import (
     DaemonOperation, str_to_operation, operation_str
 )
 from .daemon_base import DaemonBase
+from .time_entity import LockEntity
 
 LOG = logging.getLogger(__name__)
 NAME_DENYLIST = ["all"]
 
 
-class DaemonManager:
+class DaemonManager(LockEntity):
     """ A class for managing a group of daemon tasks. """
 
     def __init__(self):
         """ Construct a new daemon manager. """
 
+        super().__init__()
         self.daemons: Dict[str, DaemonBase] = {}
 
     def add_daemon(self, daemon: DaemonBase) -> bool:
@@ -30,21 +32,24 @@ class DaemonManager:
 
         name = daemon.name
         assert name not in NAME_DENYLIST
-        if name in self.daemons:
-            LOG.error("can't register daemon '%s', name is registered.", name)
-            return False
-        self.daemons[name] = daemon
+        with self.lock:
+            if name in self.daemons:
+                LOG.error("can't register daemon '%s', name is registered.",
+                          name)
+                return False
+            self.daemons[name] = daemon
         return True
 
     def perform_all(self, operation: DaemonOperation, *args, **kwargs) -> bool:
         """ Attempt to perform an action on all daemons. """
 
         failures = 0
-        for daemon_name in self.daemons:
-            if not self.perform(daemon_name, operation, *args, **kwargs):
-                LOG.error("'%s' on '%s' failed.", operation_str(operation),
-                          daemon_name)
-                failures += 1
+        with self.lock:
+            for daemon_name in self.daemons:
+                if not self.perform(daemon_name, operation, *args, **kwargs):
+                    LOG.error("'%s' on '%s' failed.", operation_str(operation),
+                              daemon_name)
+                    failures += 1
         return failures == 0
 
     def perform_str_all(self, operation: str, *args, **kwargs) -> bool:
@@ -64,7 +69,9 @@ class DaemonManager:
             LOG.error("can't '%s' daemon '%s', unknown daemon.",
                       operation_str(operation), name)
             return False
-        return self.daemons[name].perform(operation, *args, **kwargs)
+        with self.lock:
+            result = self.daemons[name].perform(operation, *args, **kwargs)
+        return result
 
     def perform_str(self, name: str, operation: str, *args, **kwargs) -> bool:
         """ Perform an action on one or more daemons by String. """
@@ -79,7 +86,8 @@ class DaemonManager:
         """ Get all daemon states as a dictionary. """
 
         states_dict = {}
-        for name, daemon in self.daemons.items():
-            get_state = daemon.get_state_str if as_str else daemon.get_state
-            states_dict[name] = get_state()
+        with self.lock:
+            for name, daemon in self.daemons.items():
+                state_fn = daemon.get_state_str if as_str else daemon.get_state
+                states_dict[name] = state_fn()
         return states_dict

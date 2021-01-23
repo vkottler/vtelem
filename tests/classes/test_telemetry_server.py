@@ -36,6 +36,9 @@ def test_telemetry_server_get_types():
     server = TelemetryServer(0.01, 0.10, ("0.0.0.0", 0), 0.25)
     server.start_all()
 
+    # add  a client
+    server.udp_clients.add_client(("0.0.0.0", 0))
+
     # get app id
     result = requests.get(server.get_base_url() + "types?indent=4").json()
     assert all(key in result for key in ["mappings", "types"])

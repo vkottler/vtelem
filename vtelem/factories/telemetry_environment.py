@@ -80,6 +80,11 @@ def create_channel_commander(env: TelemetryEnvironment,
                              command_name: str = "channel") -> None:
     """ Register a handler to a command queue for a telemetry environment. """
 
+    supported_ops = {"set": channel_set,
+                     "get": channel_get,
+                     "increment": channel_increment,
+                     "decrement": channel_decrement}
+
     def channel_commander(cmd: dict) -> Tuple[bool, str]:
         """ Attempt to command a channel in this environment """
 
@@ -113,10 +118,6 @@ def create_channel_commander(env: TelemetryEnvironment,
             return False, "no channel with id '{}'".format(chan_id)
 
         # check the operation
-        supported_ops = {"set": channel_set,
-                         "get": channel_get,
-                         "increment": channel_increment,
-                         "decrement": channel_decrement}
         if cmd["operation"] not in supported_ops:
             msg = "operation '{}' not supported"
             return False, msg.format(cmd["operation"])
@@ -125,4 +126,6 @@ def create_channel_commander(env: TelemetryEnvironment,
         return supported_ops[cmd["operation"]]((chan, chan_id), cmd,
                                                env.get_time(), env)
 
-    daemon.register_consumer(command_name, channel_commander, result_cb)
+    ops_str = ", ".join("'{}'".format(val) for val in supported_ops)
+    daemon.register_consumer(command_name, channel_commander, result_cb,
+                             "{} channels".format(ops_str))

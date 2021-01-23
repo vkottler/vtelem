@@ -72,6 +72,13 @@ class UdpClientManager(LockEntity):
                  host[0], host[1])
         return sock_id, mtu
 
+    def remove_all(self) -> None:
+        """ Remove all active clients. """
+
+        with self.lock:
+            for sock_id in list(self.clients.keys()):
+                self.remove_client(sock_id)
+
     def remove_client(self, sock_id: int) -> None:
         """ Remove a client connection by integer identifier, closes it. """
 
