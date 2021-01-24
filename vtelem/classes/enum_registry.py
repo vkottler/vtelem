@@ -13,7 +13,7 @@ from typing import Tuple, List, Type
 from . import ENUM_TYPE
 from .registry import Registry
 from .type_registry import TypeRegistry
-from .user_enum import UserEnum, from_enum
+from .user_enum import UserEnum, from_enum, UserEnumEncoder
 
 LOG = logging.getLogger(__name__)
 
@@ -52,7 +52,7 @@ class EnumRegistry(Registry[UserEnum]):
     def describe(self, indented: bool = False) -> str:
         """ Obtain a JSON String of the enum registry's current state. """
 
-        return self.describe_raw(indented)
+        return self.describe_raw(indented, UserEnumEncoder)
 
     def export(self, registry: TypeRegistry) -> bool:
         """

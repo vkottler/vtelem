@@ -44,8 +44,8 @@ def test_telemetry_server_get_types():
         assert all(key in result for key in ["mappings", "types"])
 
         # get registries
-        # result = requests.get(server.get_base_url() + "registries").json()
-        # assert result
+        result = requests.get(server.get_base_url() + "registries").json()
+        assert result
 
 
 async def ws_command(wsock, msg: str, expect: bool) -> Tuple[bool, str]:

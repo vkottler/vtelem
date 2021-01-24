@@ -8,7 +8,7 @@ from typing import List, Tuple
 
 # internal
 from vtelem.enums.primitive import Primitive
-from .channel import Channel
+from .channel import Channel, ChannelEncoder
 from .registry import Registry
 
 
@@ -37,3 +37,8 @@ class ChannelRegistry(Registry[Channel]):
         """ Attempt to register a channel. """
 
         return self.add(channel.name, channel)
+
+    def describe(self, indented: bool = False) -> str:
+        """ Obtain a JSON String of the channel registry's current state. """
+
+        return self.describe_raw(indented, ChannelEncoder)

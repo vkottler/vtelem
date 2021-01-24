@@ -16,14 +16,13 @@ from . import ENUM_TYPE
 from .type_primitive import TypePrimitive
 
 
-class UserEnum(dict):
+class UserEnum:
     """ A container for runtime, user-defined enumerations. """
 
     def __init__(self, name: str, values: Dict[int, str],
                  default: str = None) -> None:
         """ Build a runtime enumeration. """
 
-        super().__init__()
         self.enum: Dict[int, str] = defaultdict(lambda: "unknown")
         self.enum.update(values)
         for key, val in self.enum.items():
@@ -75,7 +74,18 @@ class UserEnum(dict):
         """ Describe this enumeration as a JSON String. """
 
         indent = 4 if indented else None
-        return json.dumps(self.enum, indent=indent, sort_keys=True)
+        return json.dumps(self.enum, indent=indent, sort_keys=True,
+                          cls=UserEnumEncoder)
+
+
+class UserEnumEncoder(json.JSONEncoder):
+    """ A JSON encoder for a primitive enum. """
+
+    def default(self, o) -> dict:
+        """ Implement serialization for the primitive enum value. """
+
+        assert isinstance(o, UserEnum)
+        return {"name": o.name, "mappings": o.enum}
 
 
 def from_enum(enum_class: Type[Enum]) -> UserEnum:

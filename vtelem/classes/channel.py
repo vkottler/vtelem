@@ -4,6 +4,7 @@ vtelem - A storage class that emits on an interval.
 """
 
 # built-in
+from json import JSONEncoder
 from typing import Any, Optional
 
 # internal
@@ -71,4 +72,19 @@ class Channel(TypePrimitive):
             if time >= (self.last_emitted + self.rate):
                 result = self.get()
                 self.last_emitted = time
+        return result
+
+
+class ChannelEncoder(JSONEncoder):
+    """ A JSON encoder for a primitive enum. """
+
+    def default(self, o) -> dict:
+        """ Implement serialization for the primitive enum value. """
+
+        assert isinstance(o, Channel)
+        type_dict = {"name": o.type.value["name"],
+                     "signed": o.type.value["name"],
+                     "size": o.type.value["size"]}
+        result = {"name": o.name, "rate": o.rate,
+                  "commandable": o.commandable, "type": type_dict}
         return result
