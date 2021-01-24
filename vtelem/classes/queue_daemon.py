@@ -28,6 +28,7 @@ class QueueDaemon(DaemonBase):
         def stop_injector() -> None:
             """ Put a None into the queue as the signal for stopping. """
             self.queue.put(None)
+            self.queue.join()
 
         self.function["inject_stop"] = stop_injector
 

@@ -44,7 +44,10 @@ class UdpClientManager(LockEntity):
                 del self.clients[stream_id]
             name = sock.getsockname()
             LOG.info("closing stream client '%s:%d'", name[0], name[1])
-            sock_file.close()
+            try:
+                sock_file.close()
+            except ConnectionRefusedError:
+                pass
             sock.close()
 
         self.closer = closer
