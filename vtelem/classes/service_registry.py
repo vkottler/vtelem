@@ -9,7 +9,7 @@ from typing import Tuple, List
 # internal
 from .registry import Registry
 
-Service = Tuple[str, Tuple[str, int]]
+Service = List[Tuple[str, int]]
 
 
 class ServiceRegistry(Registry[Service]):

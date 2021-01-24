@@ -27,6 +27,7 @@ from .stream_writer import StreamWriter
 from .telemetry_daemon import TelemetryDaemon
 from .time_keeper import TimeKeeper
 from .udp_client_manager import UdpClientManager
+from .websocket_daemon import WebsocketDaemon
 from .websocket_telemetry_daemon import WebsocketTelemetryDaemon
 
 
@@ -45,6 +46,7 @@ class TelemetryServer(HttpDaemon):
 
         self.daemons = DaemonManager()
         self.state_sem = threading.Semaphore(0)
+        self.first_start = True
 
         # add the ticker
         self.time_keeper = TimeKeeper("time", tick_length)
@@ -109,6 +111,21 @@ class TelemetryServer(HttpDaemon):
 
         self.daemons.perform_all(DaemonOperation.START)
         self.start()
+
+        # register services to the service registry, after they bind
+        if self.first_start:
+            telem = self.daemons.get("telemetry")
+            assert isinstance(telem, TelemetryDaemon)
+            registry = telem.registries["services"]
+            registry.add("http", [self.server.server_address])
+            names = ["websocket_command", "websocket_telemetry"]
+            for name in names:
+                daemon = self.daemons.get(name)
+                assert isinstance(daemon, WebsocketDaemon)
+                addrs = [sock.getsockname() for sock in daemon.server.sockets]
+                registry.add(name, addrs)
+        self.first_start = False
+
         with self.lock:
             self.state_sem.release()
 

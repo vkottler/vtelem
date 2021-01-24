@@ -47,6 +47,7 @@ class WebsocketDaemon(EventLoopDaemon):
         if address is None:
             address = ("0.0.0.0", 0)
         self.address = address
+        self.server = None
         self.serving = False
 
         if ws_handler is None:
@@ -79,9 +80,15 @@ class WebsocketDaemon(EventLoopDaemon):
 
             # start serving traffic
             if not self.serving:
-                routine = websockets.serve(handler, self.address[0],
-                                           self.address[1])
-                self.eloop.run_until_complete(routine)
+
+                async def routine() -> None:
+                    """ Capture the server object once we begint serving. """
+
+                    self.server = await websockets.serve(handler,
+                                                         self.address[0],
+                                                         self.address[1])
+
+                self.eloop.run_until_complete(routine())
                 self.serving = True
 
         self.function["run_init"] = run_init

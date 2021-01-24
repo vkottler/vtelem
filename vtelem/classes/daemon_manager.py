@@ -4,8 +4,9 @@ vtelem - Allows singleton management of application daemons.
 """
 
 # built-in
+from collections import defaultdict
 import logging
-from typing import Dict
+from typing import Dict, Optional
 
 # internal
 from vtelem.enums.daemon import (
@@ -25,7 +26,13 @@ class DaemonManager(LockEntity):
         """ Construct a new daemon manager. """
 
         super().__init__()
-        self.daemons: Dict[str, DaemonBase] = {}
+        self.daemons: Dict[str, DaemonBase] = defaultdict(lambda: None)
+
+    def get(self, name: str) -> Optional[DaemonBase]:
+        """ Get a daemon object by name. """
+
+        assert name not in NAME_DENYLIST
+        return self.daemons[name]
 
     def add_daemon(self, daemon: DaemonBase) -> bool:
         """ Add a daemon to this manager. """
