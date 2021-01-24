@@ -122,6 +122,8 @@ class TelemetryServer(HttpDaemon):
             for name in names:
                 daemon = self.daemons.get(name)
                 assert isinstance(daemon, WebsocketDaemon)
+                assert daemon.server is not None
+                assert daemon.server.sockets is not None
                 addrs = [sock.getsockname() for sock in daemon.server.sockets]
                 registry.add(name, addrs)
         self.first_start = False
