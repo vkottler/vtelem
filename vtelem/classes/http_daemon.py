@@ -14,6 +14,7 @@ from typing import Type, Tuple
 # internal
 from .daemon_base import DaemonBase, DaemonState
 from .http_request_mapper import HttpRequestMapper, RequestHandle
+from .service_registry import ServiceRegistry
 from .telemetry_environment import TelemetryEnvironment
 from .time_keeper import TimeKeeper
 
@@ -79,8 +80,14 @@ class HttpDaemon(DaemonBase):
         self.server.server_close()
         return True
 
-    def run(self, *_, **__) -> None:
+    def run(self, *_, **kwargs) -> None:
         """ Serve traffic. """
 
         if not self.closed:
+            if "first_start" in kwargs and "service_registry" in kwargs:
+                first_start: bool = kwargs["first_start"]
+                service_registry: ServiceRegistry = kwargs["service_registry"]
+                if first_start:
+                    service_registry.add(self.name,
+                                         [self.server.server_address])
             self.server.serve_forever(0.1)

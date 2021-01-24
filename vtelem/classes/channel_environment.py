@@ -284,7 +284,7 @@ class ChannelEnvironment(TimeEntity):
         self.metric_add("emits_captured", result[1], time)
         return result
 
-    def dispatch_now(self, should_log: bool = True) -> int:
+    def dispatch_now(self, *_, should_log: bool = True, **__) -> int:
         """ Dispatch telemetry at the current time. """
 
         return self.dispatch(self.get_time(), should_log)

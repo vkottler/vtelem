@@ -37,7 +37,7 @@ class TimeKeeper(Daemon):
         self.function["sleep"] = self.sleep_function
         self.slaves: List[Any] = []
 
-    def iteration(self) -> None:
+    def iteration(self, *_, **__) -> None:
         """ On every iteration, advance time for all slaves. """
 
         with self.lock:

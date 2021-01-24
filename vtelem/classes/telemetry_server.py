@@ -7,7 +7,6 @@ vtelem - An interface for creating telemetered applications.
 from contextlib import contextmanager
 import socket
 import threading
-import time
 from typing import Tuple, Iterator
 
 # internal
@@ -28,7 +27,6 @@ from .stream_writer import StreamWriter
 from .telemetry_daemon import TelemetryDaemon
 from .time_keeper import TimeKeeper
 from .udp_client_manager import UdpClientManager
-from .websocket_daemon import WebsocketDaemon
 from .websocket_telemetry_daemon import WebsocketTelemetryDaemon
 
 
@@ -110,24 +108,12 @@ class TelemetryServer(HttpDaemon):
     def start_all(self) -> None:
         """ Start everything. """
 
-        self.daemons.perform_all(DaemonOperation.START)
-        self.start()
-
-        # register services to the service registry, after they bind
-        if self.first_start:
-            time.sleep(0.1)
-            telem = self.daemons.get("telemetry")
-            assert isinstance(telem, TelemetryDaemon)
-            registry = telem.registries["services"]
-            registry.add("http", [self.server.server_address])
-            names = ["websocket_command", "websocket_telemetry"]
-            for name in names:
-                daemon = self.daemons.get(name)
-                assert isinstance(daemon, WebsocketDaemon)
-                assert daemon.server is not None
-                assert daemon.server.sockets is not None
-                addrs = [sock.getsockname() for sock in daemon.server.sockets]
-                registry.add(name, addrs)
+        telem = self.daemons.get("telemetry")
+        assert isinstance(telem, TelemetryDaemon)
+        kwargs: dict = {"service_registry": telem.registries["services"]}
+        kwargs["first_start"] = self.first_start
+        self.daemons.perform_all(DaemonOperation.START, **kwargs)
+        self.start(**kwargs)
         self.first_start = False
 
         with self.lock:

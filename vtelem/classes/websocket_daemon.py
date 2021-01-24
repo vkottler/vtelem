@@ -13,6 +13,7 @@ import websockets
 
 # internal
 from .event_loop_daemon import EventLoopDaemon
+from .service_registry import ServiceRegistry
 from .telemetry_environment import TelemetryEnvironment
 
 LOG = logging.getLogger(__name__)
@@ -72,7 +73,8 @@ class WebsocketDaemon(EventLoopDaemon):
                 self.wait_count -= 1
             self.wait_poster.release()
 
-        def run_init(*_, **__):
+        def run_init(*_, first_start: bool = False,
+                     service_registry: ServiceRegistry = None, **__):
             """
             A function for setting up websocket serving once the thread's
             event loop is established.
@@ -87,6 +89,11 @@ class WebsocketDaemon(EventLoopDaemon):
                     self.server = await websockets.serve(handler,
                                                          self.address[0],
                                                          self.address[1])
+                    if first_start and service_registry is not None:
+                        socks = self.server.sockets
+                        if socks:
+                            addrs = [sock.getsockname() for sock in socks]
+                            service_registry.add(self.name, addrs)
 
                 self.eloop.run_until_complete(routine())
                 self.serving = True
