@@ -75,6 +75,11 @@ class Registry(Generic[TYP]):
 
         return result
 
+    def describe(self, indented: bool = False) -> str:
+        """ A default implementation. """
+
+        return self.describe_raw(indented)
+
     def describe_raw(self, indented: bool = False, cls: Any = None) -> str:
         """ Obtain a JSON String of the registry's current state. """
 

@@ -35,6 +35,8 @@ class TelemetryEnvironment(ChannelEnvironment):
                          app_id_basis)
         self.enum_registry = EnumRegistry(initial_enums)
         self.type_registry = get_default()
+        self.registries["enum"] = self.enum_registry
+        self.registries["type"] = self.type_registry
         assert self.enum_registry.add_enum(self.framer.get_types())[0]
         self.enum_registry.export(self.type_registry)
         self.enum_channel_types: Dict[int, int] = defaultdict(lambda: -1)
@@ -57,7 +59,7 @@ class TelemetryEnvironment(ChannelEnvironment):
 
         if not self.has_channel(name):
             return False
-        chan_id = self.channel_registry.get_id(name)
+        chan_id = self.registries["channel"].get_id(name)
         assert chan_id is not None
         return self.command_enum_channel_id(chan_id, value)
 
@@ -78,7 +80,7 @@ class TelemetryEnvironment(ChannelEnvironment):
         assert enum_type is not None
         self.enum_channel_types[new_chan] = enum_type
         if initial is not None:
-            chan = self.channel_registry.get_item(new_chan)
+            chan = self.registries["channel"].get_item(new_chan)
             assert chan is not None
             enum_def = self.enum_registry.get_item(enum_type)
             assert enum_def is not None
@@ -102,7 +104,7 @@ class TelemetryEnvironment(ChannelEnvironment):
 
         assert self.metrics is not None
         if name in self.metrics:
-            chan = self.channel_registry.get_item(self.metrics[name])
+            chan = self.registries["channel"].get_item(self.metrics[name])
             assert chan is not None
             enum_type = self.enum_channel_types[self.metrics[name]]
             enum_def = self.enum_registry.get_item(enum_type)

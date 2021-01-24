@@ -4,9 +4,10 @@ vtelem - An interface for creating telemetered applications.
 """
 
 # built-in
+from contextlib import contextmanager
 import socket
 import threading
-from typing import Tuple
+from typing import Tuple, Iterator
 
 # internal
 from vtelem.mtu import discover_ipv4_mtu, DEFAULT_MTU
@@ -21,6 +22,7 @@ from .daemon_base import DaemonOperation
 from .daemon_manager import DaemonManager
 from .http_daemon import HttpDaemon
 from .http_request_mapper import MapperAwareRequestHandler
+from .service_registry import ServiceRegistry
 from .stream_writer import StreamWriter
 from .telemetry_daemon import TelemetryDaemon
 from .time_keeper import TimeKeeper
@@ -56,6 +58,8 @@ class TelemetryServer(HttpDaemon):
                                 metrics_rate, app_id_basis=app_id_basis)
         telem.handle_new_mtu(DEFAULT_MTU)
         self.channel_groups = ChannelGroupRegistry(telem)
+        telem.registries["channel_groups"] = self.channel_groups
+        telem.registries["services"] = ServiceRegistry()
         assert self.daemons.add_daemon(telem)
 
         # add the telemetry-stream writer
@@ -117,6 +121,19 @@ class TelemetryServer(HttpDaemon):
         self.udp_clients.remove_all()
         with self.lock:
             self.state_sem.release()
+
+    @contextmanager
+    def booted(self, *_, **__) -> Iterator[None]:
+        """
+        Provide a context manager that yields when this daemon is running and
+        automatically stops it.
+        """
+
+        try:
+            self.start_all()
+            yield
+        finally:
+            self.stop_all()
 
     def await_shutdown(self, timeout: float = None) -> None:
         """

@@ -35,16 +35,17 @@ def test_telemetry_server_get_types():
     """ Test that the type manifest can be successfully requested. """
 
     server = TelemetryServer(0.01, 0.10, ("0.0.0.0", 0), 0.25)
-    server.start_all()
+    with server.booted():
+        # add  a client
+        server.udp_clients.add_client(("0.0.0.0", 0))
 
-    # add  a client
-    server.udp_clients.add_client(("0.0.0.0", 0))
+        # get app id
+        result = requests.get(server.get_base_url() + "types?indent=4").json()
+        assert all(key in result for key in ["mappings", "types"])
 
-    # get app id
-    result = requests.get(server.get_base_url() + "types?indent=4").json()
-    assert all(key in result for key in ["mappings", "types"])
-
-    server.stop_all()
+        # get registries
+        # result = requests.get(server.get_base_url() + "registries").json()
+        # assert result
 
 
 async def ws_command(wsock, msg: str, expect: bool) -> Tuple[bool, str]:
@@ -67,75 +68,72 @@ def test_telemetry_server_ws_commands():
     port = get_free_tcp_port()
     server = TelemetryServer(0.01, 0.10, None, 0.25,
                              websocket_cmd_address=("0.0.0.0", port))
-    server.start_all()
+    with server.booted():
+        fails = 0
 
-    fails = 0
+        async def ws_command_check(wsock, cmd: dict, expect: bool) -> None:
+            """ Execute a command and increment failures if necessary. """
 
-    async def ws_command_check(wsock, cmd: dict, expect: bool) -> None:
-        """ Execute a command and increment failures if necessary. """
-
-        nonlocal fails
-        status, _ = await ws_command_dict(wsock, cmd, expect)
-        fails += int(not status)
-
-    async def help_test():
-        """ Send some commands to the server. """
-
-        nonlocal fails
-        uri = "ws://localhost:{}".format(port)
-        async with websockets.connect(uri) as websocket:
-
-            # test invalid json
-            status, _ = await ws_command(websocket, "{'command': 'help'}",
-                                         False)
+            nonlocal fails
+            status, _ = await ws_command_dict(wsock, cmd, expect)
             fails += int(not status)
 
-            # test valid json
-            await ws_command_check(websocket, {"command": "help"}, True)
+        async def help_test():
+            """ Send some commands to the server. """
 
-            # test udp client commands
-            data = {}
-            cmd = {"command": "udp", "data": data}
-            await ws_command_check(websocket, cmd, False)
-            data["operation"] = "asdf"
-            await ws_command_check(websocket, cmd, False)
-            data["operation"] = "list"
-            await ws_command_check(websocket, cmd, True)
+            nonlocal fails
+            uri = "ws://localhost:{}".format(port)
+            async with websockets.connect(uri) as websocket:
 
-            # add a client
-            data["operation"] = "add"
-            await ws_command_check(websocket, cmd, False)
-            data["host"] = "localhost"
-            data["port"] = 0
-            await ws_command_check(websocket, cmd, True)
-            del data["host"]
-            del data["port"]
+                # test invalid json
+                status, _ = await ws_command(websocket, "{'command': 'help'}",
+                                             False)
+                fails += int(not status)
 
-            # list the single client
-            data["operation"] = "list"
-            status, raw = await ws_command_dict(websocket, cmd, True)
-            fails += int(not status)
-            clients = json.loads(raw)
-            for client in clients:
-                data["id"] = int(client)
-                await ws_command_check(websocket, cmd, True)
-            data["id"] = -1
-            await ws_command_check(websocket, cmd, False)
+                # test valid json
+                await ws_command_check(websocket, {"command": "help"}, True)
 
-            # remove the clients
-            data["operation"] = "remove"
-            del data["id"]
-            await ws_command_check(websocket, cmd, False)
-            data["id"] = -1
-            await ws_command_check(websocket, cmd, False)
-
-            for client in clients:
-                data["id"] = int(client)
+                # test udp client commands
+                data = {}
+                cmd = {"command": "udp", "data": data}
+                await ws_command_check(websocket, cmd, False)
+                data["operation"] = "asdf"
+                await ws_command_check(websocket, cmd, False)
+                data["operation"] = "list"
                 await ws_command_check(websocket, cmd, True)
 
-    asyncio.get_event_loop().run_until_complete(help_test())
+                # add a client
+                data["operation"] = "add"
+                await ws_command_check(websocket, cmd, False)
+                data["host"] = "localhost"
+                data["port"] = 0
+                await ws_command_check(websocket, cmd, True)
+                del data["host"]
+                del data["port"]
 
-    server.stop_all()
+                # list the single client
+                data["operation"] = "list"
+                status, raw = await ws_command_dict(websocket, cmd, True)
+                fails += int(not status)
+                clients = json.loads(raw)
+                for client in clients:
+                    data["id"] = int(client)
+                    await ws_command_check(websocket, cmd, True)
+                data["id"] = -1
+                await ws_command_check(websocket, cmd, False)
+
+                # remove the clients
+                data["operation"] = "remove"
+                del data["id"]
+                await ws_command_check(websocket, cmd, False)
+                data["id"] = -1
+                await ws_command_check(websocket, cmd, False)
+
+                for client in clients:
+                    data["id"] = int(client)
+                    await ws_command_check(websocket, cmd, True)
+
+        asyncio.get_event_loop().run_until_complete(help_test())
 
     assert fails == 0
 
@@ -146,25 +144,22 @@ def test_telemetry_server_stop_http():
     port = get_free_tcp_port()
     server = TelemetryServer(0.01, 0.10, ("0.0.0.0", port), 0.25,
                              app_id_basis=0.5)
-    server.start_all()
+    with server.booted():
+        # get app id
+        result = requests.get(server.get_base_url() + "id")
+        assert result.status_code == requests.codes["ok"]
+        app_id = int(result.text)
 
-    # get app id
-    result = requests.get(server.get_base_url() + "id")
-    assert result.status_code == requests.codes["ok"]
-    app_id = int(result.text)
+        # should fail, no 'app_id'
+        result = requests.post(server.get_base_url() + "shutdown")
+        assert not result.status_code == requests.codes["ok"]
 
-    # should fail, no 'app_id'
-    result = requests.post(server.get_base_url() + "shutdown")
-    assert not result.status_code == requests.codes["ok"]
+        # should fail, 'app_id' incorrect
+        result = requests.post(server.get_base_url() + "shutdown",
+                               data={"app_id": 1234})
+        assert not result.status_code == requests.codes["ok"]
 
-    # should fail, 'app_id' incorrect
-    result = requests.post(server.get_base_url() + "shutdown",
-                           data={"app_id": 1234})
-    assert not result.status_code == requests.codes["ok"]
-
-    # should succeed, 'app_id' correct
-    result = requests.post(server.get_base_url() + "shutdown",
-                           data={"app_id": app_id})
-    assert result.status_code == requests.codes["ok"]
-
-    server.stop_all()
+        # should succeed, 'app_id' correct
+        result = requests.post(server.get_base_url() + "shutdown",
+                               data={"app_id": app_id})
+        assert result.status_code == requests.codes["ok"]

@@ -20,6 +20,7 @@ from .channel_framer import ChannelFramer, FRAME_TYPES
 from .event_queue import EventQueue
 from .metered_queue import MeteredQueue
 from .time_entity import TimeEntity
+from .registry import Registry
 from .type_primitive import TypePrimitive
 
 LOG = logging.getLogger(__name__)
@@ -37,7 +38,9 @@ class ChannelEnvironment(TimeEntity):
         """ Construct a new channel environment. """
 
         TimeEntity.__init__(self, init_time)
+        self.registries: Dict[str, Registry] = {}
         self.channel_registry = ChannelRegistry(initial_channels)
+        self.registries["channel"] = self.channel_registry
         if initial_channels is None:
             initial_channels = []
         self.framer = ChannelFramer(mtu, self.channel_registry,
