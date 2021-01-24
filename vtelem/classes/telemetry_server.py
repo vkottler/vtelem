@@ -7,6 +7,7 @@ vtelem - An interface for creating telemetered applications.
 from contextlib import contextmanager
 import socket
 import threading
+import time
 from typing import Tuple, Iterator
 
 # internal
@@ -114,6 +115,7 @@ class TelemetryServer(HttpDaemon):
 
         # register services to the service registry, after they bind
         if self.first_start:
+            time.sleep(0.1)
             telem = self.daemons.get("telemetry")
             assert isinstance(telem, TelemetryDaemon)
             registry = telem.registries["services"]
