@@ -55,7 +55,7 @@ class WebsocketTelemetryDaemon(WebsocketDaemon):
                         if should_continue:
                             await asyncio.wait_for(websocket.recv(),
                                                    timeout=0.1)
-                    except asyncio.exceptions.TimeoutError:
+                    except asyncio.TimeoutError:
                         pass
                     except websockets.exceptions.WebSocketException:
                         should_continue = False

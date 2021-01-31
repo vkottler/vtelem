@@ -166,7 +166,7 @@ def test_telemetry_server_ws_commands():
                     data["id"] = int(client)
                     await ws_command_check(websocket, cmd, True)
 
-            await websocket.close()
+                await websocket.close()
 
         asyncio.get_event_loop().run_until_complete(help_test())
 
