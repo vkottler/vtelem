@@ -9,6 +9,7 @@ from collections import defaultdict
 import json
 import logging
 from queue import Queue
+from threading import Semaphore
 from typing import Any, Dict, List, Tuple, Optional
 
 # internal
@@ -91,7 +92,10 @@ class CommandQueueDaemon(QueueDaemon):
             """ A useful command for viewing what commands are available. """
 
             cmd_help: Dict[str, List[str]] = {}
-            commands = list(self.handlers.keys())
+            commands = []
+            for key in self.handlers.keys():
+                if self.handlers[key]:
+                    commands.append(key)
             if data["command"] is not None:
                 # make sure the specified command exists
                 if data["command"] not in self.handlers:
@@ -105,7 +109,8 @@ class CommandQueueDaemon(QueueDaemon):
                 for _, __, help_msg in self.handlers[command]:
                     cmd_help[command].append(help_msg)
 
-            return True, json.dumps(cmd_help)
+            indented = data["indent"] is not None
+            return True, json.dumps(cmd_help, indent=(4 if indented else None))
 
         # add a 'help' handler
         help_msg = "inquire about available command usages"
@@ -120,3 +125,22 @@ class CommandQueueDaemon(QueueDaemon):
     def enqueue(self, command: Any, result_cb: ResultCbType = None) -> None:
         """ Put a command into our queue. """
         self.queue.put((command, result_cb))
+
+    def execute(self, command: Any) -> Tuple[bool, str]:
+        """ Execute a command and block until it's complete. """
+
+        result, msg = False, "Command result not known."
+        signal = Semaphore(0)
+
+        def cmd_cb(status: bool, message: str) -> None:
+            """ Update the result when we get it. """
+
+            nonlocal result
+            nonlocal msg
+            result = status
+            msg = message
+            signal.release()
+
+        self.enqueue(command, cmd_cb)
+        signal.acquire()
+        return result, msg

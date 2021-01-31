@@ -4,15 +4,18 @@ vtelem - An interface for managing websocket servers that serve telemetry data.
 """
 
 # built-in
-import logging
-from typing import Any, Tuple
+import asyncio
+from queue import Queue, Empty
+from typing import Any, List, Tuple
+
+# third-party
+import websockets
 
 # internal
+from .channel_frame import ChannelFrame
 from .stream_writer import StreamWriter
 from .telemetry_environment import TelemetryEnvironment
 from .websocket_daemon import WebsocketDaemon
-
-LOG = logging.getLogger(__name__)
 
 
 class WebsocketTelemetryDaemon(WebsocketDaemon):
@@ -24,29 +27,39 @@ class WebsocketTelemetryDaemon(WebsocketDaemon):
                  time_keeper: Any = None) -> None:
         """ Construct a new, telemetry-serving websocket server. """
 
-        async def telem_handle(websocket, path) -> None:
+        async def telem_handle(websocket, _) -> None:
             """
             Write telemetry to this connection, for as long as it's connected.
             """
 
-            laddr = websocket.local_address
-            raddr = websocket.remote_address
-            conn = "opened"
-            fstr = "telemetry connection ('%s') %s '%s:%d' -> '%s:%d'"
-            LOG.info(fstr, path, conn, laddr[0], laddr[1], raddr[0], raddr[1])
+            frame_queue: Any = Queue()
+            queue_id = writer.add_queue(frame_queue)
+            should_continue = True
 
-            while websocket.open:
-                pass
+            try:
+                while should_continue:
+                    try:
+                        frames: List[ChannelFrame] = []
+                        try:
+                            while True:
+                                frames.append(frame_queue.get_nowait())
+                        except Empty:
+                            pass
 
-            # add the socket to the stream-writer, while loop on the connection
-            # being open (we need to handle close signals somehow), once the
-            # connection gets closed remove us from the stream-writer
-            # ('finally' clause?)
-            print(websocket)
-            print(path)
-            print(writer)
+                        for frame in frames:
+                            if frame is None:
+                                should_continue = False
+                                break
+                            await websocket.send(frame.raw()[0])
 
-            conn = "closed"
-            LOG.info(fstr, path, conn, laddr[0], laddr[1], raddr[0], raddr[1])
+                        if should_continue:
+                            await asyncio.wait_for(websocket.recv(),
+                                                   timeout=0.1)
+                    except asyncio.exceptions.TimeoutError:
+                        pass
+                    except websockets.exceptions.WebSocketException:
+                        should_continue = False
+            finally:
+                writer.remove_queue(queue_id, False)
 
         super().__init__(name, None, address, env, time_keeper, telem_handle)

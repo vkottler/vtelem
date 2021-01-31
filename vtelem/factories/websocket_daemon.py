@@ -5,7 +5,6 @@ vtelem - A module for creating different types of websocket daemons.
 
 # built-in
 import json
-from threading import Semaphore
 from typing import Tuple
 
 # internal
@@ -33,20 +32,9 @@ def commandable_websocket_daemon(name: str, daemon: CommandQueueDaemon,
 
         # build command, result callback
         try:
-            cmd = json.loads(message)
-            signal = Semaphore(0)
-
-            def cmd_cb(status: bool, message: str) -> None:
-                """ Update the result when we get it. """
-
-                nonlocal result
-                nonlocal signal
-                result["success"] = status
-                result["message"] = message
-                signal.release()
-
-            daemon.enqueue(cmd, cmd_cb)
-            signal.acquire()
+            cmd_result = daemon.execute(json.loads(message))
+            result["success"] = cmd_result[0]
+            result["message"] = cmd_result[1]
         except json.decoder.JSONDecodeError as exc:
             result["message"] = str(exc)
 

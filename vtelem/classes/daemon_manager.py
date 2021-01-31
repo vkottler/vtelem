@@ -6,7 +6,7 @@ vtelem - Allows singleton management of application daemons.
 # built-in
 from collections import defaultdict
 import logging
-from typing import Dict, Optional
+from typing import Dict, Optional, List
 
 # internal
 from vtelem.enums.daemon import (
@@ -27,6 +27,8 @@ class DaemonManager(LockEntity):
 
         super().__init__()
         self.daemons: Dict[str, DaemonBase] = defaultdict(lambda: None)
+        opt_dict = defaultdict(lambda: None)
+        self.depends_on: Dict[str, Optional[List[str]]] = opt_dict
 
     def get(self, name: str) -> Optional[DaemonBase]:
         """ Get a daemon object by name. """
@@ -34,7 +36,8 @@ class DaemonManager(LockEntity):
         assert name not in NAME_DENYLIST
         return self.daemons[name]
 
-    def add_daemon(self, daemon: DaemonBase) -> bool:
+    def add_daemon(self, daemon: DaemonBase,
+                   depends_on: List[str] = None) -> bool:
         """ Add a daemon to this manager. """
 
         name = daemon.name
@@ -45,17 +48,54 @@ class DaemonManager(LockEntity):
                           name)
                 return False
             self.daemons[name] = daemon
+            self.depends_on[name] = depends_on
         return True
+
+    def perform_stack(self, name_stack: List[str], executed: List[str],
+                      results: Dict[str, bool], operation: DaemonOperation,
+                      *args, **kwargs) -> None:
+        """
+        Execute an operation on daemons, respecting the dependency order.
+        """
+
+        if not name_stack:
+            return
+
+        curr = name_stack.pop()
+        if curr not in executed:
+
+            # determine if we can execute yet
+            to_execute: List[str] = []
+            curr_deps = self.depends_on[curr]
+            if curr_deps:
+                for dep in curr_deps:
+                    if dep not in executed:
+                        to_execute.append(dep)
+
+            # if we have dependencies, put them in front of us, otherwise
+            # run against the current entry
+            if to_execute:
+                name_stack = to_execute + [curr] + name_stack
+            else:
+                results[curr] = self.perform(curr, operation, *args,
+                                             **kwargs)
+                executed.append(curr)
+
+        self.perform_stack(name_stack, executed, results, operation, *args,
+                           **kwargs)
 
     def perform_all(self, operation: DaemonOperation, *args, **kwargs) -> bool:
         """ Attempt to perform an action on all daemons. """
 
         failures = 0
         with self.lock:
-            for daemon_name in self.daemons:
-                if not self.perform(daemon_name, operation, *args, **kwargs):
+            results: Dict[str, bool] = {}
+            self.perform_stack(list(self.daemons.keys()), [], results,
+                               operation, *args, **kwargs)
+            for result_key, result_val in results.items():
+                if not result_val:
                     LOG.error("'%s' on '%s' failed.", operation_str(operation),
-                              daemon_name)
+                              result_key)
                     failures += 1
         return failures == 0
 

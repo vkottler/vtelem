@@ -54,6 +54,10 @@ def test_stream_writer_basic():
     b_id = writer.add_stream(stream_b)
     writer.add_stream(stream_c)
 
+    # add a queue
+    queue_id = writer.add_queue(Queue())
+    writer.remove_queue(writer.add_queue(Queue()))
+
     # enqueue some frames
     for _ in range(100):
         frame_queue.put(random_garbage_factory())
@@ -73,3 +77,5 @@ def test_stream_writer_basic():
     stream_a.close()
     stream_b.close()
     stream_c.close()
+
+    writer.remove_queue(queue_id)

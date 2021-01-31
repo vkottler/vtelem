@@ -9,10 +9,12 @@ import json
 from typing import Any, Tuple
 
 # internal
+from vtelem.classes.command_queue_daemon import CommandQueueDaemon
 from vtelem.classes.telemetry_daemon import TelemetryDaemon
 
 
-def register_http_handlers(server: Any, telem: TelemetryDaemon) -> None:
+def register_http_handlers(server: Any, telem: TelemetryDaemon,
+                           cmd: CommandQueueDaemon) -> None:
     """ Register http request handlers to a telemetry server. """
 
     def app_id(_: BaseHTTPRequestHandler, __: dict) -> Tuple[bool, str]:
@@ -52,6 +54,26 @@ def register_http_handlers(server: Any, telem: TelemetryDaemon) -> None:
             rdata[key] = json.loads(registry.describe())
         return True, json.dumps(rdata, indent=(4 if indented else None))
 
+    def run_command(_: BaseHTTPRequestHandler, data: dict) -> Tuple[bool, str]:
+        """ Execute a command through the command-queue daemon. """
+
+        if "command" not in data:
+            return False, "no 'command' specified. (try 'help')"
+
+        # collapse list items into single values
+        for key, value in data.items():
+            if isinstance(value, list):
+                data[key] = value[0]
+
+        # move additional arguments to the "data" key
+        if "data" not in data:
+            data["data"] = {}
+            for key, value in data.items():
+                if key not in ["command", "data"]:
+                    data["data"][key] = value
+
+        return cmd.execute(data)
+
     # add request handlers
     server.add_handler("GET", "id", app_id,
                        ("get this telemetry instance's " +
@@ -61,3 +83,8 @@ def register_http_handlers(server: Any, telem: TelemetryDaemon) -> None:
     server.add_handler("GET", "registries", get_registries,
                        "get registry data")
     server.add_handler("POST", "shutdown", shutdown, "shutdown the server")
+
+    server.add_handler("GET", "command", run_command,
+                       "send a command to the server")
+    server.add_handler("POST", "command", run_command,
+                       "send a command to the server")

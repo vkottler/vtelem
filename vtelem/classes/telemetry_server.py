@@ -78,19 +78,19 @@ class TelemetryServer(HttpDaemon):
         # add the http daemon
         super().__init__("http", http_address, MapperAwareRequestHandler,
                          telem, self.time_keeper)
-        register_http_handlers(self, telem)
 
         # add the command-queue daemon
         queue_daemon = CommandQueueDaemon("command", telem, self.time_keeper)
         create_channel_commander(telem, queue_daemon)
         assert self.daemons.add_daemon(queue_daemon)
+        register_http_handlers(self, telem, queue_daemon)
 
         # add the websocket-command daemon
         ws_cmd = commandable_websocket_daemon("websocket_command",
                                               queue_daemon,
                                               websocket_cmd_address, telem,
                                               self.time_keeper)
-        assert self.daemons.add_daemon(ws_cmd)
+        assert self.daemons.add_daemon(ws_cmd, ["stream"])
 
         # make the daemon-manager commandable
         create_daemon_manager_commander(self.daemons, queue_daemon)

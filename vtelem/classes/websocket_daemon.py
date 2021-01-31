@@ -58,12 +58,18 @@ class WebsocketDaemon(EventLoopDaemon):
         async def handler(websocket, path) -> None:
             with self.lock:
                 self.wait_count += 1
+
+            laddr = websocket.local_address
+            raddr = websocket.remote_address
+            fstr = "connection ('%s') opened '%s:%d' -> '%s:%d'"
+            LOG.info(fstr, path, laddr[0], laddr[1], raddr[0], raddr[1])
+
             try:
                 assert ws_handler is not None
                 await ws_handler(websocket, path)
             except (asyncio.CancelledError, GeneratorExit):
-                LOG.warning("closing client connection '%s'",
-                            websocket.remote_address)
+                LOG.warning("closing client connection '%s:%d'", raddr[0],
+                            raddr[1])
 
             # handle closing this connection ourselves, because it's difficult
             # to pend on otherwise

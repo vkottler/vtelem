@@ -40,8 +40,16 @@ def test_telemetry_server_get_types():
         server.udp_clients.add_client(("0.0.0.0", 0))
 
         # get app id
-        result = requests.get(server.get_base_url() + "types?indent=4").json()
+        cmd_str = "types?indent=4"
+        result = requests.get(server.get_base_url() + cmd_str).json()
         assert all(key in result for key in ["mappings", "types"])
+
+        # run the 'help' command
+        cmd_str = "command"
+        requests.get(server.get_base_url() + cmd_str)
+        cmd_str = "command?command=help&indent=4"
+        result = requests.get(server.get_base_url() + cmd_str).json()
+        assert result
 
         # get registries
         result = requests.get(server.get_base_url() + "registries").json()
@@ -60,6 +68,31 @@ async def ws_command_dict(wsock, msg: dict, expect: bool) -> Tuple[bool, str]:
     """ Test a websocket command from dict data. """
 
     return await ws_command(wsock, json.dumps(msg), expect)
+
+
+def test_telemetry_server_ws_telemetry():
+    """ Test that websocket telemetry is supported by the server. """
+
+    port = get_free_tcp_port()
+    server = TelemetryServer(0.01, 0.10, None, 0.25,
+                             websocket_tlm_address=("0.0.0.0", port))
+    with server.booted():
+
+        async def telemetry_test():
+            """ Send some commands to the server. """
+
+            uri = "ws://localhost:{}".format(port)
+            async with websockets.connect(uri) as websocket:
+                for _ in range(10):
+                    frame = await websocket.recv()
+                    telem = server.daemons.get("telemetry")
+                    result = telem.decode_frame(frame, len(frame),
+                                                telem.app_id)
+                    assert result["valid"]
+                await websocket.close()
+
+        for _ in range(3):
+            asyncio.get_event_loop().run_until_complete(telemetry_test())
 
 
 def test_telemetry_server_ws_commands():
@@ -132,6 +165,8 @@ def test_telemetry_server_ws_commands():
                 for client in clients:
                     data["id"] = int(client)
                     await ws_command_check(websocket, cmd, True)
+
+            await websocket.close()
 
         asyncio.get_event_loop().run_until_complete(help_test())
 
