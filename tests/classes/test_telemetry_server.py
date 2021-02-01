@@ -89,7 +89,6 @@ def test_telemetry_server_ws_telemetry():
                     result = telem.decode_frame(frame, len(frame),
                                                 telem.app_id)
                     assert result["valid"]
-                await websocket.close()
 
         for _ in range(5):
             asyncio.get_event_loop().run_until_complete(telemetry_test())
@@ -165,8 +164,6 @@ def test_telemetry_server_ws_commands():
                 for client in clients:
                     data["id"] = int(client)
                     await ws_command_check(websocket, cmd, True)
-
-                await websocket.close()
 
         asyncio.get_event_loop().run_until_complete(help_test())
 

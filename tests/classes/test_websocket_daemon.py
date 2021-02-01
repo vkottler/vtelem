@@ -50,6 +50,4 @@ def test_websocket_daemon_basic():
                     response = await websocket.recv()
                     assert response == msg
 
-                    await websocket.close()
-
             asyncio.get_event_loop().run_until_complete(ping_test())
