@@ -91,7 +91,7 @@ def test_telemetry_server_ws_telemetry():
                     assert result["valid"]
                 await websocket.close()
 
-        for _ in range(3):
+        for _ in range(5):
             asyncio.get_event_loop().run_until_complete(telemetry_test())
 
 

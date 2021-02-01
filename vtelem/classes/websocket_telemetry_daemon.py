@@ -5,8 +5,8 @@ vtelem - An interface for managing websocket servers that serve telemetry data.
 
 # built-in
 import asyncio
-from queue import Queue, Empty
-from typing import Any, List, Tuple
+from queue import Queue
+from typing import Any, Tuple, Set
 
 # third-party
 import websockets
@@ -35,31 +35,34 @@ class WebsocketTelemetryDaemon(WebsocketDaemon):
             frame_queue: Any = Queue()
             queue_id = writer.add_queue(frame_queue)
             should_continue = True
+            complete: Set[asyncio.Future] = set()
+            pending: Set[asyncio.Future] = set()
 
             try:
                 while should_continue:
                     try:
-                        frames: List[ChannelFrame] = []
-                        try:
-                            while True:
-                                frames.append(frame_queue.get_nowait())
-                        except Empty:
-                            pass
+                        frame: ChannelFrame = frame_queue.get()
+                        if frame is None:
+                            should_continue = False
+                            break
 
-                        for frame in frames:
-                            if frame is None:
-                                should_continue = False
-                                break
-                            await websocket.send(frame.raw()[0])
+                        complete, pending = await asyncio.wait([
+                            websocket.send(frame.raw()[0]),
+                            websocket.wait_closed(),
+                        ], return_when=asyncio.FIRST_COMPLETED)
 
-                        if should_continue:
-                            await asyncio.wait_for(websocket.recv(),
-                                                   timeout=0.1)
-                    except asyncio.TimeoutError:
-                        pass
+                        for future in complete:
+                            exc = future.exception()
+                            if exc is not None:
+                                raise exc
+
+                        for pend in pending:
+                            pend.cancel()
                     except websockets.exceptions.WebSocketException:
                         should_continue = False
             finally:
                 writer.remove_queue(queue_id, False)
+                for pend in pending:
+                    await pend
 
         super().__init__(name, None, address, env, time_keeper, telem_handle)

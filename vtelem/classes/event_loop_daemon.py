@@ -43,6 +43,9 @@ class EventLoopDaemon(DaemonBase):
             for _ in range(waits):
                 self.wait_poster.acquire()
 
+            with self.lock:
+                self.wait_count -= waits
+
             self.eloop.call_soon_threadsafe(self.eloop.stop)
 
         self.function["inject_stop"] = event_loop_stopper

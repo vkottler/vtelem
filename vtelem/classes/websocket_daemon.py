@@ -67,17 +67,17 @@ class WebsocketDaemon(EventLoopDaemon):
             try:
                 assert ws_handler is not None
                 await ws_handler(websocket, path)
-            except (asyncio.CancelledError, GeneratorExit):
+            except (asyncio.CancelledError, GeneratorExit,
+                    websockets.exceptions.WebSocketException):
+                pass
+            finally:
                 LOG.warning("closing client connection '%s:%d'", raddr[0],
                             raddr[1])
 
-            # handle closing this connection ourselves, because it's difficult
-            # to pend on otherwise
-            await websocket.close()
-
-            with self.lock:
-                self.wait_count -= 1
-            self.wait_poster.release()
+                # handle closing this connection ourselves, because it's
+                # difficult to pend on otherwise
+                await websocket.close()
+                self.wait_poster.release()
 
         def run_init(*_, first_start: bool = False,
                      service_registry: ServiceRegistry = None, **__):
