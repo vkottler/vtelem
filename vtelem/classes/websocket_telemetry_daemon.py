@@ -63,6 +63,6 @@ class WebsocketTelemetryDaemon(WebsocketDaemon):
             finally:
                 writer.remove_queue(queue_id, False)
                 for pend in pending:
-                    await pend
+                    pend.cancel()
 
         super().__init__(name, None, address, env, time_keeper, telem_handle)
