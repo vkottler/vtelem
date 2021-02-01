@@ -2,11 +2,11 @@
     =====================================
     generator=datazen
     version=1.3.1
-    hash=4fa69cd95fedd9e9522b23708a5dcf64
+    hash=5db271f8d70bf7f48bce9b446ae62c87
     =====================================
 -->
 
-# vtelem ([0.1.1](https://pypi.org/project/vtelem/))
+# vtelem ([0.2.0](https://pypi.org/project/vtelem/))
 
 ![Python package](https://github.com/vkottler/vtelem/workflows/Python%20package/badge.svg)
 
