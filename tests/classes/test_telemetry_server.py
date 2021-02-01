@@ -59,9 +59,16 @@ def test_telemetry_server_get_types():
 async def ws_command(wsock, msg: str, expect: bool) -> Tuple[bool, str]:
     """ Test an individual websocket command. """
 
-    await wsock.send(msg)
-    rsp_data = json.loads(await wsock.recv())
-    return rsp_data["success"] == expect, rsp_data["message"]
+    rsp_data: dict = {"success": False, "message": "send failed"}
+    request_success = False
+    try:
+        await wsock.send(msg)
+        rsp_data = json.loads(await wsock.recv())
+        request_success = True
+    except websockets.exceptions.WebSocketException:
+        pass
+    return ((rsp_data["success"] == expect and request_success),
+            rsp_data["message"])
 
 
 async def ws_command_dict(wsock, msg: dict, expect: bool) -> Tuple[bool, str]:
@@ -77,6 +84,7 @@ def test_telemetry_server_ws_telemetry():
     server = TelemetryServer(0.01, 0.10, None, 0.25,
                              websocket_tlm_address=("0.0.0.0", port))
     with server.booted():
+        time.sleep(0.1)
 
         async def telemetry_test():
             """ Send some commands to the server. """
@@ -101,6 +109,7 @@ def test_telemetry_server_ws_commands():
     server = TelemetryServer(0.01, 0.10, None, 0.25,
                              websocket_cmd_address=("0.0.0.0", port))
     with server.booted():
+        time.sleep(0.1)
         fails = 0
 
         async def ws_command_check(wsock, cmd: dict, expect: bool) -> None:
