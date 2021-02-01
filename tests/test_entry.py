@@ -30,6 +30,6 @@ def test_entry_sigint():
 
     proc = Process(target=vt_main, args=[PKG_NAME, "-u", "10"])
     proc.start()
-    time.sleep(0.5)
+    time.sleep(1.0)
     os.kill(proc.pid, signal.SIGINT)
     proc.join()

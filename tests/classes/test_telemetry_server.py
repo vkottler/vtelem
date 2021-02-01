@@ -24,9 +24,9 @@ def test_telemetry_server_basic():
     server = TelemetryServer(0.01, 0.10, ("0.0.0.0", 0), 0.25)
     assert server.start()
     assert server.daemons.perform_str_all("start")
-    time.sleep(0.5)
+    time.sleep(1.0)
     server.scale_speed(2.0)
-    time.sleep(0.5)
+    time.sleep(1.0)
     assert server.daemons.perform_str_all("stop")
     assert server.stop()
 

@@ -27,11 +27,12 @@ class Daemon(DaemonBase):
                  iter_overrun_cb: Callable = None,
                  state_change_cb: Callable = None,
                  env: TelemetryEnvironment = None,
-                 time_keeper: Any = None) -> None:
+                 time_keeper: Any = None, init: Callable = None) -> None:
         """ Create a new daemon. """
 
         super().__init__(name, env, time_keeper)
         self.function["task"] = task
+        self.function["init"] = init
         self.function["sleep"] = time.sleep
         if time_keeper is not None:
             self.function["sleep"] = time_keeper.sleep
@@ -70,6 +71,10 @@ class Daemon(DaemonBase):
 
     def run(self, *args, **kwargs) -> None:
         """ Runs this daemon's thread, until stop is requested. """
+
+        # call an initialization routine if provided
+        if self.function["init"] is not None:
+            self.function["init"](*args, **kwargs)
 
         while self.state != DaemonState.STOPPING:
             with self.lock:

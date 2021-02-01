@@ -4,10 +4,11 @@ vtelem - An interface for creating telemetered applications.
 """
 
 # built-in
+from collections import defaultdict
 from contextlib import contextmanager
 import socket
 import threading
-from typing import Tuple, Iterator
+from typing import Any, Dict, Tuple, Iterator
 
 # internal
 from vtelem.mtu import discover_ipv4_mtu, DEFAULT_MTU
@@ -16,8 +17,10 @@ from vtelem.factories.telemetry_environment import create_channel_commander
 from vtelem.factories.telemetry_server import register_http_handlers
 from vtelem.factories.udp_client_manager import create_udp_client_commander
 from vtelem.factories.websocket_daemon import commandable_websocket_daemon
+from vtelem.types.telemetry_server import AppSetup, AppLoop
 from .channel_group_registry import ChannelGroupRegistry
 from .command_queue_daemon import CommandQueueDaemon
+from .daemon import Daemon
 from .daemon_base import DaemonOperation
 from .daemon_manager import DaemonManager
 from .http_daemon import HttpDaemon
@@ -97,6 +100,31 @@ class TelemetryServer(HttpDaemon):
 
         # make the udp-client-manager commandable
         create_udp_client_commander(self.udp_clients, queue_daemon)
+
+    def register_application(self, name: str, rate: float, setup: AppSetup,
+                             loop: AppLoop) -> bool:
+        """ Attempt to register a new application thread. """
+
+        app_data: Dict[str, Any] = defaultdict(lambda: None)
+
+        def setup_caller(*_, **__) -> None:
+            """ Call the application's setup with the expected arguments. """
+            setup(self.channel_groups, app_data)
+
+        def loop_caller(*_, **__) -> None:
+            """ Call the application's loop with the expected arguments. """
+            loop(self.channel_groups, app_data)
+
+        telem = self.daemons.get("telemetry")
+        assert isinstance(telem, TelemetryDaemon)
+        daemon = Daemon(name, loop_caller, rate, env=telem,
+                        time_keeper=self.time_keeper, init=setup_caller)
+        result = self.daemons.add_daemon(daemon, ["telemetry"])
+        if not self.first_start:
+            app_daemon = self.daemons.get(name)
+            assert app_daemon is not None
+            assert app_daemon.perform(DaemonOperation.START)
+        return result
 
     def scale_speed(self, scalar: float) -> None:
         """ Change the time scaling for the time keeper. """
