@@ -39,6 +39,8 @@ def test_websocket_daemon_basic():
 
     for _ in range(5):
         with daemon.booted():
+            time.sleep(0.1)
+
             # connect a client
             async def ping_test():
                 """ Send an arbitrary message and expect the same back. """
