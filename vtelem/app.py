@@ -26,7 +26,8 @@ def entry(args: argparse.Namespace) -> int:
     # instantiate the server
     server = TelemetryServer(args.tick, args.telem_rate,
                              (ip_address, args.port), args.metrics_rate,
-                             args.app_id)
+                             args.app_id, (ip_address, args.ws_cmd_port),
+                             (ip_address, args.ws_tlm_port))
 
     # run until the server shuts down because of timeout, external command, or
     # interruption
@@ -48,6 +49,10 @@ def add_app_args(parser: argparse.ArgumentParser) -> None:
                         choices=netifaces.interfaces())
     parser.add_argument("-p", "--port", default=0, type=int,
                         help="http api port")
+    parser.add_argument("--ws-cmd-port", default=0, type=int,
+                        help="websocket command-interface port")
+    parser.add_argument("--ws-tlm-port", default=0, type=int,
+                        help="websocket telemetry-interface port")
     parser.add_argument("-t", "--tick", default=base_rate, type=float,
                         help="lenth of a time tick")
     parser.add_argument("--telem-rate", default=telem_rate, type=float,

@@ -1,8 +1,8 @@
 <!--
     =====================================
     generator=datazen
-    version=1.3.3
-    hash=6cc904a2b9b00e0bbb34a55093825e85
+    version=1.3.4
+    hash=ccd4d70a17f5cdf508da1b137e56c427
     =====================================
 -->
 
@@ -18,6 +18,7 @@
 $ ./venv3.8/bin/vtelem -h
 
 usage: vtelem [-h] [--version] [-v] [-C DIR] [-i {lo,enp0s25,wlo1}] [-p PORT]
+              [--ws-cmd-port WS_CMD_PORT] [--ws-tlm-port WS_TLM_PORT]
               [-t TICK] [--telem-rate TELEM_RATE]
               [--metrics-rate METRICS_RATE] [--time-scale TIME_SCALE]
               [-a APP_ID] [-u UPTIME]
@@ -32,6 +33,10 @@ optional arguments:
   -i {lo,enp0s25,wlo1}, --interface {lo,enp0s25,wlo1}
                         interface to bind to
   -p PORT, --port PORT  http api port
+  --ws-cmd-port WS_CMD_PORT
+                        websocket command-interface port
+  --ws-tlm-port WS_TLM_PORT
+                        websocket telemetry-interface port
   -t TICK, --tick TICK  lenth of a time tick
   --telem-rate TELEM_RATE
                         rate of the telemetry-servicing loop
