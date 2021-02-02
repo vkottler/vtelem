@@ -2,7 +2,7 @@ default_target: "groups-all"
 
 params:
   project: "vtelem"
-  python_version: "3.7"
+  python_version: "3.8"
   entry: "vtelem"
 
 includes:
