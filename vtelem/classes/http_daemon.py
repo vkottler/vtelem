@@ -12,7 +12,7 @@ import logging
 from typing import Type, Tuple
 
 # internal
-from .daemon_base import DaemonBase, DaemonState
+from .daemon_base import DaemonBase, DaemonState, MainThread
 from .http_request_mapper import HttpRequestMapper, RequestHandle
 from .service_registry import ServiceRegistry
 from .telemetry_environment import TelemetryEnvironment
@@ -79,6 +79,17 @@ class HttpDaemon(DaemonBase):
 
         self.server.server_close()
         return True
+
+    def serve(self, *args, main_thread: MainThread = None, **kwargs) -> int:
+        """
+        Run this daemon with an optionally-provided main-thread function.
+        Stops serving and closes server resources when the main-thread
+        function returns.
+        """
+
+        result = super().serve(*args, main_thread=main_thread, **kwargs)
+        assert self.close()
+        return result
 
     def run(self, *_, **kwargs) -> None:
         """ Serve traffic. """

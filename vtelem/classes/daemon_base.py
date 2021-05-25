@@ -9,7 +9,7 @@ from contextlib import contextmanager
 import logging
 import threading
 import time
-from typing import Any, Dict, Optional, Iterator
+from typing import Any, Callable, Dict, Optional, Iterator
 
 # internal
 from vtelem.enums.daemon import DaemonState, DaemonOperation, str_to_operation
@@ -21,6 +21,24 @@ from .time_entity import TimeEntity
 from .user_enum import from_enum
 
 LOG = logging.getLogger(__name__)
+MainThread = Callable[..., int]
+
+
+def dummy_thread(*args, **kwargs) -> int:
+    """
+    For applications that don't do work in the main thread outside of daemons,
+    just sleep until we're interrupted.
+    """
+
+    LOG.debug("'dummy_thread' invoked: [%s], %s", ", ".join(args[1:]),
+              str(kwargs))
+    try:
+        while True:
+            # just use native time since we're not doing any time-keeping
+            time.sleep(2**32)
+    except KeyboardInterrupt:
+        pass
+    return 0
 
 
 class DaemonBase(TimeEntity):
@@ -200,6 +218,20 @@ class DaemonBase(TimeEntity):
             yield
         finally:
             assert self.stop()
+
+    def serve(self, *args, main_thread: MainThread = None, **kwargs) -> int:
+        """
+        Run this daemon with an optionally-provided main-thread function,
+        return the main-thread function's result and shut down the daemon when
+        it returns.
+        """
+
+        result = -1
+        if main_thread is None:
+            main_thread = dummy_thread
+        with self.booted(*args, **kwargs):
+            result = main_thread(self, *args, **kwargs)
+        return result
 
     def start(self, *args, **kwargs) -> bool:
         """ Attempt to start the daemon. """
