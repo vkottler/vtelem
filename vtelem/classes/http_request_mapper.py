@@ -10,7 +10,7 @@ from http.server import BaseHTTPRequestHandler
 from http import HTTPStatus
 import json
 import logging
-from typing import Dict, Callable, Tuple
+from typing import Dict, Callable, List, Tuple
 from typing import Optional as Opt
 import urllib
 
@@ -172,31 +172,166 @@ class MapperAwareRequestHandler(BaseHTTPRequestHandler):
         return self._handle(get_post_request_data(self))
 
 
+def parse_content_type(value: str) -> Opt[dict]:
+    """ Parse a 'Content-Type' header field. (RFC 2045 5.1) """
+
+    params = [x.strip() for x in value.split(";")]
+    if len(params) >= 1 and "/" in params[0]:
+        types = [x.strip() for x in params[0].split("/")]
+        if len(types) == 2 and types[0] and types[1]:
+            return {"type": types[0], "subtype": types[1],
+                    "params": params[1:]}
+
+    return None
+
+
+def get_multipart_boundary(content_type: dict) -> Opt[str]:
+    """
+    Attempt to parse the 'boundary=gc0p4Jq0M2Yt08j34c0p' portion of of a
+    'Content-Type' header field. This is generall required for further
+    processing of 'multipart' MIME data.
+    """
+
+    if ("params" in content_type and
+            isinstance(content_type["params"], list) and
+            len(content_type["params"]) == 1):
+        boundary_raw = content_type["params"][0].split("=")
+        if len(boundary_raw) == 2 and boundary_raw[0] == "boundary":
+            return boundary_raw[1]
+
+    return None
+
+
+def parse_request_lines(lines: List[str]) -> dict:
+    """
+    Parse lines from an (RFC 822) message into headers and body lines.
+    """
+
+    part_data: dict = {"headers": {}, "body": []}
+    headers = []
+    for idx, line in enumerate(lines):
+        if line == "" and idx != 0 and idx + 1 != len(lines):
+            headers = lines[:idx]
+            part_data["body"] = lines[idx + 1:]
+            break
+
+    header_parsers = {"content-disposition": parse_content_disposition}
+
+    # parse headers (RFC 822 3.2)
+    for header in headers:
+        name_body = header.split(":")
+        if len(name_body) == 2:
+            name = name_body[0].strip().lower()
+            body = name_body[1].strip()
+            part_data["headers"][name] = body
+
+            # parse headers further if they have a parser
+            if name in header_parsers:
+                part_data["headers"][name] = header_parsers[name](body)
+
+    return part_data
+
+
+def dequote(data: str) -> str:
+    """
+    Attempt to remove single or double quote characters from the outside of a
+    String.
+    """
+
+    if len(data) > 1 and data[0] == data[-1] and data.startswith(("'", '"')):
+        data = data[1:-1]
+    return data
+
+
+def parse_multipart_data(boundary: str,
+                         data: str) -> List[Dict[str, List[str]]]:
+    """
+    Given a boundary and valid request data, attempt to parse it into 'parts'
+    where a 'part' is provided as a list of the lines it contained.
+    """
+
+    delim = "--" + boundary
+    chunks = data.split(delim)
+
+    # remove leading empty element
+    if chunks and not chunks[0]:
+        chunks = chunks[1:]
+
+    parts = []
+    if chunks:
+        # (RFC 2616 2.2)
+        parts = [x.split("\r\n") for x in chunks]
+        for idx, part in enumerate(parts):
+            # strip the 'terminating CRLF' (RFC 2047 5.1.1)
+            if part and not part[0]:
+                parts[idx] = part[1:]
+
+    # (RFC 2046 5.1)
+    return [parse_request_lines(part) for part in parts]
+
+
+def parse_content_disposition(data: str) -> dict:
+    """
+    Attempt to parse a 'Content-Disposition' header field into an expected
+    result. (RFC 2183)
+    """
+
+    result = {}
+    items = [x.strip() for x in data.split(";")]
+    if items:
+        result["type"] = items[0]
+        for param in items[1:]:
+            param_split = param.split("=")
+            if len(param_split) == 2:
+                key = param_split[0].strip().lower()
+                result[key] = dequote(param_split[1].strip())
+
+    return result
+
+
 def get_post_request_data(request: BaseHTTPRequestHandler) -> dict:
     """ Obtain a dictionary of POST request data from a given request. """
 
     result = {}
     assert request.command == "POST"
 
-    def form_parser(_: BaseHTTPRequestHandler) -> dict:
+    def form_parser(request: BaseHTTPRequestHandler,
+                    content_type: dict) -> dict:
         """ Parse form data from a POST request. (RFC 7578) """
-        return {}
 
-    def url_encoded_parser(request: BaseHTTPRequestHandler) -> dict:
+        boundary = get_multipart_boundary(content_type)
+        real_parts = []
+        if boundary is not None:
+            data = request.rfile.read(length).decode("utf-8")
+            parsed = parse_multipart_data(boundary, data)
+
+            # this is now essentially 'lines of an http request', so we should
+            # figure out the best way to parse it...
+            for part in parsed:
+                if "content-disposition" in part["headers"]:
+                    real_parts.append(part)
+
+        return {"parts": real_parts}
+
+    def url_encoded_parser(request: BaseHTTPRequestHandler, _: dict) -> dict:
         """ Parse url-encoded POST request data. """
         field_data = request.rfile.read(length).decode("utf-8")
         return urllib.parse.parse_qs(field_data)
 
-    parsers = {"multipart/form-data": form_parser,
-               "application/x-www-form-urlencoded": url_encoded_parser}
+    parsers: dict = {
+        "multipart": {"form-data": form_parser},
+        "application": {"x-www-form-urlencoded": url_encoded_parser},
+    }
 
-    # if the request has content, attempt to parse it
+    # if the request has content, attempt to find a parser for it
     keys = ["Content-Length", "Content-Type"]
     if all(key in request.headers for key in keys):
+        content_type = parse_content_type(request.headers["Content-Type"])
         length = int(request.headers["Content-Length"])
-        for mtype, parser in parsers.items():
-            if mtype in request.headers["Content-Type"].lower():
-                result = parser(request)
-                break
+        if content_type is not None and content_type["type"] in parsers:
+            subparsers = parsers[content_type["type"]]
+            if content_type["subtype"] in subparsers:
+                result = subparsers[content_type["subtype"]](request,
+                                                             content_type)
 
     return result
