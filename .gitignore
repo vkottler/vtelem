@@ -11,4 +11,5 @@ dist
 htmlcov
 .*.env
 .manifest_cache
+.task_data_cache
 datazen-out
