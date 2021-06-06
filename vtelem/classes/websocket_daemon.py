@@ -68,7 +68,7 @@ class WebsocketDaemon(EventLoopDaemon):
                 assert ws_handler is not None
                 await ws_handler(websocket, path)
             except (asyncio.CancelledError, GeneratorExit,
-                    websockets.exceptions.WebSocketException):
+                    websockets.exceptions.WebSocketException):  # type: ignore
                 pass
             finally:
                 LOG.warning("closing client connection '%s:%d'", raddr[0],
@@ -92,9 +92,11 @@ class WebsocketDaemon(EventLoopDaemon):
                 async def routine() -> None:
                     """ Capture the server object once we begint serving. """
 
-                    self.server = await websockets.serve(handler,
-                                                         self.address[0],
-                                                         self.address[1])
+                    self.server = await websockets.serve(  # type: ignore
+                        handler,
+                        self.address[0],
+                        self.address[1]
+                    )
                     if first_start and service_registry is not None:
                         socks = self.server.sockets
                         if socks:

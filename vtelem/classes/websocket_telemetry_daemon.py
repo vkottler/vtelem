@@ -9,7 +9,7 @@ from queue import Queue
 from typing import Any, Tuple, Set
 
 # third-party
-import websockets
+from websockets.exceptions import WebSocketException
 
 # internal
 from .channel_frame import ChannelFrame
@@ -58,7 +58,7 @@ class WebsocketTelemetryDaemon(WebsocketDaemon):
 
                         for pend in pending:
                             pend.cancel()
-                    except websockets.exceptions.WebSocketException:
+                    except WebSocketException:
                         should_continue = False
             finally:
                 writer.remove_queue(queue_id, False)
