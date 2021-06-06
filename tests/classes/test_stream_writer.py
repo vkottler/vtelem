@@ -47,6 +47,7 @@ def test_stream_writer_basic():
     assert writer.start()
 
     # add streams
+    # pylint:disable=consider-using-with
     stream_a = tempfile.TemporaryFile()
     stream_b = tempfile.TemporaryFile()
     stream_c = tempfile.TemporaryFile()

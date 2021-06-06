@@ -142,5 +142,5 @@ class CommandQueueDaemon(QueueDaemon):
             signal.release()
 
         self.enqueue(command, cmd_cb)
-        signal.acquire()
+        signal.acquire()  # pylint:disable=consider-using-with
         return result, msg

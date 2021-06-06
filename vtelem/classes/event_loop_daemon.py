@@ -41,7 +41,8 @@ class EventLoopDaemon(DaemonBase):
 
             # decrement the semaphore the required number of times
             for _ in range(waits):
-                self.wait_poster.acquire()
+                sig = self.wait_poster
+                sig.acquire()  # pylint:disable=consider-using-with
 
             with self.lock:
                 self.wait_count -= waits

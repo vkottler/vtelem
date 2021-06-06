@@ -177,6 +177,7 @@ class TelemetryServer(HttpDaemon):
         """
 
         try:
+            # pylint:disable=consider-using-with
             self.state_sem.acquire()
             if not self.state_sem.acquire(True, timeout):  # type: ignore
                 self.stop_all()

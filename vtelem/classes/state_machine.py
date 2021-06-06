@@ -68,11 +68,8 @@ class StateMachine(LockEntity):
     def data(self) -> Iterator[dict]:
         """ Acquire stateful data in a locked context. """
 
-        try:
-            self.lock.acquire()
+        with self.lock:
             yield self._data
-        finally:
-            self.lock.release()
 
     def run(self, new_data: dict = None) -> Tuple[State, State]:
         """
