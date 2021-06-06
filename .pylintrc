@@ -5,3 +5,6 @@ extension-pkg-whitelist=netifaces
 max-args=9
 max-attributes=8
 max-public-methods=22
+
+[TYPECHECK]
+generated-members=websockets

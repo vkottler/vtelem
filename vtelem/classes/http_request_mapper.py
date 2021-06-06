@@ -121,10 +121,10 @@ class MapperAwareRequestHandler(BaseHTTPRequestHandler):
         data.update(_data)
 
         # parse the request uri
-        parsed = urllib.parse.urlparse(self.path)
+        parsed = urllib.parse.urlparse(self.path)  # type: ignore
         self.path = parsed.path
         if parsed.query:
-            data.update(urllib.parse.parse_qs(parsed.query))
+            data.update(urllib.parse.parse_qs(parsed.query))  # type: ignore
 
         if not hasattr(self.server, "mapper"):
             return self._no_mapper_response()
@@ -316,7 +316,7 @@ def get_post_request_data(request: BaseHTTPRequestHandler) -> dict:
     def url_encoded_parser(request: BaseHTTPRequestHandler, _: dict) -> dict:
         """ Parse url-encoded POST request data. """
         field_data = request.rfile.read(length).decode("utf-8")
-        return urllib.parse.parse_qs(field_data)
+        return urllib.parse.parse_qs(field_data)  # type: ignore
 
     parsers: dict = {
         "multipart": {"form-data": form_parser},
