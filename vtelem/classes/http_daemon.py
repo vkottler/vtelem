@@ -61,13 +61,14 @@ class HttpDaemon(DaemonBase):
 
     def add_handler(self, request_type: str, path: str, handle: RequestHandle,
                     description: str = "no description",
-                    data: dict = None) -> None:
+                    data: dict = None,
+                    response_type: str = "application/json") -> None:
         """ Add a handler for a specific request-type and path. """
 
         mapper: HttpRequestMapper
         mapper = self.server.mapper  # type: ignore
         return mapper.add_handler(request_type, path, handle, description,
-                                  data)
+                                  data, response_type)
 
     def close(self) -> bool:
         """ Close the server and clean up its resources. """
