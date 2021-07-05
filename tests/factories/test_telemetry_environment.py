@@ -1,4 +1,3 @@
-
 """
 vtelem - Test the telemetry-environment factory functions.
 """
@@ -17,9 +16,10 @@ from tests import command_result, make_queue_cb
 from tests.classes import EnumA
 
 
-def assert_get_id(results: Queue, daemon: CommandQueueDaemon, chan_id: int,
-                  value: str):
-    """ A simple function for asserting the result of a 'get' command. """
+def assert_get_id(
+    results: Queue, daemon: CommandQueueDaemon, chan_id: int, value: str
+):
+    """A simple function for asserting the result of a 'get' command."""
 
     cmd_data = {"operation": "get", "channel_id": chan_id}
     base_cmd = {"command": "channel", "data": cmd_data}
@@ -29,7 +29,7 @@ def assert_get_id(results: Queue, daemon: CommandQueueDaemon, chan_id: int,
 
 
 def test_channel_commander():  # pylint: disable=too-many-statements
-    """ Test all of the traversable paths for commanding channels. """
+    """Test all of the traversable paths for commanding channels."""
 
     env = TelemetryEnvironment(1024, metrics_rate=0.5)
     daemon = CommandQueueDaemon("test", env)
@@ -40,8 +40,9 @@ def test_channel_commander():  # pylint: disable=too-many-statements
     assert env.add_from_enum(EnumA) >= 0
     enum_ids = []
     for i in range(5):
-        enum_ids.append(env.add_enum_channel("echan{}".format(i), "enum_a",
-                        1.0))
+        enum_ids.append(
+            env.add_enum_channel("echan{}".format(i), "enum_a", 1.0)
+        )
     prim_ids = {}
     for prim in Primitive:
         prim_list = []

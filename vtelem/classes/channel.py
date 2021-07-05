@@ -1,4 +1,3 @@
-
 """
 vtelem - A storage class that emits on an interval.
 """
@@ -21,9 +20,14 @@ class Channel(TypePrimitive):
     changes.
     """
 
-    def __init__(self, name: str, instance: Primitive, rate: float,
-                 event_queue: EventQueue = None,
-                 commandable: bool = True) -> None:
+    def __init__(
+        self,
+        name: str,
+        instance: Primitive,
+        rate: float,
+        event_queue: EventQueue = None,
+        commandable: bool = True,
+    ) -> None:
         """
         Construct a new channel of a provided primitive type that should be
         emitted at a specified rate.
@@ -33,10 +37,12 @@ class Channel(TypePrimitive):
         # nothing
         changed_cb = None
         if event_queue is not None:
+
             def new_changed_cb(prev: EventType, curr: EventType) -> None:
-                """ Create a function specific to this channel. """
+                """Create a function specific to this channel."""
                 assert event_queue is not None
                 event_queue.enqueue(name, prev, curr)
+
             changed_cb = new_changed_cb
 
         super().__init__(instance, changed_cb)
@@ -45,9 +51,10 @@ class Channel(TypePrimitive):
         self.commandable = commandable
         self.last_emitted: float = float()
 
-    def command(self, value: Any, time: float = None,
-                add: bool = False) -> bool:
-        """ Attempt to command this channel to a new value """
+    def command(
+        self, value: Any, time: float = None, add: bool = False
+    ) -> bool:
+        """Attempt to command this channel to a new value"""
 
         if not self.commandable:
             return False
@@ -56,7 +63,7 @@ class Channel(TypePrimitive):
             return operation(value, time)
 
     def set_rate(self, rate: float) -> None:
-        """ Set a channel's rate post-initialization. """
+        """Set a channel's rate post-initialization."""
 
         with self.lock:
             self.rate = rate
@@ -76,15 +83,21 @@ class Channel(TypePrimitive):
 
 
 class ChannelEncoder(JSONEncoder):
-    """ A JSON encoder for a primitive enum. """
+    """A JSON encoder for a primitive enum."""
 
     def default(self, o) -> dict:
-        """ Implement serialization for the primitive enum value. """
+        """Implement serialization for the primitive enum value."""
 
         assert isinstance(o, Channel)
-        type_dict = {"name": o.type.value["name"],
-                     "signed": o.type.value["name"],
-                     "size": o.type.value["size"]}
-        result = {"name": o.name, "rate": o.rate,
-                  "commandable": o.commandable, "type": type_dict}
+        type_dict = {
+            "name": o.type.value["name"],
+            "signed": o.type.value["name"],
+            "size": o.type.value["size"],
+        }
+        result = {
+            "name": o.name,
+            "rate": o.rate,
+            "commandable": o.commandable,
+            "type": type_dict,
+        }
         return result

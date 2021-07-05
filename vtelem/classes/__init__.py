@@ -1,4 +1,3 @@
-
 """
 vtelem - Class defaults.
 """

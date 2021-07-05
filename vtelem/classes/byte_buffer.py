@@ -1,4 +1,3 @@
-
 """
 vtelem - A buffer implementation for serializing and de-serializing primitives.
 """
@@ -20,9 +19,14 @@ class ByteBuffer:
     containing library primitives.
     """
 
-    def __init__(self, data: bytearray = None, mutable: bool = True,
-                 size: int = 0, order: str = "!") -> None:
-        """ Construct a new, managed buffer """
+    def __init__(
+        self,
+        data: bytearray = None,
+        mutable: bool = True,
+        size: int = 0,
+        order: str = "!",
+    ) -> None:
+        """Construct a new, managed buffer"""
 
         if data is None:
             data = bytearray()
@@ -52,14 +56,14 @@ class ByteBuffer:
                 self.set_pos(orig_pos)
 
     def expand_to(self, size: int) -> None:
-        """ Extend the backing buffer if requested. """
+        """Extend the backing buffer if requested."""
 
         if size > len(self.data):
             with self.lock:
                 self.data += bytearray(size - len(self.data))
 
     def set_pos(self, pos: int) -> None:
-        """ Set the current buffer position. """
+        """Set the current buffer position."""
 
         with self.lock:
             # extend the backing buffer if position
@@ -67,7 +71,7 @@ class ByteBuffer:
             self.pos = pos
 
     def advance(self, amount: int, inc_size: bool = False) -> None:
-        """ Advance the current position by a specified amount. """
+        """Advance the current position by a specified amount."""
 
         with self.lock:
             self.set_pos(self.get_pos() + amount)
@@ -75,7 +79,7 @@ class ByteBuffer:
                 self.size += self.get_pos() - self.size
 
     def get_pos(self) -> int:
-        """ Obtain the current buffer position. """
+        """Obtain the current buffer position."""
 
         return self.pos
 
@@ -87,28 +91,28 @@ class ByteBuffer:
         return self.order + get_fstring(inst)
 
     def read(self, inst: Primitive) -> Any:
-        """ Read a primitive out of a buffer, at its current position. """
+        """Read a primitive out of a buffer, at its current position."""
 
         with self.lock:
             elem_size = get_size(inst)
             assert self.get_pos() + elem_size <= self.size
             end_pos = self.get_pos() + elem_size
-            buffer_slice = self.data[self.get_pos():end_pos]
+            buffer_slice = self.data[self.get_pos() : end_pos]
             result = struct.unpack(self.fstring(inst), buffer_slice)[0]
             self.advance(elem_size)
         return result
 
     def append(self, other: bytearray, data_len: int) -> None:
-        """ Add raw data to the end of this set. """
+        """Add raw data to the end of this set."""
 
         with self.lock:
-            self.data = self.data[0:self.size] + other[0:data_len]
+            self.data = self.data[0 : self.size] + other[0:data_len]
             self.advance(data_len, True)
 
     def crc32(self, initial_val: int = 0) -> int:
-        """ Compute this buffer's crc32. """
+        """Compute this buffer's crc32."""
 
-        return zlib.crc32(self.data[0:self.size], initial_val)
+        return zlib.crc32(self.data[0 : self.size], initial_val)
 
     def write(self, inst: Primitive, data: Any) -> int:
         """
@@ -121,7 +125,8 @@ class ByteBuffer:
         with self.lock:
             size = get_size(inst)
             self.expand_to(self.get_pos() + size)
-            struct.pack_into(self.fstring(inst), self.data, self.get_pos(),
-                             data)
+            struct.pack_into(
+                self.fstring(inst), self.data, self.get_pos(), data
+            )
             self.advance(size, True)
         return size

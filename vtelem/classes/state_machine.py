@@ -1,4 +1,3 @@
-
 """
 vtelem - A module for orchestrating state-machine implementation.
 """
@@ -24,10 +23,16 @@ class StateMachine(LockEntity):
     A class that supports structuring execution of code as a state machine.
     """
 
-    def __init__(self, name: str, states: List[State],
-                 initial_state: State = None, initial_data: dict = None,
-                 env: TelemetryEnvironment = None, rate: float = 1.0) -> None:
-        """ Construct a new state machine. """
+    def __init__(
+        self,
+        name: str,
+        states: List[State],
+        initial_state: State = None,
+        initial_data: dict = None,
+        env: TelemetryEnvironment = None,
+        rate: float = 1.0,
+    ) -> None:
+        """Construct a new state machine."""
 
         super().__init__()
 
@@ -66,7 +71,7 @@ class StateMachine(LockEntity):
 
     @contextmanager
     def data(self) -> Iterator[dict]:
-        """ Acquire stateful data in a locked context. """
+        """Acquire stateful data in a locked context."""
 
         with self.lock:
             yield self._data
@@ -93,22 +98,28 @@ class StateMachine(LockEntity):
             exit_failed = False
             transitioned = False
             if new != self.current_state:
-                LOG.info("%s: attempting '%s' -> '%s'", self.name,
-                         self.current_state, new)
+                LOG.info(
+                    "%s: attempting '%s' -> '%s'",
+                    self.name,
+                    self.current_state,
+                    new,
+                )
                 if curr.leaving(new, self._data):
                     candidate = self.states[new]
                     assert candidate is not None
                     if candidate.entering(self.current_state, self._data):
                         self.current_state = new
-                        LOG.info("%s: transition succeeded to '%s'", self.name,
-                                 new)
+                        LOG.info(
+                            "%s: transition succeeded to '%s'", self.name, new
+                        )
                         transitioned = True
                     else:
                         LOG.error("%s: couldn't enter '%s'", self.name, new)
                         enter_failed = True
                 else:
-                    LOG.error("%s: couldn't exit '%s'", self.name,
-                              self.current_state)
+                    LOG.error(
+                        "%s: couldn't exit '%s'", self.name, self.current_state
+                    )
                     exit_failed = True
 
         # increment metrics

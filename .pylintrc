@@ -8,3 +8,6 @@ max-public-methods=22
 
 [TYPECHECK]
 generated-members=websockets
+
+[MESSAGES CONTROL]
+disable=duplicate-code

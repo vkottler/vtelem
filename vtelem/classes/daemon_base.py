@@ -1,4 +1,3 @@
-
 """
 vtelem - A base for building runtime tasks.
 """
@@ -30,25 +29,30 @@ def dummy_thread(*args, **kwargs) -> int:
     just sleep until we're interrupted.
     """
 
-    LOG.debug("'dummy_thread' invoked: [%s], %s", ", ".join(args[1:]),
-              str(kwargs))
+    LOG.debug(
+        "'dummy_thread' invoked: [%s], %s", ", ".join(args[1:]), str(kwargs)
+    )
     try:
         while True:
             # just use native time since we're not doing any time-keeping
-            time.sleep(2**32)
+            time.sleep(2 ** 32)
     except KeyboardInterrupt:
         pass
     return 0
 
 
 class DaemonBase(TimeEntity):
-    """ A base class for building worker threads. """
+    """A base class for building worker threads."""
 
     states = from_enum(DaemonState)
     operations = from_enum(DaemonOperation)
 
-    def __init__(self, name: str, env: TelemetryEnvironment = None,
-                 time_keeper: Any = None):
+    def __init__(
+        self,
+        name: str,
+        env: TelemetryEnvironment = None,
+        time_keeper: Any = None,
+    ):
         """
         Construct a base daemon, supports implementations of tasks that can
         be started, stopped, paused etc. at runtime.
@@ -80,39 +84,59 @@ class DaemonBase(TimeEntity):
         self.reset_metric("unpauses")
         self.reset_metric("count")
 
-        def default_state_change(prev_state: DaemonState, state: DaemonState,
-                                 time_val: float) -> None:
-            """ By default, log state changes for a daemon. """
-            LOG.info("%-10s - %s: %s -> %s", self.name, time.ctime(time_val),
-                     prev_state.name.lower(), state.name.lower())
+        def default_state_change(
+            prev_state: DaemonState, state: DaemonState, time_val: float
+        ) -> None:
+            """By default, log state changes for a daemon."""
+            LOG.info(
+                "%-10s - %s: %s -> %s",
+                self.name,
+                time.ctime(time_val),
+                prev_state.name.lower(),
+                state.name.lower(),
+            )
 
         self.function["state_change"] = default_state_change
 
         # add a metric channel for the overall state
         if self.env is not None:
             self.env.add_from_enum(DaemonState)
-            self.env.add_enum_metric(self.get_metric_name("state"),
-                                     class_to_snake(DaemonState), True)
+            self.env.add_enum_metric(
+                self.get_metric_name("state"),
+                class_to_snake(DaemonState),
+                True,
+            )
 
         self.set_state(DaemonState.IDLE)
 
         # set up the actions data
-        default: dict = defaultdict(lambda: {"action": lambda: False,
-                                             "takes_args": False})
+        default: dict = defaultdict(
+            lambda: {"action": lambda: False, "takes_args": False}
+        )
         self.daemon_ops: Dict[DaemonOperation, dict] = default
-        self.daemon_ops[DaemonOperation.START] = {"action": self.start,
-                                                  "takes_args": True}
-        self.daemon_ops[DaemonOperation.STOP] = {"action": self.stop,
-                                                 "takes_args": False}
-        self.daemon_ops[DaemonOperation.PAUSE] = {"action": self.pause,
-                                                  "takes_args": False}
-        self.daemon_ops[DaemonOperation.UNPAUSE] = {"action": self.unpause,
-                                                    "takes_args": False}
-        self.daemon_ops[DaemonOperation.RESTART] = {"action": self.restart,
-                                                    "takes_args": True}
+        self.daemon_ops[DaemonOperation.START] = {
+            "action": self.start,
+            "takes_args": True,
+        }
+        self.daemon_ops[DaemonOperation.STOP] = {
+            "action": self.stop,
+            "takes_args": False,
+        }
+        self.daemon_ops[DaemonOperation.PAUSE] = {
+            "action": self.pause,
+            "takes_args": False,
+        }
+        self.daemon_ops[DaemonOperation.UNPAUSE] = {
+            "action": self.unpause,
+            "takes_args": False,
+        }
+        self.daemon_ops[DaemonOperation.RESTART] = {
+            "action": self.restart,
+            "takes_args": True,
+        }
 
     def perform(self, action: DaemonOperation, *args, **kwargs) -> bool:
-        """ Perform an action by enum. """
+        """Perform an action by enum."""
 
         operation = self.daemon_ops[action]
         if not operation["takes_args"]:
@@ -120,7 +144,7 @@ class DaemonBase(TimeEntity):
         return operation["action"](*args, **kwargs)
 
     def perform_str(self, action: str, *args, **kwargs) -> bool:
-        """ Perform an action on this daemon by String. """
+        """Perform an action on this daemon by String."""
 
         operation = str_to_operation(action)
         if operation is None:
@@ -128,12 +152,12 @@ class DaemonBase(TimeEntity):
         return self.perform(operation, *args, **kwargs)
 
     def get_metric_name(self, channel_name: str) -> str:
-        """ Build the name of a metric channel for this daemon. """
+        """Build the name of a metric channel for this daemon."""
 
         return "{}.{}".format(self.name, channel_name)
 
     def set_state(self, state: DaemonState) -> None:
-        """ Assigns a new run-state to this daemon. """
+        """Assigns a new run-state to this daemon."""
 
         with self.lock:
             if self.state == state:
@@ -143,49 +167,54 @@ class DaemonBase(TimeEntity):
 
             # set the metric channel
             if self.env is not None:
-                self.env.set_enum_metric(self.get_metric_name("state"),
-                                         self.get_state_str(), self.get_time())
+                self.env.set_enum_metric(
+                    self.get_metric_name("state"),
+                    self.get_state_str(),
+                    self.get_time(),
+                )
 
-    def set_env_metric(self, name: str, value: Any,
-                       prim: Primitive = METRIC_PRIM) -> None:
-        """ Set a metric channel value if an environment is registered. """
+    def set_env_metric(
+        self, name: str, value: Any, prim: Primitive = METRIC_PRIM
+    ) -> None:
+        """Set a metric channel value if an environment is registered."""
 
         if self.env is not None:
             metric_name = self.get_metric_name(name)
             if not self.env.has_metric(metric_name):
-                self.env.add_metric(metric_name, prim,
-                                    self.function["track_metric_changes"])
+                self.env.add_metric(
+                    metric_name, prim, self.function["track_metric_changes"]
+                )
             self.env.set_metric(metric_name, value, self.get_time())
 
     def reset_metric(self, name: str) -> None:
-        """ Set a metric back to zero. """
+        """Set a metric back to zero."""
 
         with self.lock:
             self.function["metrics_data"][name] = 0
             self.set_env_metric(name, self.function["metrics_data"][name])
 
     def increment_metric(self, name: str, value: Any = 1) -> None:
-        """ Increment a named metric. """
+        """Increment a named metric."""
 
         with self.lock:
             self.function["metrics_data"][name] += value
             self.set_env_metric(name, self.function["metrics_data"][name])
 
     def decrement_metric(self, name: str, value: Any = 1) -> None:
-        """ Decrement a named metric. """
+        """Decrement a named metric."""
 
         with self.lock:
             self.function["metrics_data"][name] -= value
             self.set_env_metric(name, self.function["metrics_data"][name])
 
     def get_state(self) -> DaemonState:
-        """ Query this daemon's current state. """
+        """Query this daemon's current state."""
 
         with self.lock:
             return self.state
 
     def get_state_str(self) -> str:
-        """ Get the current state as a String. """
+        """Get the current state as a String."""
 
         return self.get_state().name.lower()
 
@@ -204,7 +233,7 @@ class DaemonBase(TimeEntity):
             self.set_state(DaemonState.IDLE)
 
     def run(self, *_, **__) -> None:
-        """ To be implemented by parent. """
+        """To be implemented by parent."""
 
     @contextmanager
     def booted(self, *args, **kwargs) -> Iterator[None]:
@@ -234,14 +263,18 @@ class DaemonBase(TimeEntity):
         return result
 
     def start(self, *args, **kwargs) -> bool:
-        """ Attempt to start the daemon. """
+        """Attempt to start the daemon."""
 
         with self.lock:
             if self.state != DaemonState.IDLE:
                 return False
 
-            self.thread = threading.Thread(target=self.run_harness, args=args,
-                                           kwargs=kwargs, name=self.name)
+            self.thread = threading.Thread(
+                target=self.run_harness,
+                args=args,
+                kwargs=kwargs,
+                name=self.name,
+            )
             self.reset_metric("count")
             self.increment_metric("starts")
             self.set_state(DaemonState.STARTING)
@@ -251,7 +284,7 @@ class DaemonBase(TimeEntity):
 
     @contextmanager
     def paused(self) -> Iterator[None]:
-        """ Exposes pausing and unpausing while yielded. """
+        """Exposes pausing and unpausing while yielded."""
 
         try:
             assert self.pause()
@@ -260,7 +293,7 @@ class DaemonBase(TimeEntity):
             assert self.unpause()
 
     def pause(self) -> bool:
-        """ Attempt to pause the daemon. """
+        """Attempt to pause the daemon."""
 
         with self.lock:
             if self.state == DaemonState.RUNNING:
@@ -270,7 +303,7 @@ class DaemonBase(TimeEntity):
         return False
 
     def unpause(self) -> bool:
-        """ Attempt to un-pause the daemon. """
+        """Attempt to un-pause the daemon."""
 
         with self.lock:
             if self.state == DaemonState.PAUSED:
@@ -300,14 +333,14 @@ class DaemonBase(TimeEntity):
         return should_stop
 
     def restart(self, *args, **kwargs) -> bool:
-        """ Attempt to restart this daemon. """
+        """Attempt to restart this daemon."""
 
         if self.stop():
             return self.start(*args, **kwargs)
         return False
 
     def stop(self) -> bool:
-        """ Attempt to stop the daemon. """
+        """Attempt to stop the daemon."""
 
         if not self.begin_stop():
             return False

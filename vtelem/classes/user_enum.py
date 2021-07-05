@@ -1,4 +1,3 @@
-
 """
 vtelem - Implements an object for storing a runtime enumeration.
 """
@@ -17,11 +16,12 @@ from .type_primitive import TypePrimitive
 
 
 class UserEnum:
-    """ A container for runtime, user-defined enumerations. """
+    """A container for runtime, user-defined enumerations."""
 
-    def __init__(self, name: str, values: Dict[int, str],
-                 default: str = None) -> None:
-        """ Build a runtime enumeration. """
+    def __init__(
+        self, name: str, values: Dict[int, str], default: str = None
+    ) -> None:
+        """Build a runtime enumeration."""
 
         self.enum: Dict[int, str] = defaultdict(lambda: "unknown")
         self.enum.update(values)
@@ -42,24 +42,25 @@ class UserEnum:
         self.default_val = val
 
     def get_str(self, val: int) -> str:
-        """ Look up the String represented by the integer enum value. """
+        """Look up the String represented by the integer enum value."""
 
         return self.enum[val]
 
     def get_value(self, val: str) -> int:
-        """ Get the integer value of an enum String. """
+        """Get the integer value of an enum String."""
 
         result = self.strings[val.lower()]
         assert result is not None
         return result
 
     def default(self) -> str:
-        """ Get the default value for this enum. """
+        """Get the default value for this enum."""
 
         return self.default_val
 
-    def get_primitive(self, value: str,
-                      changed_cb: Callable = None) -> TypePrimitive:
+    def get_primitive(
+        self, value: str, changed_cb: Callable = None
+    ) -> TypePrimitive:
         """
         Create a new primitive with an initial value from this enum definition.
         """
@@ -71,25 +72,26 @@ class UserEnum:
         return result
 
     def describe(self, indented: bool = False) -> str:
-        """ Describe this enumeration as a JSON String. """
+        """Describe this enumeration as a JSON String."""
 
         indent = 4 if indented else None
-        return json.dumps(self.enum, indent=indent, sort_keys=True,
-                          cls=UserEnumEncoder)
+        return json.dumps(
+            self.enum, indent=indent, sort_keys=True, cls=UserEnumEncoder
+        )
 
 
 class UserEnumEncoder(json.JSONEncoder):
-    """ A JSON encoder for a primitive enum. """
+    """A JSON encoder for a primitive enum."""
 
     def default(self, o) -> dict:
-        """ Implement serialization for the primitive enum value. """
+        """Implement serialization for the primitive enum value."""
 
         assert isinstance(o, UserEnum)
         return {"name": o.name, "mappings": o.enum}
 
 
 def from_enum(enum_class: Type[Enum]) -> UserEnum:
-    """ From an enum class, create a user enum. """
+    """From an enum class, create a user enum."""
 
     values = {}
     for inst in enum_class:

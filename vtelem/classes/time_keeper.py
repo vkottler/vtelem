@@ -1,4 +1,3 @@
-
 """
 vtelem - A class for managing application time.
 """
@@ -16,10 +15,15 @@ class TimeKeeper(Daemon):
     A class for managing a notion of time for an arbitrary number of slaves.
     """
 
-    def __init__(self, name: str, rate: float, real_scalar: float = 1.0,
-                 time_fn: Callable = None,
-                 sleep_fn: Callable = None):
-        """ Construct a new time keeper. """
+    def __init__(
+        self,
+        name: str,
+        rate: float,
+        real_scalar: float = 1.0,
+        time_fn: Callable = None,
+        sleep_fn: Callable = None,
+    ):
+        """Construct a new time keeper."""
 
         if time_fn is None:
             time_fn = time.time
@@ -38,7 +42,7 @@ class TimeKeeper(Daemon):
         self.slaves: List[Any] = []
 
     def iteration(self, *_, **__) -> None:
-        """ On every iteration, advance time for all slaves. """
+        """On every iteration, advance time for all slaves."""
 
         with self.lock:
             curr = self.time_function()
@@ -48,14 +52,14 @@ class TimeKeeper(Daemon):
         self.set_slaves()
 
     def add_slave(self, slave: Any) -> None:
-        """ Add a new slave under this keeper's management. """
+        """Add a new slave under this keeper's management."""
 
         with self.lock:
             slave.set_time(self.get_time())
             self.slaves.append(slave)
 
     def set_slaves(self) -> None:
-        """ Set slave time. """
+        """Set slave time."""
 
         with self.lock:
             curr_time = self.get_time()
@@ -63,13 +67,13 @@ class TimeKeeper(Daemon):
                 slave.set_time(curr_time)
 
     def scale(self, scalar: float) -> None:
-        """ Change the current time scaling. """
+        """Change the current time scaling."""
 
         if scalar >= 0.0:
             with self.lock:
                 self.scalar = scalar
 
     def sleep(self, amount: float) -> None:
-        """ Sleep for the specified amount, scaled appropriately. """
+        """Sleep for the specified amount, scaled appropriately."""
 
         self.sleep_function(amount / self.scalar)

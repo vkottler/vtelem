@@ -1,4 +1,3 @@
-
 """
 vtelem - Test the event-loop daemon's correctness.
 """
@@ -11,7 +10,7 @@ from vtelem.classes.event_loop_daemon import EventLoopDaemon
 
 
 def test_event_loop_daemon_basic():
-    """ Test that the event loop daemon can start and stop. """
+    """Test that the event loop daemon can start and stop."""
 
     daemon = EventLoopDaemon("test")
 

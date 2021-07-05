@@ -1,4 +1,3 @@
-
 """
 vtelem - Test the UDP-client manager module's correctness.
 """
@@ -14,7 +13,7 @@ from vtelem.mtu import DEFAULT_MTU
 
 
 def test_udp_client_manager_basic():
-    """ Test that adding clients and sending data is functional. """
+    """Test that adding clients and sending data is functional."""
 
     frame_queue = Queue()
     writer = StreamWriter("test_writer", frame_queue)

@@ -1,4 +1,3 @@
-
 """
 vtelem - Simplify management of logical groups of channels and synchronize
          their reading and writing.
@@ -20,14 +19,19 @@ class ChannelGroup:
     """
 
     def __init__(self, name: str, env: TelemetryEnvironment) -> None:
-        """ Construct a new channel group. """
+        """Construct a new channel group."""
 
         self.env = env
         self.name = name
         self.channels: Dict[str, Dict[str, Any]] = {}
 
-    def add_channel(self, name: str, instance: Primitive, rate: float,
-                    track_change: bool = False) -> bool:
+    def add_channel(
+        self,
+        name: str,
+        instance: Primitive,
+        rate: float,
+        track_change: bool = False,
+    ) -> bool:
         """
         Attempt to add a channel to the environment and this group manager.
         """
@@ -36,17 +40,26 @@ class ChannelGroup:
         try:
             val = default_val(instance)
             real_name = "{}.{}".format(self.name, name)
-            chan_id = self.env.add_channel(real_name, instance, rate,
-                                           track_change,
-                                           (val, self.env.get_time()))
+            chan_id = self.env.add_channel(
+                real_name,
+                instance,
+                rate,
+                track_change,
+                (val, self.env.get_time()),
+            )
         except AssertionError:
             return False
 
         self.channels[name] = {"id": chan_id, "value": val, "is_enum": False}
         return True
 
-    def add_enum_channel(self, name: str, enum_name: str, rate: float,
-                         track_change: bool = False) -> bool:
+    def add_enum_channel(
+        self,
+        name: str,
+        enum_name: str,
+        rate: float,
+        track_change: bool = False,
+    ) -> bool:
         """
         Attempt to add an enum channel to the environment and this group
         manager.
@@ -65,9 +78,13 @@ class ChannelGroup:
         # the environment should catch duplicate channel names for us
         try:
             real_name = "{}.{}".format(self.name, name)
-            chan_id = self.env.add_enum_channel(real_name, enum_name, rate,
-                                                track_change,
-                                                (val, self.env.get_time()))
+            chan_id = self.env.add_enum_channel(
+                real_name,
+                enum_name,
+                rate,
+                track_change,
+                (val, self.env.get_time()),
+            )
         except AssertionError:
             return False
 
@@ -88,7 +105,7 @@ class ChannelGroup:
             self.write(data)
 
     def read(self) -> Dict[str, Any]:
-        """ Read all channel values from the environment, atomically. """
+        """Read all channel values from the environment, atomically."""
 
         values = {}
         with self.env.lock:
@@ -100,7 +117,7 @@ class ChannelGroup:
         return values
 
     def write(self, values: Dict[str, Any]) -> None:
-        """ Write the values into the environment. """
+        """Write the values into the environment."""
 
         with self.env.lock:
             for name, value in values.items():

@@ -1,4 +1,3 @@
-
 """
 vtelem - Test the queue-daemon class's correctness.
 """
@@ -12,12 +11,12 @@ from vtelem.classes.queue_daemon import QueueDaemon
 
 
 def test_queue_daemon_basic():
-    """ Test basic queue-daemon correctness. """
+    """Test basic queue-daemon correctness."""
 
     count = 0
 
     def handle_elem(queue_elem: Any) -> None:
-        """ Accumulate a count with provided elements. """
+        """Accumulate a count with provided elements."""
 
         nonlocal count
         count += queue_elem

@@ -1,4 +1,3 @@
-
 """
 vtelem - Test the http request-mapper's correctness.
 """
@@ -19,22 +18,20 @@ from vtelem.classes.http_request_mapper import (
 )
 
 
-def error_handle(request: BaseHTTPRequestHandler,
-                 _: dict) -> Tuple[bool, str]:
-    """ An example handle that always returns error. """
+def error_handle(request: BaseHTTPRequestHandler, _: dict) -> Tuple[bool, str]:
+    """An example handle that always returns error."""
 
     fstr = "sample error handle ('{}', '{}')"
     return False, fstr.format(request.command, request.path)
 
 
 def test_http_reqest_mapper_post():
-    """ Test POST requests with 'multipart/form-data' encoding. """
+    """Test POST requests with 'multipart/form-data' encoding."""
 
     daemon = HttpDaemon("test_daemon", handler_class=MapperAwareRequestHandler)
 
-    def post_handle(_: BaseHTTPRequestHandler,
-                    data: dict) -> Tuple[bool, str]:
-        """ Example request handler. """
+    def post_handle(_: BaseHTTPRequestHandler, data: dict) -> Tuple[bool, str]:
+        """Example request handler."""
 
         assert "parts" in data
         assert len(data["parts"]) == 3
@@ -42,8 +39,10 @@ def test_http_reqest_mapper_post():
 
     daemon.add_handler("POST", "example", post_handle)
     with daemon.booted():
-        result = requests.post(daemon.get_base_url() + "example",
-                               files={"a": "a", "b": "b", "c": "c"})
+        result = requests.post(
+            daemon.get_base_url() + "example",
+            files={"a": "a", "b": "b", "c": "c"},
+        )
         assert result.status_code == requests.codes["ok"]
 
     assert parse_content_type("") is None
@@ -51,11 +50,16 @@ def test_http_reqest_mapper_post():
 
 
 def test_http_request_mapper_basic():
-    """ Test that the daemon can be managed effectively. """
+    """Test that the daemon can be managed effectively."""
 
     daemon = HttpDaemon("test_daemon", handler_class=MapperAwareRequestHandler)
-    daemon.add_handler("GET", "example", error_handle,
-                       "sample handler", {"Random-Header": "test"})
+    daemon.add_handler(
+        "GET",
+        "example",
+        error_handle,
+        "sample handler",
+        {"Random-Header": "test"},
+    )
 
     with daemon.booted():
         result = requests.get(daemon.get_base_url() + "bad")

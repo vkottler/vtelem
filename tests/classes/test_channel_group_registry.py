@@ -1,4 +1,3 @@
-
 """
 vtelem - Test the channel-group registry's correctness.
 """
@@ -13,13 +12,16 @@ from . import EnumA
 
 
 def test_group_registry_basic():
-    """ Test simple functionality of a group registry. """
+    """Test simple functionality of a group registry."""
 
     env = TelemetryEnvironment(2 ** 8)
     assert env.add_from_enum(EnumA) >= 0
     reg = ChannelGroupRegistry(env)
-    groups = [reg.create_group("a"), reg.create_group("b"),
-              reg.create_group("c")]
+    groups = [
+        reg.create_group("a"),
+        reg.create_group("b"),
+        reg.create_group("c"),
+    ]
 
     # add channels to each group
     for group in groups:

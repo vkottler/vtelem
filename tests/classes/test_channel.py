@@ -1,4 +1,3 @@
-
 """
 vtelem - Test the channel class's correctness.
 """
@@ -10,7 +9,7 @@ from vtelem.enums.primitive import Primitive
 
 
 def test_channel_basic():
-    """ Test that emitting and the changed callbacks work. """
+    """Test that emitting and the changed callbacks work."""
 
     queue = EventQueue()
     chan_a = Channel("a", Primitive.FLOAT, 1.0)

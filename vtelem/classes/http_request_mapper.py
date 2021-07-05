@@ -1,4 +1,3 @@
-
 """
 vtelem - An interface for simplifying registering implementations for
          individual request types.
@@ -24,24 +23,25 @@ class HttpRequestMapper:
     """
 
     def __init__(self) -> None:
-        """ Construct a new request mapper. """
+        """Construct a new request mapper."""
 
         req: dict = defaultdict(lambda: defaultdict(lambda: None))
         self.requests: Dict[str, Dict[str, Opt[RequestHandle]]] = req
         data: dict = defaultdict(lambda: defaultdict(lambda: None))
         self.handle_data: Dict[str, Dict[str, Opt[dict]]] = data
 
-        def index_handler(_: BaseHTTPRequestHandler,
-                          __: dict) -> Tuple[bool, str]:
+        def index_handler(
+            _: BaseHTTPRequestHandler, __: dict
+        ) -> Tuple[bool, str]:
             """
             A default handler that can be used to discover the implemented
             request handles.
             """
 
             handles: dict = {}
-            for method in self.requests.keys():
+            for method, handlers in self.requests.items():
                 handles[method] = []
-                for path in self.requests[method].keys():
+                for path in handlers.keys():
                     handle_inst = self.handle_data[method][path]
                     handle_data = {"path": path}
                     if handle_inst is not None:
@@ -51,17 +51,26 @@ class HttpRequestMapper:
 
         self.add_handler("GET", "", index_handler, "request index")
 
-    def get_handle(self, request_type: str,
-                   path: str) -> Tuple[Opt[RequestHandle], Opt[dict]]:
-        """ Retrieve a handle by request type and path. """
+    def get_handle(
+        self, request_type: str, path: str
+    ) -> Tuple[Opt[RequestHandle], Opt[dict]]:
+        """Retrieve a handle by request type and path."""
 
-        return (self.requests[request_type][path],
-                self.handle_data[request_type][path])
+        return (
+            self.requests[request_type][path],
+            self.handle_data[request_type][path],
+        )
 
-    def add_handler(self, request_type: str, path: str,
-                    handle: RequestHandle, description: str, data: dict = None,
-                    response_type: str = "application/json",
-                    charset: str = "utf-8") -> None:
+    def add_handler(
+        self,
+        request_type: str,
+        path: str,
+        handle: RequestHandle,
+        description: str,
+        data: dict = None,
+        response_type: str = "application/json",
+        charset: str = "utf-8",
+    ) -> None:
         """
         A default handler for displaying the list of registered handles.
         """
@@ -70,8 +79,9 @@ class HttpRequestMapper:
         self.requests[request_type][path] = handle
         handle_data = {}
         handle_data["Description"] = description
-        handle_data["Content-Type"] = "{}; charset={}".format(response_type,
-                                                              charset)
+        handle_data["Content-Type"] = "{}; charset={}".format(
+            response_type, charset
+        )
         if data is not None:
             handle_data.update(data)
         self.handle_data[request_type][path] = handle_data
@@ -79,10 +89,10 @@ class HttpRequestMapper:
 
 # pylint: disable=attribute-defined-outside-init
 class MapperAwareRequestHandler(BaseHTTPRequestHandler):
-    """ A request handler that integrates with the request mapper. """
+    """A request handler that integrates with the request mapper."""
 
     def log_message(self, fmt, *args):  # pylint: disable=arguments-differ
-        """ Overrides the default logging method. """
+        """Overrides the default logging method."""
 
         fmt = "%s - - [%s] " + fmt
         new_args = [self.address_string(), self.log_date_time_string()]
@@ -95,10 +105,11 @@ class MapperAwareRequestHandler(BaseHTTPRequestHandler):
             LOG.info(fmt, *args)
 
     def _no_mapper_response(self) -> None:
-        """ Handle responding when no server mapper is detected. """
+        """Handle responding when no server mapper is detected."""
 
-        self.send_error(HTTPStatus.NOT_IMPLEMENTED,
-                        "no request-mapper configured")
+        self.send_error(
+            HTTPStatus.NOT_IMPLEMENTED, "no request-mapper configured"
+        )
         self.end_headers()
         self.close_connection = True
 
@@ -113,7 +124,7 @@ class MapperAwareRequestHandler(BaseHTTPRequestHandler):
         self.close_connection = True
 
     def _handle(self, _data: dict = None) -> None:
-        """ Handle an arbitrary request. """
+        """Handle an arbitrary request."""
 
         if _data is None:
             _data = {}
@@ -160,27 +171,30 @@ class MapperAwareRequestHandler(BaseHTTPRequestHandler):
         return None
 
     def do_HEAD(self) -> None:  # pylint: disable=invalid-name
-        """ Respond to a HEAD request. """
+        """Respond to a HEAD request."""
         return self._handle()
 
     def do_GET(self) -> None:  # pylint: disable=invalid-name
-        """ Respond to a GET request. """
+        """Respond to a GET request."""
         return self._handle()
 
     def do_POST(self) -> None:  # pylint: disable=invalid-name
-        """ Respond to a POST request. """
+        """Respond to a POST request."""
         return self._handle(get_post_request_data(self))
 
 
 def parse_content_type(value: str) -> Opt[dict]:
-    """ Parse a 'Content-Type' header field. (RFC 2045 5.1) """
+    """Parse a 'Content-Type' header field. (RFC 2045 5.1)"""
 
     params = [x.strip() for x in value.split(";")]
     if len(params) >= 1 and "/" in params[0]:
         types = [x.strip() for x in params[0].split("/")]
         if len(types) == 2 and types[0] and types[1]:
-            return {"type": types[0], "subtype": types[1],
-                    "params": params[1:]}
+            return {
+                "type": types[0],
+                "subtype": types[1],
+                "params": params[1:],
+            }
 
     return None
 
@@ -192,9 +206,11 @@ def get_multipart_boundary(content_type: dict) -> Opt[str]:
     processing of 'multipart' MIME data.
     """
 
-    if ("params" in content_type and
-            isinstance(content_type["params"], list) and
-            len(content_type["params"]) == 1):
+    if (
+        "params" in content_type
+        and isinstance(content_type["params"], list)
+        and len(content_type["params"]) == 1
+    ):
         boundary_raw = content_type["params"][0].split("=")
         if len(boundary_raw) == 2 and boundary_raw[0] == "boundary":
             return boundary_raw[1]
@@ -212,7 +228,7 @@ def parse_request_lines(lines: List[str]) -> dict:
     for idx, line in enumerate(lines):
         if line == "" and idx != 0 and idx + 1 != len(lines):
             headers = lines[:idx]
-            part_data["body"] = lines[idx + 1:]
+            part_data["body"] = lines[idx + 1 :]
             break
 
     header_parsers = {"content-disposition": parse_content_disposition}
@@ -243,8 +259,9 @@ def dequote(data: str) -> str:
     return data
 
 
-def parse_multipart_data(boundary: str,
-                         data: str) -> List[Dict[str, List[str]]]:
+def parse_multipart_data(
+    boundary: str, data: str
+) -> List[Dict[str, List[str]]]:
     """
     Given a boundary and valid request data, attempt to parse it into 'parts'
     where a 'part' is provided as a list of the lines it contained.
@@ -290,14 +307,15 @@ def parse_content_disposition(data: str) -> dict:
 
 
 def get_post_request_data(request: BaseHTTPRequestHandler) -> dict:
-    """ Obtain a dictionary of POST request data from a given request. """
+    """Obtain a dictionary of POST request data from a given request."""
 
     result = {}
     assert request.command == "POST"
 
-    def form_parser(request: BaseHTTPRequestHandler,
-                    content_type: dict) -> dict:
-        """ Parse form data from a POST request. (RFC 7578) """
+    def form_parser(
+        request: BaseHTTPRequestHandler, content_type: dict
+    ) -> dict:
+        """Parse form data from a POST request. (RFC 7578)"""
 
         boundary = get_multipart_boundary(content_type)
         real_parts = []
@@ -314,7 +332,7 @@ def get_post_request_data(request: BaseHTTPRequestHandler) -> dict:
         return {"parts": real_parts}
 
     def url_encoded_parser(request: BaseHTTPRequestHandler, _: dict) -> dict:
-        """ Parse url-encoded POST request data. """
+        """Parse url-encoded POST request data."""
         field_data = request.rfile.read(length).decode("utf-8")
         return urllib.parse.parse_qs(field_data)  # type: ignore
 
@@ -331,7 +349,8 @@ def get_post_request_data(request: BaseHTTPRequestHandler) -> dict:
         if content_type is not None and content_type["type"] in parsers:
             subparsers = parsers[content_type["type"]]
             if content_type["subtype"] in subparsers:
-                result = subparsers[content_type["subtype"]](request,
-                                                             content_type)
+                result = subparsers[content_type["subtype"]](
+                    request, content_type
+                )
 
     return result

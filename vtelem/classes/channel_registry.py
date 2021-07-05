@@ -1,4 +1,3 @@
-
 """
 vtelem - A module for managing channel registrations.
 """
@@ -19,7 +18,7 @@ class ChannelRegistry(Registry[Channel]):
     """
 
     def __init__(self, initial_channels: List[Channel] = None) -> None:
-        """ Construct a new channel registry. """
+        """Construct a new channel registry."""
 
         super().__init__("channels", None)
         if initial_channels is not None:
@@ -27,18 +26,18 @@ class ChannelRegistry(Registry[Channel]):
                 self.add_channel(channel)
 
     def get_channel_type(self, chan_id: int) -> Primitive:
-        """ Get a channel's primitive type by its integer identifier. """
+        """Get a channel's primitive type by its integer identifier."""
 
         channel = self.get_item(chan_id)
         assert channel is not None
         return channel.type
 
     def add_channel(self, channel: Channel) -> Tuple[bool, int]:
-        """ Attempt to register a channel. """
+        """Attempt to register a channel."""
 
         return self.add(channel.name, channel)
 
     def describe(self, indented: bool = False) -> str:
-        """ Obtain a JSON String of the channel registry's current state. """
+        """Obtain a JSON String of the channel registry's current state."""
 
         return self.describe_raw(indented, ChannelEncoder)

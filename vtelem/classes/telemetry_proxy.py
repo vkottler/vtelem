@@ -1,4 +1,3 @@
-
 """
 vtelem - A daemon that provides decoded telemetry frames into a queue, from a
          udp listener.
@@ -23,10 +22,15 @@ class TelemetryProxy(DaemonBase):
     A class for publishing decoded telemetry frames into a queue as a daemon.
     """
 
-    def __init__(self, host: Tuple[str, int], output_stream: Queue,
-                 app_id: TypePrimitive, env: TelemetryEnvironment,
-                 mtu: int = DEFAULT_MTU) -> None:
-        """ Construct a new telemetry proxy. """
+    def __init__(
+        self,
+        host: Tuple[str, int],
+        output_stream: Queue,
+        app_id: TypePrimitive,
+        env: TelemetryEnvironment,
+        mtu: int = DEFAULT_MTU,
+    ) -> None:
+        """Construct a new telemetry proxy."""
 
         self.socket = create_udp_socket(host, False)
         self.mtu = mtu
@@ -59,7 +63,7 @@ class TelemetryProxy(DaemonBase):
         LOG.info("%s: mtu set to %d", self.name, new_mtu)
 
     def run(self, *_, **__) -> None:
-        """ Read from the listener and enqueue decoded frames. """
+        """Read from the listener and enqueue decoded frames."""
 
         errored = False
         while self.state != DaemonState.STOPPING and not errored:
@@ -75,5 +79,6 @@ class TelemetryProxy(DaemonBase):
                 continue
 
             assert self.env is not None
-            self.frames.put(self.env.decode_frame(data, len(data),
-                                                  self.expected_id))
+            self.frames.put(
+                self.env.decode_frame(data, len(data), self.expected_id)
+            )

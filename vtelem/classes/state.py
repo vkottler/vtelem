@@ -1,4 +1,3 @@
-
 """
 vtelem - A module for encapsulating software states.
 """
@@ -17,12 +16,16 @@ class State:
     A class for encapsulating a single state to be used in a state machine.
     """
 
-    def __init__(self, name: str, run: Callable = None,
-                 entering: Callable = None,
-                 leaving: Callable = None,
-                 env: TelemetryEnvironment = None,
-                 rate: float = 1.0) -> None:
-        """ Construct a new state. """
+    def __init__(
+        self,
+        name: str,
+        run: Callable = None,
+        entering: Callable = None,
+        leaving: Callable = None,
+        env: TelemetryEnvironment = None,
+        rate: float = 1.0,
+    ) -> None:
+        """Construct a new state."""
 
         self.name = name
         self.run_fn: Optional[Callable] = run
@@ -39,7 +42,7 @@ class State:
         self.is_initial_state = False
 
     def __eq__(self, other) -> bool:
-        """ Generic equality check for state instances. """
+        """Generic equality check for state instances."""
 
         return self.name == other.name
 
@@ -65,7 +68,7 @@ class State:
         return result
 
     def run(self, data: dict) -> str:
-        """ Run an iteration for this state. """
+        """Run an iteration for this state."""
 
         result = self.name
         if self.run_fn is not None:

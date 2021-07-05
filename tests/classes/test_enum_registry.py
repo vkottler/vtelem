@@ -1,4 +1,3 @@
-
 """
 vtelem - Test the enum-registry class's correctness.
 """
@@ -13,10 +12,11 @@ from vtelem.classes.user_enum import UserEnum, from_enum
 
 
 def test_from_enum():
-    """ Test that an enum can be constructed from an existing class. """
+    """Test that an enum can be constructed from an existing class."""
 
     class EnumA(Enum):
-        """ Sample enumeration. """
+        """Sample enumeration."""
+
         A = 0
         B = 1
         C = 2
@@ -35,7 +35,7 @@ def test_from_enum():
 
 
 def test_enum_registry_basic():
-    """ Test basic functionality of enum registration """
+    """Test basic functionality of enum registration"""
 
     registry = get_default()
 

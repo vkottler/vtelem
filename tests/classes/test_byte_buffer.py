@@ -1,4 +1,3 @@
-
 """
 vtelem - Test the byte-buffer class's correctness.
 """
@@ -10,7 +9,7 @@ from vtelem.enums.primitive import Primitive
 
 
 def test_byte_buffer_basic():
-    """ Test basic read and write operations with a byte buffer. """
+    """Test basic read and write operations with a byte buffer."""
 
     buf = ByteBuffer()
 

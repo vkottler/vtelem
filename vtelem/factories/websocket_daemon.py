@@ -1,4 +1,3 @@
-
 """
 vtelem - A module for creating different types of websocket daemons.
 """
@@ -14,10 +13,13 @@ from vtelem.classes.telemetry_environment import TelemetryEnvironment
 from vtelem.classes.time_keeper import TimeKeeper
 
 
-def commandable_websocket_daemon(name: str, daemon: CommandQueueDaemon,
-                                 address: Tuple[str, int] = None,
-                                 env: TelemetryEnvironment = None,
-                                 keeper: TimeKeeper = None) -> WebsocketDaemon:
+def commandable_websocket_daemon(
+    name: str,
+    daemon: CommandQueueDaemon,
+    address: Tuple[str, int] = None,
+    env: TelemetryEnvironment = None,
+    keeper: TimeKeeper = None,
+) -> WebsocketDaemon:
     """
     Construct a daemon that forwards commands to the telemetry environment.
     """

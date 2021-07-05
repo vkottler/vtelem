@@ -1,4 +1,3 @@
-
 """
 vtelem - Test the time keeper's correctness.
 """
@@ -16,7 +15,7 @@ from vtelem.classes.time_entity import TimeEntity
 
 
 def test_time_keeper_interrupted():
-    """ Test that daemons handle interrupts correctly. """
+    """Test that daemons handle interrupts correctly."""
 
     keeper = TimeKeeper("time", 0.05)
     proc = Process(target=keeper.run_harness)
@@ -28,7 +27,7 @@ def test_time_keeper_interrupted():
 
 
 def test_time_keeper_basic():
-    """ Test standard time-keeper operation. """
+    """Test standard time-keeper operation."""
 
     keeper = TimeKeeper("time", 0.05)
     slave_a = TimeEntity()

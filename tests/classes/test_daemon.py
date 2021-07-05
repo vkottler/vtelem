@@ -1,4 +1,3 @@
-
 """
 vtelem - Test the daemon class's correctness.
 """
@@ -13,13 +12,13 @@ from vtelem.classes.time_keeper import TimeKeeper
 
 
 def test_daemon_callbacks():
-    """ Test the daemon's callback functions. """
+    """Test the daemon's callback functions."""
 
     keeper = TimeKeeper("time", 0.05)
     assert keeper.start()
 
     def daemon_task(*args, **kwargs) -> None:
-        """ Example daemon task. """
+        """Example daemon task."""
         assert args[0] == "arg1"
         assert args[1] == "arg2"
         assert args[2] == "arg3"
@@ -28,22 +27,29 @@ def test_daemon_callbacks():
         assert kwargs["kwarg3"] == 3
         keeper.sleep(0.2)
 
-    def state_change_cb(prev_state: DaemonState, state: DaemonState,
-                        _: float) -> None:
-        """ Example state-change function. """
+    def state_change_cb(
+        prev_state: DaemonState, state: DaemonState, _: float
+    ) -> None:
+        """Example state-change function."""
         assert prev_state != state
 
     task_rate = 0.1
 
-    def iter_overrun(start: float, end: float, rate: float,
-                     _: dict) -> None:
-        """ Example overrun function. """
+    def iter_overrun(start: float, end: float, rate: float, _: dict) -> None:
+        """Example overrun function."""
         assert end >= start
         nonlocal task_rate
         assert rate == task_rate
 
-    daemon = Daemon("test", daemon_task, task_rate, iter_overrun,
-                    state_change_cb, None, keeper)
+    daemon = Daemon(
+        "test",
+        daemon_task,
+        task_rate,
+        iter_overrun,
+        state_change_cb,
+        None,
+        keeper,
+    )
     assert daemon.get_rate() == task_rate
     assert daemon.get_state() == DaemonState.IDLE
     args = ["arg1", "arg2", "arg3"]
@@ -55,13 +61,13 @@ def test_daemon_callbacks():
 
 
 def basic_task():
-    """ Sample daemon task. """
+    """Sample daemon task."""
 
     print("test!")
 
 
 def test_daemon_basic():
-    """ Test basic daemon functionality. """
+    """Test basic daemon functionality."""
 
     keeper = TimeKeeper("time", 0.05)
     assert keeper.start()

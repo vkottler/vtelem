@@ -1,4 +1,3 @@
-
 """
 vtelem - Common type definitions for the telemetry server.
 """

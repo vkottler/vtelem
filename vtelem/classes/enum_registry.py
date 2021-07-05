@@ -1,4 +1,3 @@
-
 """
 vtelem - Contains a class for managing known enumeration sets.
 """
@@ -19,10 +18,10 @@ LOG = logging.getLogger(__name__)
 
 
 class EnumRegistry(Registry[UserEnum]):
-    """ A class for storing runtime enumeration registrations. """
+    """A class for storing runtime enumeration registrations."""
 
     def __init__(self, initial_enums: List[UserEnum] = None) -> None:
-        """ Construct a new enum registry. """
+        """Construct a new enum registry."""
 
         super().__init__("enums", None)
         self.data["global_mappings"] = defaultdict(lambda: -1)
@@ -31,7 +30,7 @@ class EnumRegistry(Registry[UserEnum]):
                 self.add_enum(enum)
 
     def get_enum(self, enum: UserEnum) -> Tuple[bool, int]:
-        """ Get an enum identifier if it has been registered. """
+        """Get an enum identifier if it has been registered."""
 
         result = (False, -1)
         id_candidate = self.get_id(enum.name)
@@ -40,17 +39,17 @@ class EnumRegistry(Registry[UserEnum]):
         return result
 
     def add_from_enum(self, enum_class: Type[Enum]) -> Tuple[bool, int]:
-        """ Attempt to register an enumeration from an enum class. """
+        """Attempt to register an enumeration from an enum class."""
 
         return self.add_enum(from_enum(enum_class))
 
     def add_enum(self, enum: UserEnum) -> Tuple[bool, int]:
-        """ Attempt to register an enumeration. """
+        """Attempt to register an enumeration."""
 
         return self.add(enum.name, enum)
 
     def describe(self, indented: bool = False) -> str:
-        """ Obtain a JSON String of the enum registry's current state. """
+        """Obtain a JSON String of the enum registry's current state."""
 
         return self.describe_raw(indented, UserEnumEncoder)
 
@@ -68,13 +67,19 @@ class EnumRegistry(Registry[UserEnum]):
                 if curr_id is not None:
                     expected_id = self.data["global_mappings"][curr_id]
                     if expected_id != enum_id:
-                        log_str = ("couldn't register '%s', type has value " +
-                                   "%d (expected %d)")
-                        LOG.error(log_str, enum_data.name, enum_id,
-                                  expected_id)
+                        log_str = (
+                            "couldn't register '%s', type has value "
+                            + "%d (expected %d)"
+                        )
+                        LOG.error(
+                            log_str, enum_data.name, enum_id, expected_id
+                        )
                         return False
-                    LOG.debug("enum '%s' already registered as %d",
-                              enum_data.name, expected_id)
+                    LOG.debug(
+                        "enum '%s' already registered as %d",
+                        enum_data.name,
+                        expected_id,
+                    )
                     continue
 
                 # remember the mapping for this enum to the global type

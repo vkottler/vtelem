@@ -1,4 +1,3 @@
-
 """
 vtelem - Test the telemetry proxy's correctness.
 """
@@ -26,8 +25,9 @@ def setup_environment() -> dict:
 
     # set up the proxy
     app_basis = 0.5
-    proxy = TelemetryProxy(("localhost", 0), Queue(),
-                           create_app_id(app_basis), env, DEFAULT_MTU)
+    proxy = TelemetryProxy(
+        ("localhost", 0), Queue(), create_app_id(app_basis), env, DEFAULT_MTU
+    )
 
     # set up a stream-writer
     frame_queue: Queue = Queue()
@@ -58,8 +58,9 @@ def test_telemetry_proxy_read_error():
     with testenv["writer"].booted():
         # write some frames
         for _ in range(frame_count):
-            testenv["frame_queue"].put(build_dummy_frame(testenv["client"][1],
-                                                         testenv["app_basis"]))
+            testenv["frame_queue"].put(
+                build_dummy_frame(testenv["client"][1], testenv["app_basis"])
+            )
 
         # read expected number of frames
         for _ in range(frame_count):
@@ -71,14 +72,15 @@ def test_telemetry_proxy_read_error():
 
         # write more frames
         for _ in range(frame_count):
-            testenv["frame_queue"].put(build_dummy_frame(testenv["client"][1],
-                                                         testenv["app_basis"]))
+            testenv["frame_queue"].put(
+                build_dummy_frame(testenv["client"][1], testenv["app_basis"])
+            )
 
     testenv["proxy"].stop()
 
 
 def test_telemetry_proxy_basic():
-    """ Test that valid frames can be decoded. """
+    """Test that valid frames can be decoded."""
 
     testenv = setup_environment()
     assert testenv["proxy"].start()
@@ -88,9 +90,11 @@ def test_telemetry_proxy_basic():
     with testenv["writer"].booted():
         for i in range(frame_count):
             crc_type = i % 2 == 0
-            testenv["frame_queue"].put(build_dummy_frame(testenv["client"][1],
-                                                         testenv["app_basis"],
-                                                         crc_type))
+            testenv["frame_queue"].put(
+                build_dummy_frame(
+                    testenv["client"][1], testenv["app_basis"], crc_type
+                )
+            )
     testenv["manager"].remove_client(testenv["client"][0])
 
     # read frames from proxy

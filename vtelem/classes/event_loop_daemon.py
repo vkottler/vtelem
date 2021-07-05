@@ -1,4 +1,3 @@
-
 """
 vtelem - A module for using event loops as daemons.
 """
@@ -14,11 +13,15 @@ from .telemetry_environment import TelemetryEnvironment
 
 
 class EventLoopDaemon(DaemonBase):
-    """ A class for wrapping asyncio event loops with daemonic behavior. """
+    """A class for wrapping asyncio event loops with daemonic behavior."""
 
-    def __init__(self, name: str, env: TelemetryEnvironment = None,
-                 time_keeper: Any = None) -> None:
-        """ Construct a new event-loop daemon. """
+    def __init__(
+        self,
+        name: str,
+        env: TelemetryEnvironment = None,
+        time_keeper: Any = None,
+    ) -> None:
+        """Construct a new event-loop daemon."""
 
         super().__init__(name, env, time_keeper)
         self.eloop = asyncio.new_event_loop()
@@ -52,7 +55,7 @@ class EventLoopDaemon(DaemonBase):
         self.function["inject_stop"] = event_loop_stopper
 
     def run(self, *args, **kwargs) -> None:
-        """ Runs this daemon's thread, until stop is requested. """
+        """Runs this daemon's thread, until stop is requested."""
 
         asyncio.set_event_loop(self.eloop)
         try:

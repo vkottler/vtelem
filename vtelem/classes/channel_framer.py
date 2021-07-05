@@ -1,4 +1,3 @@
-
 """
 vtelem - A module for building frames of channel data from emissions.
 """
@@ -54,9 +53,14 @@ class ChannelFramer:
     An extension of channel management that builds frames from emitted data.
     """
 
-    def __init__(self, mtu: int, registry: ChannelRegistry,
-                 channels: List[Channel], app_id_basis: float = None) -> None:
-        """ Construct a new channel framer. """
+    def __init__(
+        self,
+        mtu: int,
+        registry: ChannelRegistry,
+        channels: List[Channel],
+        app_id_basis: float = None,
+    ) -> None:
+        """Construct a new channel framer."""
 
         self.mtu = mtu
         self.registry = registry
@@ -71,44 +75,57 @@ class ChannelFramer:
             self.timestamps[name] = TypePrimitive(TIMESTAMP_PRIM)
             self.primitives[name] = self.frame_types.get_primitive(name)
         self.primitives["app_id"] = create_app_id(app_id_basis)
-        LOG.info("using application identifier '%d'",
-                 self.primitives["app_id"].get())
+        LOG.info(
+            "using application identifier '%d'",
+            self.primitives["app_id"].get(),
+        )
 
     def get_types(self) -> UserEnum:
-        """ Get the frame-type enumeration. """
+        """Get the frame-type enumeration."""
 
         return self.frame_types
 
-    def new_frame(self, frame_type: str, time: float,
-                  set_time: bool = True) -> ChannelFrame:
-        """ Construct a new frame object. """
+    def new_frame(
+        self, frame_type: str, time: float, set_time: bool = True
+    ) -> ChannelFrame:
+        """Construct a new frame object."""
 
         timestamp = self.timestamps[frame_type]
         if set_time:
             assert timestamp.set(time_to_int(time))
-        return ChannelFrame(self.mtu, self.primitives["app_id"],
-                            self.primitives[frame_type], timestamp)
+        return ChannelFrame(
+            self.mtu,
+            self.primitives["app_id"],
+            self.primitives[frame_type],
+            timestamp,
+        )
 
-    def new_event_frame(self, time: float,
-                        set_time: bool = True) -> ChannelFrame:
-        """ Construct a new event-frame object. """
+    def new_event_frame(
+        self, time: float, set_time: bool = True
+    ) -> ChannelFrame:
+        """Construct a new event-frame object."""
 
         return self.new_frame("event", time, set_time)
 
-    def new_data_frame(self, time: float,
-                       set_time: bool = True) -> ChannelFrame:
-        """ Construct a new data-frame object. """
+    def new_data_frame(
+        self, time: float, set_time: bool = True
+    ) -> ChannelFrame:
+        """Construct a new data-frame object."""
 
         return self.new_frame("data", time, set_time)
 
     def add_channel(self, channel: Channel) -> None:
-        """ Add another managed channel. """
+        """Add another managed channel."""
 
         self.channels.append(channel)
 
-    def build_event_frames(self, time: float, event_queue: EventQueue,
-                           queue: Queue,
-                           write_crc: bool = True) -> Tuple[int, int]:
+    def build_event_frames(
+        self,
+        time: float,
+        event_queue: EventQueue,
+        queue: Queue,
+        write_crc: bool = True,
+    ) -> Tuple[int, int]:
         """
         Consume the current event queue and build frames from the contained
         events.
@@ -125,14 +142,16 @@ class ChannelFramer:
             chan_type = self.registry.get_channel_type(chan_id)
 
             # add this event, start a new frame if necessary
-            if not curr_frame.add_event(chan_id, chan_type, event[1],
-                                        event[2]):
+            if not curr_frame.add_event(
+                chan_id, chan_type, event[1], event[2]
+            ):
                 curr_frame.finalize(write_crc)
                 queue.put(curr_frame)
                 frame_count += 1
                 curr_frame = self.new_event_frame(time, False)
-                assert curr_frame.add_event(chan_id, chan_type, event[1],
-                                            event[2])
+                assert curr_frame.add_event(
+                    chan_id, chan_type, event[1], event[2]
+                )
 
         # finalize the last frame if necessary
         if event_count and not curr_frame.finalized:
@@ -142,8 +161,9 @@ class ChannelFramer:
 
         return (frame_count, event_count)
 
-    def build_data_frames(self, time: float, queue: Queue,
-                          write_crc: bool = True) -> Tuple[int, int]:
+    def build_data_frames(
+        self, time: float, queue: Queue, write_crc: bool = True
+    ) -> Tuple[int, int]:
         """
         For this step, gather up channel emissions into discrete frames for
         wire-level transport.
@@ -182,13 +202,17 @@ class ChannelFramer:
         return (frame_count, emit_count)
 
 
-def build_dummy_frame(overall_size: int, app_id_basis: float = None,
-                      bad_crc: bool = False) -> ChannelFrame:
-    """ Build an empty frame of a specified size. """
+def build_dummy_frame(
+    overall_size: int, app_id_basis: float = None, bad_crc: bool = False
+) -> ChannelFrame:
+    """Build an empty frame of a specified size."""
 
-    frame = ChannelFrame(overall_size, create_app_id(app_id_basis),
-                         FRAME_TYPES.get_primitive("invalid"),
-                         TypePrimitive(TIMESTAMP_PRIM))
+    frame = ChannelFrame(
+        overall_size,
+        create_app_id(app_id_basis),
+        FRAME_TYPES.get_primitive("invalid"),
+        TypePrimitive(TIMESTAMP_PRIM),
+    )
 
     while frame.add(0, Primitive.BOOL, False):
         pass

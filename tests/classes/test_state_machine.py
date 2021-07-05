@@ -1,4 +1,3 @@
-
 """
 vtelem - Test the state machine module's correctness.
 """
@@ -11,20 +10,20 @@ from vtelem.mtu import DEFAULT_MTU
 
 
 def test_state_machine_basic():
-    """ Test basic state machine operation. """
+    """Test basic state machine operation."""
 
     env = TelemetryEnvironment(DEFAULT_MTU)
     iterations = 0
 
     def sample_enter(_: str, __: dict) -> bool:
-        """ Does nothing. """
+        """Does nothing."""
         return (iterations % 4) == 0
 
     total_states = 10
     next_state = 1
 
     def sample_run(_: dict) -> str:
-        """ Transitions to the next numerical state name. """
+        """Transitions to the next numerical state name."""
         nonlocal next_state
         result = str(next_state)
         next_state += 1
@@ -33,13 +32,14 @@ def test_state_machine_basic():
         return result
 
     def sample_leaving(_: str, __: dict) -> bool:
-        """ Does nothing. """
+        """Does nothing."""
         return (iterations % 2) == 0
 
     states = []
     for i in range(total_states):
-        states.append(State(str(i), sample_run, sample_enter, sample_leaving,
-                            env=env))
+        states.append(
+            State(str(i), sample_run, sample_enter, sample_leaving, env=env)
+        )
     assert states[0] != states[1]
 
     sm_test = StateMachine("test", states, env=env)

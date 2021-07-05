@@ -1,4 +1,3 @@
-
 """
 vtelem - An interface for managing websocket servers that serve telemetry data.
 """
@@ -19,13 +18,17 @@ from .websocket_daemon import WebsocketDaemon
 
 
 class WebsocketTelemetryDaemon(WebsocketDaemon):
-    """ A class for creating telemetry-serving websocket servers. """
+    """A class for creating telemetry-serving websocket servers."""
 
-    def __init__(self, name: str, writer: StreamWriter,
-                 address: Tuple[str, int] = None,
-                 env: TelemetryEnvironment = None,
-                 time_keeper: Any = None) -> None:
-        """ Construct a new, telemetry-serving websocket server. """
+    def __init__(
+        self,
+        name: str,
+        writer: StreamWriter,
+        address: Tuple[str, int] = None,
+        env: TelemetryEnvironment = None,
+        time_keeper: Any = None,
+    ) -> None:
+        """Construct a new, telemetry-serving websocket server."""
 
         async def telem_handle(websocket, _) -> None:
             """
@@ -46,10 +49,13 @@ class WebsocketTelemetryDaemon(WebsocketDaemon):
                             should_continue = False
                             break
 
-                        complete, pending = await asyncio.wait([
-                            websocket.send(frame.raw()[0]),
-                            websocket.wait_closed(),
-                        ], return_when=asyncio.FIRST_COMPLETED)
+                        complete, pending = await asyncio.wait(
+                            [
+                                websocket.send(frame.raw()[0]),
+                                websocket.wait_closed(),
+                            ],
+                            return_when=asyncio.FIRST_COMPLETED,
+                        )
 
                         for future in complete:
                             exc = future.exception()

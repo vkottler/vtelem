@@ -1,4 +1,3 @@
-
 """
 vtelem - Test the frame-reader class's correctness.
 """
@@ -12,7 +11,7 @@ from vtelem.enums.primitive import Primitive
 
 
 def test_read_frame_basic():
-    """ Test that frames can be correctly read. """
+    """Test that frames can be correctly read."""
 
     start_time = time.time()
     env = TelemetryEnvironment(2 ** 8, start_time)
@@ -28,7 +27,7 @@ def test_read_frame_basic():
         if i > 8:
             env.write_crc = False
         for chan in chan_ids:
-            env.set_now(chan, i * (-1 ** i))
+            env.set_now(chan, i * (-(1 ** i)))
         env.advance_time(0.1)
         total_frames += env.dispatch_now()
     assert total_frames > 0

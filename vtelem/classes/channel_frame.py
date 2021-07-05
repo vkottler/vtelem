@@ -1,4 +1,3 @@
-
 """
 vtelem - A module that implements storage for channel data, restricted by
          a desired maximum size.
@@ -16,18 +15,23 @@ from .type_primitive import TypePrimitive
 
 
 def time_to_int(time: float, precision: int = 1000) -> int:
-    """ Convert a floating-point time value into an integer. """
+    """Convert a floating-point time value into an integer."""
 
     frac, num = math.modf(time)
     return int((int(num) * precision) + int(math.floor(frac * precision)))
 
 
 class ChannelFrame:
-    """ A channel-data storage that respects a maximum size. """
+    """A channel-data storage that respects a maximum size."""
 
-    def __init__(self, mtu: int, frame_id: TypePrimitive,
-                 frame_type: TypePrimitive, timestamp: TypePrimitive) -> None:
-        """ Construct an empty channel frame. """
+    def __init__(
+        self,
+        mtu: int,
+        frame_id: TypePrimitive,
+        frame_type: TypePrimitive,
+        timestamp: TypePrimitive,
+    ) -> None:
+        """Construct an empty channel frame."""
 
         self.mtu = mtu
         self.used: int = 0
@@ -97,19 +101,24 @@ class ChannelFrame:
         return pad_amt
 
     def pad_to_mtu(self) -> None:
-        """ Attempt to pad this frame to the full mtu size. """
+        """Attempt to pad this frame to the full mtu size."""
 
         self.pad(self.mtu - self.used)
 
     def raw(self) -> Tuple[bytearray, int]:
-        """ Obtain the raw buffer, and its size, from this frame. """
+        """Obtain the raw buffer, and its size, from this frame."""
 
         assert self.finalized
         return self.buffer.data, self.used
 
-    def add_event(self, chan_id: int, chan_type: Primitive, prev: EventType,
-                  curr: EventType) -> bool:
-        """ Add event data into this frame. """
+    def add_event(
+        self,
+        chan_id: int,
+        chan_type: Primitive,
+        prev: EventType,
+        curr: EventType,
+    ) -> bool:
+        """Add event data into this frame."""
 
         # determine if this event element will fit in the current frame
         space_required = self.id_primitive.size()

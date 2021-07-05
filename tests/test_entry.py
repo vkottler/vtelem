@@ -1,4 +1,3 @@
-
 """
 vtelem - Test the program's entry-point.
 """
@@ -18,7 +17,7 @@ from vtelem.entry import main as vt_main
 
 
 def test_entry():
-    """ Test some basic command-line argument scenarios. """
+    """Test some basic command-line argument scenarios."""
 
     assert vt_main([PKG_NAME, "-u", "1"]) == 0
     assert vt_main([PKG_NAME, "-u", "1", "-i", netifaces.interfaces()[0]]) == 0
@@ -26,7 +25,7 @@ def test_entry():
 
 
 def test_entry_sigint():
-    """ Test that the program handles keyboard interrupts gracefully. """
+    """Test that the program handles keyboard interrupts gracefully."""
 
     proc = Process(target=vt_main, args=[PKG_NAME, "-u", "10"])
     proc.start()

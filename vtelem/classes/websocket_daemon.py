@@ -1,4 +1,3 @@
-
 """
 vtelem - An interface for managing websocket servers.
 """
@@ -20,7 +19,7 @@ LOG = logging.getLogger(__name__)
 
 
 def create_default_handler(message_consumer: Callable) -> Callable:
-    """ Create a default websocket-connection handler. """
+    """Create a default websocket-connection handler."""
 
     async def handler(websocket, path) -> None:
         """
@@ -34,13 +33,18 @@ def create_default_handler(message_consumer: Callable) -> Callable:
 
 
 class WebsocketDaemon(EventLoopDaemon):
-    """ A class for creating daemonic websocket request handlers. """
+    """A class for creating daemonic websocket request handlers."""
 
-    def __init__(self, name: str, message_consumer: Optional[Callable],
-                 address: Tuple[str, int] = None,
-                 env: TelemetryEnvironment = None,
-                 time_keeper: Any = None, ws_handler: Callable = None) -> None:
-        """ Construct a new websocket daemon. """
+    def __init__(
+        self,
+        name: str,
+        message_consumer: Optional[Callable],
+        address: Tuple[str, int] = None,
+        env: TelemetryEnvironment = None,
+        time_keeper: Any = None,
+        ws_handler: Callable = None,
+    ) -> None:
+        """Construct a new websocket daemon."""
 
         super().__init__(name, env, time_keeper)
 
@@ -67,20 +71,28 @@ class WebsocketDaemon(EventLoopDaemon):
             try:
                 assert ws_handler is not None
                 await ws_handler(websocket, path)
-            except (asyncio.CancelledError, GeneratorExit,
-                    websockets.exceptions.WebSocketException):  # type: ignore
+            except (
+                asyncio.CancelledError,
+                GeneratorExit,
+                websockets.exceptions.WebSocketException,
+            ):  # type: ignore
                 pass
             finally:
-                LOG.warning("closing client connection '%s:%d'", raddr[0],
-                            raddr[1])
+                LOG.warning(
+                    "closing client connection '%s:%d'", raddr[0], raddr[1]
+                )
 
                 # handle closing this connection ourselves, because it's
                 # difficult to pend on otherwise
                 await websocket.close()
                 self.wait_poster.release()
 
-        def run_init(*_, first_start: bool = False,
-                     service_registry: ServiceRegistry = None, **__):
+        def run_init(
+            *_,
+            first_start: bool = False,
+            service_registry: ServiceRegistry = None,
+            **__
+        ):
             """
             A function for setting up websocket serving once the thread's
             event loop is established.
@@ -90,12 +102,10 @@ class WebsocketDaemon(EventLoopDaemon):
             if not self.serving:
 
                 async def routine() -> None:
-                    """ Capture the server object once we begint serving. """
+                    """Capture the server object once we begint serving."""
 
                     self.server = await websockets.serve(  # type: ignore
-                        handler,
-                        self.address[0],
-                        self.address[1]
+                        handler, self.address[0], self.address[1]
                     )
                     if first_start and service_registry is not None:
                         socks = self.server.sockets

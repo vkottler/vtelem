@@ -1,4 +1,3 @@
-
 """
 vtelem - A definition of the supported primitive types for this library.
 """
@@ -11,12 +10,19 @@ import random
 from typing import Any
 
 
-def build_primitive(fmt: str, inst: type, size: int, name: str,
-                    signed: bool) -> dict:
-    """ Build a primitive dictionary from data. """
+def build_primitive(
+    fmt: str, inst: type, size: int, name: str, signed: bool
+) -> dict:
+    """Build a primitive dictionary from data."""
 
-    return {"format": fmt, "type": inst, "size": size, "name": name,
-            "signed": signed, "validate": lambda _, __: True}
+    return {
+        "format": fmt,
+        "type": inst,
+        "size": size,
+        "name": name,
+        "signed": signed,
+        "validate": lambda _, __: True,
+    }
 
 
 class Primitive(Enum):
@@ -58,7 +64,7 @@ def integer_can_hold(prim: Primitive, val: int) -> bool:
 
 
 def get_integer_max(prim: Primitive) -> int:
-    """ Get the maximum value for an integer type. """
+    """Get the maximum value for an integer type."""
 
     assert prim != Primitive.BOOL
     assert prim != Primitive.FLOAT
@@ -72,7 +78,7 @@ def get_integer_max(prim: Primitive) -> int:
 
 
 def get_integer_min(prim: Primitive) -> int:
-    """ Get the minimum value for an integer type. """
+    """Get the minimum value for an integer type."""
 
     assert prim != Primitive.BOOL
     assert prim != Primitive.FLOAT
@@ -84,10 +90,10 @@ def get_integer_min(prim: Primitive) -> int:
 
 
 class PrimitiveEncoder(JSONEncoder):
-    """ A JSON encoder for a primitive enum. """
+    """A JSON encoder for a primitive enum."""
 
     def default(self, o) -> dict:
-        """ Implement serialization for the primitive enum value. """
+        """Implement serialization for the primitive enum value."""
 
         assert isinstance(o, Primitive)
         result = copy(o.value)
@@ -97,32 +103,39 @@ class PrimitiveEncoder(JSONEncoder):
 
 
 def get_name(inst: Primitive) -> str:
-    """ Get a primitive's canonical name. """
+    """Get a primitive's canonical name."""
 
     return inst.value["name"]
 
 
 def get_fstring(inst: Primitive) -> str:
-    """ Get the 'struct' format specifier for a primitive. """
+    """Get the 'struct' format specifier for a primitive."""
 
     return inst.value["format"]
 
 
 def get_size(inst: Primitive) -> int:
-    """ Get the size of a primitive. """
+    """Get the size of a primitive."""
 
     return inst.value["size"]
 
 
 def default_val(inst: Primitive) -> Any:
-    """ Get the default value for a specific primitive. """
+    """Get the default value for a specific primitive."""
 
     return inst.value["type"]()
 
 
-INTEGER_PRIMITIVES = [Primitive.UINT8, Primitive.INT8, Primitive.UINT16,
-                      Primitive.INT16, Primitive.UINT32, Primitive.INT32,
-                      Primitive.UINT64, Primitive.INT64]
+INTEGER_PRIMITIVES = [
+    Primitive.UINT8,
+    Primitive.INT8,
+    Primitive.UINT16,
+    Primitive.INT16,
+    Primitive.UINT32,
+    Primitive.INT32,
+    Primitive.UINT64,
+    Primitive.INT64,
+]
 
 for _prim in INTEGER_PRIMITIVES:
     _prim.value["max"] = get_integer_max(_prim)

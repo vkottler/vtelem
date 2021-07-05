@@ -1,4 +1,3 @@
-
 """
 vtelem - Test the correctness of the daemon manager.
 """
@@ -18,7 +17,7 @@ from tests import make_queue_cb, command_result
 
 
 def get_test_manager() -> DaemonManager:
-    """ Create a manager with some daemons for testing purposes. """
+    """Create a manager with some daemons for testing purposes."""
 
     manager = DaemonManager()
     manager.add_daemon(TimeKeeper("test1", 0.05))
@@ -28,7 +27,7 @@ def get_test_manager() -> DaemonManager:
 
 
 def test_daemon_manager_commands():
-    """ Test commanding the daemon manager via command queue. """
+    """Test commanding the daemon manager via command queue."""
 
     manager = get_test_manager()
     daemon = CommandQueueDaemon("command")
@@ -73,7 +72,7 @@ def test_daemon_manager_commands():
 
 
 def test_daemon_manager_basic():
-    """ Test management of basic tasks. """
+    """Test management of basic tasks."""
 
     manager = get_test_manager()
     assert not manager.add_daemon(TimeKeeper("test3", 0.05))

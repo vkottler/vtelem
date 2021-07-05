@@ -1,4 +1,3 @@
-
 """
 vtelem - Test the type-registry class's correctness.
 """
@@ -9,7 +8,7 @@ from vtelem.enums.primitive import Primitive, get_name
 
 
 def test_type_registry_basic():
-    """ Test basic functionality of the default type registrar. """
+    """Test basic functionality of the default type registrar."""
 
     registry = get_default()
     assert registry.describe() != ""

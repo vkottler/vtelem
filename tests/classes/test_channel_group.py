@@ -1,4 +1,3 @@
-
 """
 vtelem - Test the channel group class's correctness.
 """
@@ -13,7 +12,7 @@ from . import EnumA
 
 
 def test_channel_group_basic():
-    """ Test basic channel-group operations. """
+    """Test basic channel-group operations."""
 
     env = TelemetryEnvironment(2 ** 8)
     group = ChannelGroup("test_group", env)

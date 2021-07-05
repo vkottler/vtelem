@@ -1,4 +1,3 @@
-
 """
 vtelem - An interface for creating telemetered applications.
 """
@@ -34,14 +33,18 @@ from .websocket_telemetry_daemon import WebsocketTelemetryDaemon
 
 
 class TelemetryServer(HttpDaemon):
-    """ A class for application-level telemetry integration. """
+    """A class for application-level telemetry integration."""
 
-    def __init__(self, tick_length: float, telem_rate: float,
-                 http_address: Tuple[str, int] = None,
-                 metrics_rate: float = None,
-                 app_id_basis: float = None,
-                 websocket_cmd_address: Tuple[str, int] = None,
-                 websocket_tlm_address: Tuple[str, int] = None) -> None:
+    def __init__(
+        self,
+        tick_length: float,
+        telem_rate: float,
+        http_address: Tuple[str, int] = None,
+        metrics_rate: float = None,
+        app_id_basis: float = None,
+        websocket_cmd_address: Tuple[str, int] = None,
+        websocket_tlm_address: Tuple[str, int] = None,
+    ) -> None:
         """
         Construct a new telemetry server that can be commanded over http.
         """
@@ -58,8 +61,14 @@ class TelemetryServer(HttpDaemon):
         # interface, or a practical mtu based on a 1500-byte Ethernet II frame
         # (we will re-evalute mtu when we connect new clients)
         mtu = discover_ipv4_mtu((socket.getfqdn(), 0)) - (60 + 8)
-        telem = TelemetryDaemon("telemetry", mtu, telem_rate, self.time_keeper,
-                                metrics_rate, app_id_basis=app_id_basis)
+        telem = TelemetryDaemon(
+            "telemetry",
+            mtu,
+            telem_rate,
+            self.time_keeper,
+            metrics_rate,
+            app_id_basis=app_id_basis,
+        )
         telem.handle_new_mtu(DEFAULT_MTU)
         self.channel_groups = ChannelGroupRegistry(telem)
         telem.registries["channel_groups"] = self.channel_groups
@@ -72,15 +81,24 @@ class TelemetryServer(HttpDaemon):
         assert self.daemons.add_daemon(writer)
 
         # add the websocket-telemetry daemon
-        assert self.daemons.add_daemon(WebsocketTelemetryDaemon(
-            "websocket_telemetry", writer,
-            websocket_tlm_address, telem,
-            self.time_keeper
-        ))
+        assert self.daemons.add_daemon(
+            WebsocketTelemetryDaemon(
+                "websocket_telemetry",
+                writer,
+                websocket_tlm_address,
+                telem,
+                self.time_keeper,
+            )
+        )
 
         # add the http daemon
-        super().__init__("http", http_address, MapperAwareRequestHandler,
-                         telem, self.time_keeper)
+        super().__init__(
+            "http",
+            http_address,
+            MapperAwareRequestHandler,
+            telem,
+            self.time_keeper,
+        )
 
         # add the command-queue daemon
         queue_daemon = CommandQueueDaemon("command", telem, self.time_keeper)
@@ -89,10 +107,13 @@ class TelemetryServer(HttpDaemon):
         register_http_handlers(self, telem, queue_daemon)
 
         # add the websocket-command daemon
-        ws_cmd = commandable_websocket_daemon("websocket_command",
-                                              queue_daemon,
-                                              websocket_cmd_address, telem,
-                                              self.time_keeper)
+        ws_cmd = commandable_websocket_daemon(
+            "websocket_command",
+            queue_daemon,
+            websocket_cmd_address,
+            telem,
+            self.time_keeper,
+        )
         assert self.daemons.add_daemon(ws_cmd, ["stream"])
 
         # make the daemon-manager commandable
@@ -101,24 +122,31 @@ class TelemetryServer(HttpDaemon):
         # make the udp-client-manager commandable
         create_udp_client_commander(self.udp_clients, queue_daemon)
 
-    def register_application(self, name: str, rate: float, setup: AppSetup,
-                             loop: AppLoop) -> bool:
-        """ Attempt to register a new application thread. """
+    def register_application(
+        self, name: str, rate: float, setup: AppSetup, loop: AppLoop
+    ) -> bool:
+        """Attempt to register a new application thread."""
 
         app_data: Dict[str, Any] = defaultdict(lambda: None)
 
         def setup_caller(*_, **__) -> None:
-            """ Call the application's setup with the expected arguments. """
+            """Call the application's setup with the expected arguments."""
             setup(self.channel_groups, app_data)
 
         def loop_caller(*_, **__) -> None:
-            """ Call the application's loop with the expected arguments. """
+            """Call the application's loop with the expected arguments."""
             loop(self.channel_groups, app_data)
 
         telem = self.daemons.get("telemetry")
         assert isinstance(telem, TelemetryDaemon)
-        daemon = Daemon(name, loop_caller, rate, env=telem,
-                        time_keeper=self.time_keeper, init=setup_caller)
+        daemon = Daemon(
+            name,
+            loop_caller,
+            rate,
+            env=telem,
+            time_keeper=self.time_keeper,
+            init=setup_caller,
+        )
         result = self.daemons.add_daemon(daemon, ["telemetry"])
         if not self.first_start:
             app_daemon = self.daemons.get(name)
@@ -127,14 +155,14 @@ class TelemetryServer(HttpDaemon):
         return result
 
     def scale_speed(self, scalar: float) -> None:
-        """ Change the time scaling for the time keeper. """
+        """Change the time scaling for the time keeper."""
 
         self.daemons.perform_all(DaemonOperation.PAUSE)
         self.time_keeper.scale(scalar)
         self.daemons.perform_all(DaemonOperation.UNPAUSE)
 
     def start_all(self) -> None:
-        """ Start everything. """
+        """Start everything."""
 
         telem = self.daemons.get("telemetry")
         assert isinstance(telem, TelemetryDaemon)
@@ -148,7 +176,7 @@ class TelemetryServer(HttpDaemon):
             self.state_sem.release()
 
     def stop_all(self) -> None:
-        """ Stop everything. """
+        """Stop everything."""
 
         self.daemons.perform_all(DaemonOperation.STOP)
         self.stop()

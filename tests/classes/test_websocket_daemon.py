@@ -1,4 +1,3 @@
-
 """
 vtelem - Test the websocket daemon's correctness.
 """
@@ -16,12 +15,12 @@ from vtelem.mtu import get_free_tcp_port
 
 
 async def consumer(websocket, message, _) -> None:
-    """ Simple echo consumer. """
+    """Simple echo consumer."""
     await websocket.send(message)
 
 
 def test_websocket_daemon_boot():
-    """ Test that the daemon can be started and stopped. """
+    """Test that the daemon can be started and stopped."""
 
     daemon = WebsocketDaemon("test", consumer)
 
@@ -32,7 +31,7 @@ def test_websocket_daemon_boot():
 
 
 def test_websocket_daemon_basic():
-    """ Test basic client-server echoes with a few starts and stops. """
+    """Test basic client-server echoes with a few starts and stops."""
 
     port = get_free_tcp_port()
     daemon = WebsocketDaemon("test", consumer, ("0.0.0.0", port))
@@ -43,7 +42,7 @@ def test_websocket_daemon_basic():
 
             # connect a client
             async def ping_test():
-                """ Send an arbitrary message and expect the same back. """
+                """Send an arbitrary message and expect the same back."""
 
                 uri = "ws://localhost:{}".format(port)
                 async with websockets.connect(uri) as websocket:

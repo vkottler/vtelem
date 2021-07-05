@@ -1,4 +1,3 @@
-
 """
 vtelem - Test the http daemon's correctness.
 """
@@ -17,12 +16,12 @@ from vtelem.classes.http_daemon import HttpDaemon
 
 
 def test_http_daemon_serve():
-    """ Test the simplified 'serve' interface. """
+    """Test the simplified 'serve' interface."""
 
     daemon = HttpDaemon("test_daemon1")
 
     def thread_fn(*args, **kwargs) -> int:
-        """ An example 'main thread' that doesn't do anything. """
+        """An example 'main thread' that doesn't do anything."""
 
         print(args)
         print(kwargs)
@@ -31,7 +30,7 @@ def test_http_daemon_serve():
     assert daemon.serve(main_thread=thread_fn) == 0
 
     def threaded_server() -> None:
-        """ Serve the daemon using the default main-thread function. """
+        """Serve the daemon using the default main-thread function."""
 
         dmon = HttpDaemon("test_daemon2")
         assert dmon.serve() == 0
@@ -44,7 +43,7 @@ def test_http_daemon_serve():
 
 
 def test_http_daemon_basic():
-    """ Test that the daemon can be managed effectively. """
+    """Test that the daemon can be managed effectively."""
 
     daemon = HttpDaemon("test_daemon")
     assert daemon.start()

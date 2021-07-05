@@ -1,4 +1,3 @@
-
 """
 vtelem - Exposes a base class for building http services that can be managed
          as daemons.
@@ -6,7 +5,9 @@ vtelem - Exposes a base class for building http services that can be managed
 
 # built-in
 from http.server import (
-    BaseHTTPRequestHandler, ThreadingHTTPServer, SimpleHTTPRequestHandler
+    BaseHTTPRequestHandler,
+    ThreadingHTTPServer,
+    SimpleHTTPRequestHandler,
 )
 import logging
 from typing import Type, Tuple
@@ -22,12 +23,16 @@ LOG = logging.getLogger(__name__)
 
 
 class HttpDaemon(DaemonBase):
-    """ Allows daemonic management of an http server. """
+    """Allows daemonic management of an http server."""
 
-    def __init__(self, name: str, address: Tuple[str, int] = None,
-                 handler_class: Type[BaseHTTPRequestHandler] = None,
-                 env: TelemetryEnvironment = None,
-                 time_keeper: TimeKeeper = None):
+    def __init__(
+        self,
+        name: str,
+        address: Tuple[str, int] = None,
+        handler_class: Type[BaseHTTPRequestHandler] = None,
+        env: TelemetryEnvironment = None,
+        time_keeper: TimeKeeper = None,
+    ):
         """
         Construct a new HTTP daemon, which is a wrapper for the built-in
         server.
@@ -48,30 +53,37 @@ class HttpDaemon(DaemonBase):
         self.closed = False
 
         def stop_injector() -> None:
-            """ Signal the server to stop. """
+            """Signal the server to stop."""
             self.server.shutdown()
 
         self.function["inject_stop"] = stop_injector
 
     def get_base_url(self) -> str:
-        """ Get this server's root url as a String. """
+        """Get this server's root url as a String."""
 
-        return "http://{}:{}/".format(self.server.server_address[0],
-                                      self.server.server_address[1])
+        return "http://{}:{}/".format(
+            self.server.server_address[0], self.server.server_address[1]
+        )
 
-    def add_handler(self, request_type: str, path: str, handle: RequestHandle,
-                    description: str = "no description",
-                    data: dict = None,
-                    response_type: str = "application/json") -> None:
-        """ Add a handler for a specific request-type and path. """
+    def add_handler(
+        self,
+        request_type: str,
+        path: str,
+        handle: RequestHandle,
+        description: str = "no description",
+        data: dict = None,
+        response_type: str = "application/json",
+    ) -> None:
+        """Add a handler for a specific request-type and path."""
 
         mapper: HttpRequestMapper
         mapper = self.server.mapper  # type: ignore
-        return mapper.add_handler(request_type, path, handle, description,
-                                  data, response_type)
+        return mapper.add_handler(
+            request_type, path, handle, description, data, response_type
+        )
 
     def close(self) -> bool:
-        """ Close the server and clean up its resources. """
+        """Close the server and clean up its resources."""
 
         with self.lock:
             if self.get_state() != DaemonState.IDLE or self.closed:
@@ -93,13 +105,14 @@ class HttpDaemon(DaemonBase):
         return result
 
     def run(self, *_, **kwargs) -> None:
-        """ Serve traffic. """
+        """Serve traffic."""
 
         if not self.closed:
             if "first_start" in kwargs and "service_registry" in kwargs:
                 first_start: bool = kwargs["first_start"]
                 service_registry: ServiceRegistry = kwargs["service_registry"]
                 if first_start:
-                    service_registry.add(self.name,
-                                         [self.server.server_address])
+                    service_registry.add(
+                        self.name, [self.server.server_address]
+                    )
             self.server.serve_forever(0.1)

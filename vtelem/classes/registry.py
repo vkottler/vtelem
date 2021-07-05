@@ -1,4 +1,3 @@
-
 """
 vtelem - A generic registrar implementation.
 """
@@ -9,14 +8,15 @@ import json
 from typing import TypeVar, Generic, Tuple, Optional, Dict, List, Any
 import threading
 
-TYP = TypeVar('TYP')
+TYP = TypeVar("TYP")
 
 
 class Registry(Generic[TYP]):
-    """ A base class for building type-specific registries. """
+    """A base class for building type-specific registries."""
 
-    def __init__(self, type_name: str,
-                 initial_data: List[Tuple[str, TYP]] = None) -> None:
+    def __init__(
+        self, type_name: str, initial_data: List[Tuple[str, TYP]] = None
+    ) -> None:
         """
         Construct a new registry of a provided type, optionally add initial
         elements.
@@ -38,12 +38,12 @@ class Registry(Generic[TYP]):
                 self.add(item[0], item[1])
 
     def count(self) -> int:
-        """ Get a count of the number of elements in this registry. """
+        """Get a count of the number of elements in this registry."""
 
         return self.curr_id
 
     def get_item(self, item_id: int) -> Optional[TYP]:
-        """ Obtain an item's data by its integer identifier. """
+        """Obtain an item's data by its integer identifier."""
 
         with self.lock:
             result = self.data[self.type_name][item_id]
@@ -76,15 +76,16 @@ class Registry(Generic[TYP]):
         return result
 
     def describe(self, indented: bool = False) -> str:
-        """ A default implementation. """
+        """A default implementation."""
 
         return self.describe_raw(indented)
 
     def describe_raw(self, indented: bool = False, cls: Any = None) -> str:
-        """ Obtain a JSON String of the registry's current state. """
+        """Obtain a JSON String of the registry's current state."""
 
         indent = 4 if indented else None
         with self.lock:
-            result = json.dumps(self.data, indent=indent, cls=cls,
-                                sort_keys=True)
+            result = json.dumps(
+                self.data, indent=indent, cls=cls, sort_keys=True
+            )
         return result

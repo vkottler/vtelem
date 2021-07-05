@@ -1,4 +1,3 @@
-
 """
 vtelem - A generic element that can be read from and written to buffers.
 """
@@ -21,9 +20,10 @@ class TypePrimitive:
     into buffers.
     """
 
-    def __init__(self, instance: Primitive,
-                 changed_cb: Callable = None) -> None:
-        """ Construct a new primitive storage of a certain type. """
+    def __init__(
+        self, instance: Primitive, changed_cb: Callable = None
+    ) -> None:
+        """Construct a new primitive storage of a certain type."""
 
         self.type = instance
         self.data: Any = default_val(self.type)
@@ -32,26 +32,26 @@ class TypePrimitive:
         self.lock = threading.RLock()
 
     def __eq__(self, other) -> bool:
-        """ Generic equality check for primitives. """
+        """Generic equality check for primitives."""
 
         if not self.type == other.type:
             return False
         return abs(float(self.data) - float(other.data)) < 0.001
 
     def __str__(self) -> str:
-        """ Conver this type primitive into a String. """
+        """Conver this type primitive into a String."""
 
         return "({}) {}".format(self.type.name, self.data)
 
     def add(self, data: Any, time: float = None) -> bool:
-        """ Safely add some amount to the primitive. """
+        """Safely add some amount to the primitive."""
 
         with self.lock:
             result = self.set(self.get() + data, time)
         return result
 
     def set(self, data: Any, time: float = None) -> bool:
-        """ Set this primitive's data manually. """
+        """Set this primitive's data manually."""
 
         if time is None:
             time = float()
@@ -61,8 +61,9 @@ class TypePrimitive:
 
             # validate the desired value
             if not self.type.value["validate"](self.type, data):
-                LOG.warning("value '%s' not valid for type '%s'", data,
-                            self.type)
+                LOG.warning(
+                    "value '%s' not valid for type '%s'", data, self.type
+                )
                 return False
 
             with self.lock:
@@ -81,22 +82,26 @@ class TypePrimitive:
                 self.changed_cb(*cb_args)
             return True
 
-        LOG.warning("can't assign '%s', expected type '%s' got '%s'",
-                    str(data), type(data), expected_type)
+        LOG.warning(
+            "can't assign '%s', expected type '%s' got '%s'",
+            str(data),
+            type(data),
+            expected_type,
+        )
         return False
 
     def get(self) -> Any:
-        """ Get this primitive's data. """
+        """Get this primitive's data."""
 
         return self.data
 
     def size(self) -> int:
-        """ Get the size of this primitive type. """
+        """Get the size of this primitive type."""
 
         return get_size(self.type)
 
     def write(self, buf: ByteBuffer, pos: int = None) -> int:
-        """ Write this primitive into a buffer. """
+        """Write this primitive into a buffer."""
 
         with buf.with_pos(pos):
             result = buf.write(self.type, self.data)

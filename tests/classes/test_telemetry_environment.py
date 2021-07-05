@@ -1,4 +1,3 @@
-
 """
 vtelem - Test the telemetry environment's correctness.
 """
@@ -18,7 +17,7 @@ from . import EnumA
 
 
 def test_environment_commanding():
-    """ Test that channels can be commanded when expected to be. """
+    """Test that channels can be commanded when expected to be."""
 
     start_time = time.time()
     env = TelemetryEnvironment(2 ** 8, start_time, 1.0)
@@ -38,13 +37,13 @@ def test_environment_commanding():
 
 
 def test_app_id_from_basis():
-    """ Test application-identifer creation. """
+    """Test application-identifer creation."""
 
     create_app_id(2.0)
 
 
 def test_environment_with_metrics():
-    """ Test that metrics channels are present when initialized. """
+    """Test that metrics channels are present when initialized."""
 
     start_time = time.time()
     env = TelemetryEnvironment(2 ** 8, start_time, 1.0)
@@ -56,13 +55,15 @@ def test_environment_with_metrics():
     assert frame_data["type"] == "data"
 
     # make sure all the metrics can be found in the frame
-    expected_metrics = ["metrics_rate",
-                        "channel_count",
-                        "events_captured",
-                        "emits_captured",
-                        "frame_queue.elements",
-                        "frame_queue.total_enqueued",
-                        "frame_queue.total_dequeued"]
+    expected_metrics = [
+        "metrics_rate",
+        "channel_count",
+        "events_captured",
+        "emits_captured",
+        "frame_queue.elements",
+        "frame_queue.total_enqueued",
+        "frame_queue.total_dequeued",
+    ]
     for metric in expected_metrics:
         found = False
         for chan in frame_data["channels"]:
@@ -73,28 +74,30 @@ def test_environment_with_metrics():
 
     assert env.add_from_enum(EnumA) >= 0
 
-    chan = env.add_enum_channel("enum_chan", "enum_a", 1.0, True,
-                                ("b", float()))
+    chan = env.add_enum_channel(
+        "enum_chan", "enum_a", 1.0, True, ("b", float())
+    )
     assert env.get_enum_value(chan) == "b"
 
 
 def test_create_environment():
-    """ Test that an environment can be created successfully. """
+    """Test that an environment can be created successfully."""
 
     start_time = time.time()
     TelemetryEnvironment(2 ** 8, start_time)
 
 
 def test_create_many_channels():
-    """ Test an environment with many channels. """
+    """Test an environment with many channels."""
 
     start_time = time.time()
     env = TelemetryEnvironment(2 ** 8, start_time)
 
     chan_ids = []
     for i in range(1000):
-        chan_ids.append(env.add_channel("chan{}".format(i), Primitive.FLOAT,
-                                        0.1))
+        chan_ids.append(
+            env.add_channel("chan{}".format(i), Primitive.FLOAT, 0.1)
+        )
 
     # set all channels and dispatch
     for _ in range(5):
@@ -106,7 +109,7 @@ def test_create_many_channels():
 
 
 def test_telemetry_environment_basic():
-    """ Exercise some basic telemetry-environment operations. """
+    """Exercise some basic telemetry-environment operations."""
 
     start_time = time.time()
     chan_1 = Channel("chan_1", Primitive.BOOL, 0.5)
@@ -134,8 +137,9 @@ def test_telemetry_environment_basic():
 
     frame = env.get_next_frame()
     assert frame.finalize() > 0
-    assert not frame.add_event(0, Primitive.BOOL, (False, float()),
-                               (False, float()))
+    assert not frame.add_event(
+        0, Primitive.BOOL, (False, float()), (False, float())
+    )
     assert not frame.add(0, Primitive.BOOL, False)
 
     # set channel 'a' over and over

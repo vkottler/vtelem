@@ -1,4 +1,3 @@
-
 """
 vtelem - A module for creating functions based on a daemon manager.
 """
@@ -14,14 +13,16 @@ from vtelem.enums.daemon import is_operation, DaemonOperation, operation_str
 from vtelem.types.command_queue_daemon import ResultCbType
 
 
-def create_daemon_manager_commander(manager: DaemonManager,
-                                    daemon: CommandQueueDaemon,
-                                    result_cb: ResultCbType = None,
-                                    command_name: str = "daemon") -> None:
-    """ Register a handler to a command queue for a daemon manager. """
+def create_daemon_manager_commander(
+    manager: DaemonManager,
+    daemon: CommandQueueDaemon,
+    result_cb: ResultCbType = None,
+    command_name: str = "daemon",
+) -> None:
+    """Register a handler to a command queue for a daemon manager."""
 
     def daemon_commander(cmd: dict) -> Tuple[bool, str]:
-        """ Attempt to run a daemon-manager command. """
+        """Attempt to run a daemon-manager command."""
 
         if "operation" not in cmd:
             return False, "no command 'operation' provided"
@@ -55,5 +56,6 @@ def create_daemon_manager_commander(manager: DaemonManager,
 
     oper_strs = [operation_str(op) for op in DaemonOperation]
     ops_str = ", ".join("'{}'".format(val) for val in oper_strs)
-    daemon.register_consumer(command_name, daemon_commander, result_cb,
-                             "{} daemons".format(ops_str))
+    daemon.register_consumer(
+        command_name, daemon_commander, result_cb, "{} daemons".format(ops_str)
+    )

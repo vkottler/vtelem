@@ -1,4 +1,3 @@
-
 """
 vtelem - Test this package in the context of additional application tasks.
 """
@@ -21,7 +20,7 @@ def test_telemetry_server_app_basic():
     instance = 0
 
     def app_setup(groups: ChannelGroupRegistry, data: Dict[str, Any]) -> None:
-        """ Set up a channel group. """
+        """Set up a channel group."""
 
         nonlocal instance
         data["a"] = "a"
@@ -32,7 +31,7 @@ def test_telemetry_server_app_basic():
         groups.add_channel(data["group_a"], "c", Primitive.UINT32, 0.1, True)
 
     def app_loop(groups: ChannelGroupRegistry, data: Dict[str, Any]) -> None:
-        """ Update telemetry values. """
+        """Update telemetry values."""
 
         with groups.group(data["group_a"]) as chan_data:
             chan_data["a"] += 1

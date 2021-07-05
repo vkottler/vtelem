@@ -1,4 +1,3 @@
-
 """
 vtelem - Test the telemetry server's correctness.
 """
@@ -19,7 +18,7 @@ from vtelem.mtu import get_free_tcp_port
 
 
 def test_telemetry_server_basic():
-    """ Test that the telemetry server can boot. """
+    """Test that the telemetry server can boot."""
 
     server = TelemetryServer(0.01, 0.10, ("0.0.0.0", 0), 0.25)
     assert server.start()
@@ -32,7 +31,7 @@ def test_telemetry_server_basic():
 
 
 def test_telemetry_server_get_types():
-    """ Test that the type manifest can be successfully requested. """
+    """Test that the type manifest can be successfully requested."""
 
     server = TelemetryServer(0.01, 0.10, ("0.0.0.0", 0), 0.25)
     with server.booted():
@@ -57,7 +56,7 @@ def test_telemetry_server_get_types():
 
 
 async def ws_command(wsock, msg: str, expect: bool) -> Tuple[bool, str]:
-    """ Test an individual websocket command. """
+    """Test an individual websocket command."""
 
     rsp_data: dict = {"success": False, "message": "send failed"}
     request_success = False
@@ -67,35 +66,39 @@ async def ws_command(wsock, msg: str, expect: bool) -> Tuple[bool, str]:
         request_success = True
     except websockets.exceptions.WebSocketException:
         pass
-    return ((rsp_data["success"] == expect and request_success),
-            rsp_data["message"])
+    return (
+        (rsp_data["success"] == expect and request_success),
+        rsp_data["message"],
+    )
 
 
 async def ws_command_dict(wsock, msg: dict, expect: bool) -> Tuple[bool, str]:
-    """ Test a websocket command from dict data. """
+    """Test a websocket command from dict data."""
 
     return await ws_command(wsock, json.dumps(msg), expect)
 
 
 def test_telemetry_server_ws_telemetry():
-    """ Test that websocket telemetry is supported by the server. """
+    """Test that websocket telemetry is supported by the server."""
 
     port = get_free_tcp_port()
-    server = TelemetryServer(0.01, 0.10, None, 0.25,
-                             websocket_tlm_address=("0.0.0.0", port))
+    server = TelemetryServer(
+        0.01, 0.10, None, 0.25, websocket_tlm_address=("0.0.0.0", port)
+    )
     with server.booted():
         time.sleep(0.1)
 
         async def telemetry_test():
-            """ Send some commands to the server. """
+            """Send some commands to the server."""
 
             uri = "ws://localhost:{}".format(port)
             async with websockets.connect(uri) as websocket:
                 for _ in range(10):
                     frame = await websocket.recv()
                     telem = server.daemons.get("telemetry")
-                    result = telem.decode_frame(frame, len(frame),
-                                                telem.app_id)
+                    result = telem.decode_frame(
+                        frame, len(frame), telem.app_id
+                    )
                     assert result["valid"]
 
         for _ in range(5):
@@ -103,32 +106,34 @@ def test_telemetry_server_ws_telemetry():
 
 
 def test_telemetry_server_ws_commands():
-    """ Test that websocket commands are supported by the server. """
+    """Test that websocket commands are supported by the server."""
 
     port = get_free_tcp_port()
-    server = TelemetryServer(0.01, 0.10, None, 0.25,
-                             websocket_cmd_address=("0.0.0.0", port))
+    server = TelemetryServer(
+        0.01, 0.10, None, 0.25, websocket_cmd_address=("0.0.0.0", port)
+    )
     with server.booted():
         time.sleep(0.1)
         fails = 0
 
         async def ws_command_check(wsock, cmd: dict, expect: bool) -> None:
-            """ Execute a command and increment failures if necessary. """
+            """Execute a command and increment failures if necessary."""
 
             nonlocal fails
             status, _ = await ws_command_dict(wsock, cmd, expect)
             fails += int(not status)
 
         async def help_test():
-            """ Send some commands to the server. """
+            """Send some commands to the server."""
 
             nonlocal fails
             uri = "ws://localhost:{}".format(port)
             async with websockets.connect(uri) as websocket:
 
                 # test invalid json
-                status, _ = await ws_command(websocket, "{'command': 'help'}",
-                                             False)
+                status, _ = await ws_command(
+                    websocket, "{'command': 'help'}", False
+                )
                 fails += int(not status)
 
                 # test valid json
@@ -181,11 +186,12 @@ def test_telemetry_server_ws_commands():
 
 
 def test_telemetry_server_stop_http():
-    """ Test that the server can shutdown from an http request. """
+    """Test that the server can shutdown from an http request."""
 
     port = get_free_tcp_port()
-    server = TelemetryServer(0.01, 0.10, ("0.0.0.0", port), 0.25,
-                             app_id_basis=0.5)
+    server = TelemetryServer(
+        0.01, 0.10, ("0.0.0.0", port), 0.25, app_id_basis=0.5
+    )
     with server.booted():
         # get app id
         result = requests.get(server.get_base_url() + "id")
@@ -197,11 +203,13 @@ def test_telemetry_server_stop_http():
         assert not result.status_code == requests.codes["ok"]
 
         # should fail, 'app_id' incorrect
-        result = requests.post(server.get_base_url() + "shutdown",
-                               data={"app_id": 1234})
+        result = requests.post(
+            server.get_base_url() + "shutdown", data={"app_id": 1234}
+        )
         assert not result.status_code == requests.codes["ok"]
 
         # should succeed, 'app_id' correct
-        result = requests.post(server.get_base_url() + "shutdown",
-                               data={"app_id": app_id})
+        result = requests.post(
+            server.get_base_url() + "shutdown", data={"app_id": app_id}
+        )
         assert result.status_code == requests.codes["ok"]

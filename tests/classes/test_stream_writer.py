@@ -1,4 +1,3 @@
-
 """
 vtelem - Test the stream-writer class's correctness.
 """
@@ -15,23 +14,23 @@ from vtelem.classes.stream_writer import StreamWriter
 
 
 class DummyFrame:
-    """ Class for mocking a channel frame. """
+    """Class for mocking a channel frame."""
 
     def __init__(self) -> None:
-        """ Construct an empty frame. """
+        """Construct an empty frame."""
         self.data = bytearray()
 
     def add_byte(self, val: int) -> None:
-        """ Add a single byte to the frame. """
+        """Add a single byte to the frame."""
         self.data.extend(val.to_bytes(1, sys.byteorder))
 
     def raw(self) -> Tuple[bytearray, int]:
-        """ Required to match the channel-frame interface. """
+        """Required to match the channel-frame interface."""
         return self.data, len(self.data)
 
 
 def random_garbage_factory() -> DummyFrame:
-    """ Create a dummy frame, containing a random number of random bytes. """
+    """Create a dummy frame, containing a random number of random bytes."""
 
     frame = DummyFrame()
     for _ in range(int(random.random() * 1000.0)):
@@ -40,7 +39,7 @@ def random_garbage_factory() -> DummyFrame:
 
 
 def test_stream_writer_basic():
-    """ Test basic functionality of a stream writer. """
+    """Test basic functionality of a stream writer."""
 
     frame_queue = Queue()
     writer = StreamWriter("test_writer", frame_queue)

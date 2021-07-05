@@ -1,4 +1,3 @@
-
 """
 vtelem - Test the correctness of primitive information.
 """
@@ -6,13 +5,17 @@ vtelem - Test the correctness of primitive information.
 # module under test
 from vtelem.classes.type_primitive import TypePrimitive
 from vtelem.enums.primitive import (
-    Primitive, get_integer_max, get_integer_min, integer_can_hold,
-    random_integer, INTEGER_PRIMITIVES
+    Primitive,
+    get_integer_max,
+    get_integer_min,
+    integer_can_hold,
+    random_integer,
+    INTEGER_PRIMITIVES,
 )
 
 
 def test_primitive_max_min():
-    """ Test that our internal representation of integers is correct. """
+    """Test that our internal representation of integers is correct."""
 
     # 8-bit
     assert get_integer_max(Primitive.UINT8) == 255

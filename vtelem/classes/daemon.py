@@ -1,4 +1,3 @@
-
 """
 vtelem - Implements management of a synchronous task.
 """
@@ -23,12 +22,18 @@ class Daemon(DaemonBase):
     desired.
     """
 
-    def __init__(self, name: str, task: Callable, rate: float,
-                 iter_overrun_cb: Callable = None,
-                 state_change_cb: Callable = None,
-                 env: TelemetryEnvironment = None,
-                 time_keeper: Any = None, init: Callable = None) -> None:
-        """ Create a new daemon. """
+    def __init__(
+        self,
+        name: str,
+        task: Callable,
+        rate: float,
+        iter_overrun_cb: Callable = None,
+        state_change_cb: Callable = None,
+        env: TelemetryEnvironment = None,
+        time_keeper: Any = None,
+        init: Callable = None,
+    ) -> None:
+        """Create a new daemon."""
 
         super().__init__(name, env, time_keeper)
         self.function["task"] = task
@@ -40,17 +45,21 @@ class Daemon(DaemonBase):
         if state_change_cb is not None:
             self.function["state_change"] = state_change_cb
 
-        def default_overrun(start: float, end: float, rate: float,
-                            metrics_data: dict) -> None:
-            """ A default handler for overrun conditions. """
+        def default_overrun(
+            start: float, end: float, rate: float, metrics_data: dict
+        ) -> None:
+            """A default handler for overrun conditions."""
 
             last_log_delta = end - metrics_data["last_overrun_time"]
             if last_log_delta >= metrics_data["overrun_throttle"]:
                 over = (end - start) - rate
-                log_str = ("%-10s - %.3f: most recent overrun was %.3f over " +
-                           "(%d overruns)")
-                LOG.warning(log_str, self.name, rate, over,
-                            metrics_data["overruns"])
+                log_str = (
+                    "%-10s - %.3f: most recent overrun was %.3f over "
+                    + "(%d overruns)"
+                )
+                LOG.warning(
+                    log_str, self.name, rate, over, metrics_data["overruns"]
+                )
 
             metrics_data["last_overrun_time"] = end
 
@@ -65,12 +74,12 @@ class Daemon(DaemonBase):
         self.set_env_metric("cycle_time", 0.0, Primitive.FLOAT)
 
     def get_rate(self) -> float:
-        """ Get the current daemon-iteration rate. """
+        """Get the current daemon-iteration rate."""
 
         return self.function["rate"]
 
     def run(self, *args, **kwargs) -> None:
-        """ Runs this daemon's thread, until stop is requested. """
+        """Runs this daemon's thread, until stop is requested."""
 
         # call an initialization routine if provided
         if self.function["init"] is not None:
@@ -92,8 +101,9 @@ class Daemon(DaemonBase):
 
             # keep runtime metrics
             self.increment_metric("uptime", iter_end - iter_start)
-            self.set_env_metric("cycle_time", iter_end - iter_start,
-                                Primitive.FLOAT)
+            self.set_env_metric(
+                "cycle_time", iter_end - iter_start, Primitive.FLOAT
+            )
 
             # await the next iteration
             sleep_amount = rate - (self.get_time() - iter_start)
@@ -101,11 +111,12 @@ class Daemon(DaemonBase):
                 self.function["sleep"](sleep_amount)
             elif self.function["overrun"] is not None:
                 self.increment_metric("overruns")
-                self.function["overrun"](iter_start, iter_end, rate,
-                                         self.function["metrics_data"])
+                self.function["overrun"](
+                    iter_start, iter_end, rate, self.function["metrics_data"]
+                )
 
     def set_rate(self, rate: float) -> None:
-        """ Set the rate for the daemon. """
+        """Set the rate for the daemon."""
 
         if rate > 0.0:
             with self.lock:

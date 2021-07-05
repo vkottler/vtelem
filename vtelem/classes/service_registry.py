@@ -1,4 +1,3 @@
-
 """
 vtelem - Contains a class for managing known services.
 """
@@ -13,10 +12,11 @@ Service = List[Tuple[str, int]]
 
 
 class ServiceRegistry(Registry[Service]):
-    """ A class for managing services by name, hostname and port. """
+    """A class for managing services by name, hostname and port."""
 
-    def __init__(self,
-                 initial_services: List[Tuple[str, Service]] = None) -> None:
-        """ Construct a new service registry. """
+    def __init__(
+        self, initial_services: List[Tuple[str, Service]] = None
+    ) -> None:
+        """Construct a new service registry."""
 
         super().__init__("services", initial_services)

@@ -1,4 +1,3 @@
-
 """
 vtelem - Uses daemon machinery to build the task that can consume outgoing
          telemetry frames.
@@ -23,9 +22,13 @@ class StreamWriter(QueueDaemon):
     streams.
     """
 
-    def __init__(self, name: str, frame_queue: Queue,
-                 error_handle: Callable[[int], None] = None) -> None:
-        """ Construct a new stream-writer daemon. """
+    def __init__(
+        self,
+        name: str,
+        frame_queue: Queue,
+        error_handle: Callable[[int], None] = None,
+    ) -> None:
+        """Construct a new stream-writer daemon."""
 
         self.curr_id: int = 0
         self.queue_id: int = 0
@@ -34,7 +37,7 @@ class StreamWriter(QueueDaemon):
         self.error_handle = error_handle
 
         def frame_handle(frame: Optional[ChannelFrame]) -> None:
-            """ Write this frame to all registered streams. """
+            """Write this frame to all registered streams."""
 
             if frame is not None:
                 array, size = frame.raw()
@@ -46,16 +49,27 @@ class StreamWriter(QueueDaemon):
                             self.increment_metric("stream_writes")
                             self.increment_metric("bytes_written", size)
                         except OSError as exc:
-                            msg = ("stream '%s' (%d) error writing %d " +
-                                   "bytes: %s (%d)")
-                            LOG.error(msg, stream.name, stream_id, len(array),
-                                      exc.strerror, exc.errno)
+                            msg = (
+                                "stream '%s' (%d) error writing %d "
+                                + "bytes: %s (%d)"
+                            )
+                            LOG.error(
+                                msg,
+                                stream.name,
+                                stream_id,
+                                len(array),
+                                exc.strerror,
+                                exc.errno,
+                            )
                             to_remove.append((stream_id, stream))
 
                     # remove streams that errored when writing
                     for stream_id, stream in to_remove:
-                        LOG.warning("removing stream '%s' (%d) errors writing",
-                                    stream.name, stream_id)
+                        LOG.warning(
+                            "removing stream '%s' (%d) errors writing",
+                            stream.name,
+                            stream_id,
+                        )
 
                         # signal parent that their stream may be broken
                         if self.error_handle is not None:
@@ -77,7 +91,7 @@ class StreamWriter(QueueDaemon):
         self.reset_metric("queue_count")
 
     def add_queue(self, queue: Queue) -> int:
-        """ Add a queue and return its integer identifier. """
+        """Add a queue and return its integer identifier."""
 
         with self.lock:
             result = self.queue_id
@@ -87,7 +101,7 @@ class StreamWriter(QueueDaemon):
         return result
 
     def add_stream(self, stream: BytesIO) -> int:
-        """ Add a stream and return its integer identifier. """
+        """Add a stream and return its integer identifier."""
 
         with self.lock:
             result = self.curr_id
@@ -97,7 +111,7 @@ class StreamWriter(QueueDaemon):
         return result
 
     def remove_stream(self, stream_id: int) -> bool:
-        """ Remove a stream, if one is present with this identifier. """
+        """Remove a stream, if one is present with this identifier."""
 
         with self.lock:
             result = stream_id in self.streams
@@ -108,7 +122,7 @@ class StreamWriter(QueueDaemon):
         return result
 
     def remove_queue(self, queue_id: int, inject_none: bool = True) -> bool:
-        """ Remove a stream, if one is present with this identifier. """
+        """Remove a stream, if one is present with this identifier."""
 
         with self.lock:
             result = queue_id in self.queues

@@ -1,4 +1,3 @@
-
 """
 vtelem - Test the correctness of the command-queue daemon.
 """
@@ -11,26 +10,26 @@ from vtelem.classes.command_queue_daemon import CommandQueueDaemon
 
 
 def test_command_queue_daemon_basic():
-    """ Test the command queue's ability to correctly dispatch. """
+    """Test the command queue's ability to correctly dispatch."""
 
     daemon = CommandQueueDaemon("test")
 
     iteration = 0
 
     def sample_handler(_: dict) -> Tuple[bool, str]:
-        """ An example command handler. """
+        """An example command handler."""
         nonlocal iteration
         iteration += 1
         return iteration % 2 == 0, str(iteration)
 
     def result_cb(result: bool, message: str) -> None:
-        """ Sample result callback. """
+        """Sample result callback."""
         nonlocal iteration
         assert result == (iteration % 2 == 0)
         assert str(iteration) == message
 
     def cmd_cb(_: bool, __: str) -> None:
-        """ Stub callback. """
+        """Stub callback."""
 
     # register handlers
     daemon.register_consumer("test", sample_handler, result_cb)

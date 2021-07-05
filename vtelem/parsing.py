@@ -1,4 +1,3 @@
-
 """
 vtelem - Parsing frames into runtime data.
 """
@@ -9,8 +8,9 @@ from .classes.channel_registry import ChannelRegistry
 from .classes import TIMESTAMP_PRIM, ID_PRIM
 
 
-def parse_data_frame(obj: dict, buf: ByteBuffer,
-                     registry: ChannelRegistry) -> None:
+def parse_data_frame(
+    obj: dict, buf: ByteBuffer, registry: ChannelRegistry
+) -> None:
     """
     From an object that contains frame-header data, parse the telemetry data.
     """
@@ -29,8 +29,9 @@ def parse_data_frame(obj: dict, buf: ByteBuffer,
         chan["value"] = buf.read(chan["channel"].type)
 
 
-def parse_event_frame(obj: dict, buf: ByteBuffer,
-                      registry: ChannelRegistry) -> None:
+def parse_event_frame(
+    obj: dict, buf: ByteBuffer, registry: ChannelRegistry
+) -> None:
     """
     From an object that contains frame-header data, parse the event data.
     """

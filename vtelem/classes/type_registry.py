@@ -1,4 +1,3 @@
-
 """
 vtelem - Contains a class for managing known type primitives.
 """
@@ -17,19 +16,20 @@ class TypeRegistry(Registry[Primitive]):
     name and an integer identifier.
     """
 
-    def __init__(self,
-                 initial_types: List[Tuple[str, Primitive]] = None) -> None:
-        """ Construct a new type registry, optionally add initial types. """
+    def __init__(
+        self, initial_types: List[Tuple[str, Primitive]] = None
+    ) -> None:
+        """Construct a new type registry, optionally add initial types."""
 
         super().__init__("types", initial_types)
 
     def get_type(self, type_id: int) -> Optional[Primitive]:
-        """ Obtain a type's data by its integer identifier. """
+        """Obtain a type's data by its integer identifier."""
 
         return self.get_item(type_id)
 
     def describe(self, indented: bool = False) -> str:
-        """ Obtain a JSON String of the type registry's current state. """
+        """Obtain a JSON String of the type registry's current state."""
 
         return self.describe_raw(indented, PrimitiveEncoder)
 

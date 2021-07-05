@@ -33,6 +33,9 @@ jobs:
     - name: lint
       run: |
         mk PYTHON_VERSION=${{matrix.python-version}} python-lint
+    - name: sa-types
+      run: |
+        mk PYTHON_VERSION=${{matrix.python-version}} python-sa-types
     - name: sa
       run: |
         mk PYTHON_VERSION=${{matrix.python-version}} python-sa
