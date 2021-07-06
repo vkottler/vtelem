@@ -11,6 +11,9 @@ import time
 # third-party
 import requests
 
+# internal
+from tests.resources import get_resource
+
 # module under test
 from vtelem.classes.http_daemon import HttpDaemon
 
@@ -40,6 +43,17 @@ def test_http_daemon_serve():
     time.sleep(1.0)
     os.kill(proc.pid, signal.SIGINT)
     proc.join()
+
+
+def test_http_daemon_with_tls():
+    """Test that a daemon works with secure-socket layer enabled."""
+
+    daemon = HttpDaemon("test_daemon")
+    daemon.use_tls(get_resource("test.key"), get_resource("test.cert"))
+    with daemon.booted():
+        result = requests.get(daemon.get_base_url(), verify=False)
+        assert result.status_code == requests.codes["ok"]
+    assert daemon.close()
 
 
 def test_http_daemon_basic():

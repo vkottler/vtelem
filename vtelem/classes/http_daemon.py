@@ -10,7 +10,8 @@ from http.server import (
     SimpleHTTPRequestHandler,
 )
 import logging
-from typing import Type, Tuple
+import ssl
+from typing import Type, Tuple, Optional
 
 # internal
 from .daemon_base import DaemonBase, DaemonState, MainThread
@@ -50,7 +51,9 @@ class HttpDaemon(DaemonBase):
         self.server.mapper = HttpRequestMapper()  # type: ignore
         host = self.server.server_address
         LOG.info("'%s' daemon bound to %s:%d", self.name, host[0], host[1])
+        self.ssl_context: Optional[ssl.SSLContext] = None
         self.closed = False
+        self.uses_tls = False
 
         def stop_injector() -> None:
             """Signal the server to stop."""
@@ -58,11 +61,22 @@ class HttpDaemon(DaemonBase):
 
         self.function["inject_stop"] = stop_injector
 
+    def use_tls(self, keyfile_path: str, certfile_path: str) -> None:
+        """Set up a secure-socket layer for this server."""
+
+        with self.lock:
+            assert self.get_state() == DaemonState.IDLE
+            self.ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+            self.ssl_context.load_cert_chain(certfile_path, keyfile_path)
+
     def get_base_url(self) -> str:
         """Get this server's root url as a String."""
 
-        return "http://{}:{}/".format(
-            self.server.server_address[0], self.server.server_address[1]
+        protocol = "http" if self.ssl_context is None else "https"
+        return "{}://{}:{}/".format(
+            protocol,
+            self.server.server_address[0],
+            self.server.server_address[1],
         )
 
     def add_handler(
@@ -115,4 +129,11 @@ class HttpDaemon(DaemonBase):
                     service_registry.add(
                         self.name, [self.server.server_address]
                     )
-            self.server.serve_forever(0.1)
+            if self.ssl_context is not None:
+                with self.ssl_context.wrap_socket(
+                    self.server.socket, server_side=True
+                ) as ssock:
+                    self.server.socket = ssock
+                    self.server.serve_forever(0.1)
+            else:
+                self.server.serve_forever(0.1)
