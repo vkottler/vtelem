@@ -1,7 +1,7 @@
 # =====================================
 # generator=datazen
-# version=1.7.4
-# hash=e4ae7136bfdedaebc4be3f24ec1519b6
+# version=1.7.7
+# hash=0edc258f2b3c30dc681f1b952a4494cc
 # =====================================
 
 """
@@ -20,7 +20,15 @@ author_info = {
     "email": "vaughnkottler@gmail.com",
     "username": "vkottler",
 }
-pkg_info = {"name": PKG_NAME, "version": VERSION, "description": DESCRIPTION}
+pkg_info = {
+    "name": PKG_NAME,
+    "version": VERSION,
+    "description": DESCRIPTION,
+    "versions": [
+        "3.7",
+        "3.8",
+    ],
+}
 setup(
     pkg_info,
     author_info,

@@ -1,14 +1,16 @@
 <!--
     =====================================
     generator=datazen
-    version=1.7.4
-    hash=c3674391701890d9b5ca28c91f0afb6d
+    version=1.7.7
+    hash=7b7993000dfaafa0fdf5e1679f3e4378
     =====================================
 -->
 
 # vtelem ([0.2.5](https://pypi.org/project/vtelem/))
 
-![Python package](https://github.com/vkottler/vtelem/workflows/Python%20package/badge.svg)
+[![python](https://img.shields.io/pypi/pyversions/vtelem.svg)](https://pypi.org/project/vtelem/)
+![Build Status](https://github.com/vkottler/vtelem/workflows/Python%20package/badge.svg)
+[![codecov](https://codecov.io/gh/vkottler/vtelem/branch/master/graphs/badge.svg?branch=master)](https://codecov.io/github/vkottler/vtelem)
 
 *A real-time telemetry library.*
 
@@ -17,9 +19,9 @@
 ```
 $ ./venv3.8/bin/vtelem -h
 
-usage: vtelem [-h] [--version] [-v] [-C DIR] [-i {lo,bond0,dummy0,eth0,sit0}]
-              [-p PORT] [--ws-cmd-port WS_CMD_PORT]
-              [--ws-tlm-port WS_TLM_PORT] [-t TICK] [--telem-rate TELEM_RATE]
+usage: vtelem [-h] [--version] [-v] [-C DIR] [-i {lo,enp0s25,wlo1}] [-p PORT]
+              [--ws-cmd-port WS_CMD_PORT] [--ws-tlm-port WS_TLM_PORT]
+              [-t TICK] [--telem-rate TELEM_RATE]
               [--metrics-rate METRICS_RATE] [--time-scale TIME_SCALE]
               [-a APP_ID] [-u UPTIME]
 
@@ -30,7 +32,7 @@ optional arguments:
   --version             show program's version number and exit
   -v, --verbose         set to increase logging verbosity
   -C DIR, --dir DIR     execute from a specific directory
-  -i {lo,bond0,dummy0,eth0,sit0}, --interface {lo,bond0,dummy0,eth0,sit0}
+  -i {lo,enp0s25,wlo1}, --interface {lo,enp0s25,wlo1}
                         interface to bind to
   -p PORT, --port PORT  http api port
   --ws-cmd-port WS_CMD_PORT
