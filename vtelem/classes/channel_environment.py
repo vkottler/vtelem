@@ -48,7 +48,11 @@ class ChannelEnvironment(TimeEntity):
         if initial_channels is None:
             initial_channels = []
         self.framer = ChannelFramer(
-            mtu, self.channel_registry, initial_channels, app_id_basis
+            mtu,
+            self.channel_registry,
+            initial_channels,
+            self.lock,
+            app_id_basis,
         )
         self.write_crc = True
 
@@ -172,7 +176,9 @@ class ChannelEnvironment(TimeEntity):
 
         chan = self.channel_registry.get_item(chan_id)
         assert chan is not None
-        return chan.command(value, self.get_time())
+        with self.lock:
+            result = chan.command(value, self.get_time())
+        return result
 
     def command_channel(self, name: str, value: Any) -> bool:
         """Attempt to command a channel, by its name."""

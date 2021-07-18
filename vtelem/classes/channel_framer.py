@@ -5,6 +5,7 @@ vtelem - A module for building frames of channel data from emissions.
 # built-in
 import logging
 from queue import Queue
+from threading import RLock
 from typing import Dict, Tuple, List
 
 # internal
@@ -58,6 +59,7 @@ class ChannelFramer:
         mtu: int,
         registry: ChannelRegistry,
         channels: List[Channel],
+        channel_lock: RLock,
         app_id_basis: float = None,
     ) -> None:
         """Construct a new channel framer."""
@@ -65,6 +67,7 @@ class ChannelFramer:
         self.mtu = mtu
         self.registry = registry
         self.channels = channels
+        self.lock = channel_lock
         self.timestamp = new_default("timestamp")
         self.frame_types = FRAME_TYPES
 
@@ -173,25 +176,26 @@ class ChannelFramer:
         emit_count = 0
 
         curr_frame = self.new_data_frame(time)
-        for channel in self.channels:
+        with self.lock:
+            for channel in self.channels:
 
-            result = channel.emit(time)
+                result = channel.emit(time)
 
-            # if the channel emitted, add it to the current frame
-            if result is not None:
-                emit_count += 1
+                # if the channel emitted, add it to the current frame
+                if result is not None:
+                    emit_count += 1
 
-                chan_id = self.registry.get_id(channel.name)
-                assert chan_id is not None
+                    chan_id = self.registry.get_id(channel.name)
+                    assert chan_id is not None
 
-                # if we failed to add this emit to the current frame, finalize
-                # it and start a new one
-                if not curr_frame.add(chan_id, channel.type, result):
-                    curr_frame.finalize(write_crc)
-                    queue.put(curr_frame)
-                    frame_count += 1
-                    curr_frame = self.new_data_frame(time, False)
-                    assert curr_frame.add(chan_id, channel.type, result)
+                    # if we failed to add this emit to the current frame,
+                    # finalize it and start a new one
+                    if not curr_frame.add(chan_id, channel.type, result):
+                        curr_frame.finalize(write_crc)
+                        queue.put(curr_frame)
+                        frame_count += 1
+                        curr_frame = self.new_data_frame(time, False)
+                        assert curr_frame.add(chan_id, channel.type, result)
 
         # finalize the last frame if necessary
         if emit_count and not curr_frame.finalized:

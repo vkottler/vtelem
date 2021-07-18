@@ -3,7 +3,7 @@ vtelem - Implements an interface for getting and setting time on an object.
 """
 
 # built-in
-import threading
+from threading import RLock
 
 
 class LockEntity:  # pylint: disable=too-few-public-methods
@@ -13,7 +13,7 @@ class LockEntity:  # pylint: disable=too-few-public-methods
         """Construct a new locked entity."""
 
         if not hasattr(self, "lock"):
-            self.lock = threading.RLock()
+            self.lock = RLock()
 
 
 class TimeEntity(LockEntity):

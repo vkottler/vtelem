@@ -5,7 +5,6 @@ vtelem - A generic element that can be read from and written to buffers.
 # built-in
 import logging
 from typing import Any, Callable
-import threading
 
 # internal
 from vtelem.enums.primitive import Primitive, default_val, get_size
@@ -30,7 +29,6 @@ class TypePrimitive:
         self.data: Any = default_val(self.type)
         self.changed_cb = changed_cb
         self.last_set: float = float()
-        self.lock = threading.RLock()
 
     def __eq__(self, other) -> bool:
         """Generic equality check for primitives."""
@@ -47,9 +45,7 @@ class TypePrimitive:
     def add(self, data: Any, time: float = None) -> bool:
         """Safely add some amount to the primitive."""
 
-        with self.lock:
-            result = self.set(self.get() + data, time)
-        return result
+        return self.set(self.get() + data, time)
 
     def set(self, data: Any, time: float = None) -> bool:
         """Set this primitive's data manually."""
@@ -67,16 +63,15 @@ class TypePrimitive:
                 )
                 return False
 
-            with self.lock:
-                # setup changed-callback if necessary
-                if self.changed_cb is not None:
-                    cb_args = [(self.data, self.last_set), (data, time)]
-                    prev_data = self.data
+            # setup changed-callback if necessary
+            if self.changed_cb is not None:
+                cb_args = [(self.data, self.last_set), (data, time)]
+                prev_data = self.data
 
-                # set the new value
-                self.data = expected_type(data)
-                if time is not None:
-                    self.last_set = time
+            # set the new value
+            self.data = expected_type(data)
+            if time is not None:
+                self.last_set = time
 
             # call changed-callback
             if self.changed_cb is not None and prev_data != data:

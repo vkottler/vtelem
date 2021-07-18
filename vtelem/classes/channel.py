@@ -59,14 +59,12 @@ class Channel(TypePrimitive):
         if not self.commandable:
             return False
         operation = self.add if add else self.set
-        with self.lock:
-            return operation(value, time)
+        return operation(value, time)
 
     def set_rate(self, rate: float) -> None:
         """Set a channel's rate post-initialization."""
 
-        with self.lock:
-            self.rate = rate
+        self.rate = rate
 
     def emit(self, time: float) -> Optional[Any]:
         """
@@ -75,10 +73,9 @@ class Channel(TypePrimitive):
         """
 
         result = None
-        with self.lock:
-            if time >= (self.last_emitted + self.rate):
-                result = self.get()
-                self.last_emitted = time
+        if time >= (self.last_emitted + self.rate):
+            result = self.get()
+            self.last_emitted = time
         return result
 
 
