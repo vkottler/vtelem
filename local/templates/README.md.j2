@@ -10,4 +10,6 @@ $ {{" ".join(help["args"])}}
 
 # Documentation
 
-* [Primitive Types](docs/primitive.md)
+{% for file, name in docs.items() %}
+* [{{name}}](docs/{{file}}.md)
+{% endfor %}

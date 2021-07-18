@@ -2,7 +2,7 @@
     =====================================
     generator=datazen
     version=1.7.8
-    hash=e82b108b64cd22a8156b3bcd703cade9
+    hash=3b642f3fbeb67f39d0e203249568240a
     =====================================
 -->
 
@@ -57,3 +57,4 @@ optional arguments:
 # Documentation
 
 * [Primitive Types](docs/primitive.md)
+* [Message Types](docs/message.md)
