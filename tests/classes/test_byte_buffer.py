@@ -13,7 +13,7 @@ def test_byte_buffer_basic():
 
     buf = ByteBuffer()
 
-    type_a = TypePrimitive(Primitive.BOOL)
+    type_a = TypePrimitive(Primitive.BOOLEAN)
     assert not type_a.set("test")
     assert not type_a.set(5)
     assert type_a.set(True)
@@ -46,4 +46,4 @@ def test_byte_buffer_basic():
     buf.append(bytearray(10), 10)
 
     immut_buf = ByteBuffer(mutable=False)
-    assert not immut_buf.write(Primitive.BOOL, False)
+    assert not immut_buf.write(Primitive.BOOLEAN, False)

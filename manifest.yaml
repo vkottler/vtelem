@@ -20,6 +20,9 @@ templates:
 
 compiles:
 - name: "local"
+- name: "enums"
+  configs:
+  - "local/enums"
 
 renders:
 - name: "README.md"
@@ -28,6 +31,10 @@ renders:
   - "compiles-local"
   - "commands-help"
   - "renders-python_readme_header.md"
+- name: "primitive.py"
+  output_dir: "{{project}}/enums"
+  dependencies:
+  - "compiles-enums"
 - name: "LICENSE"
   key: "LICENSE_MIT"
   output_dir: "."
@@ -39,4 +46,5 @@ groups:
   dependencies:
   - "renders-LICENSE"
   - "renders-README.md"
+  - "renders-primitive.py"
   - "groups-python"

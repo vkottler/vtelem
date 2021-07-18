@@ -14,7 +14,7 @@ def test_type_registry_basic():
     assert registry.describe() != ""
 
     # prove you can't double register
-    assert not registry.add(get_name(Primitive.BOOL), Primitive.BOOL)[0]
+    assert not registry.add(get_name(Primitive.BOOLEAN), Primitive.BOOLEAN)[0]
 
     assert registry.get_type(0) is not None
     assert registry.get_type(1) is not None

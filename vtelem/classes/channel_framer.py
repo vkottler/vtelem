@@ -214,7 +214,7 @@ def build_dummy_frame(
         TypePrimitive(TIMESTAMP_PRIM),
     )
 
-    while frame.add(0, Primitive.BOOL, False):
+    while frame.add(0, Primitive.BOOLEAN, False):
         pass
 
     frame.finalize(not bad_crc)

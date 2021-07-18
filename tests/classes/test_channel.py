@@ -14,7 +14,7 @@ def test_channel_basic():
     queue = EventQueue()
     chan_a = Channel("a", Primitive.FLOAT, 1.0)
     chan_b = Channel("b", Primitive.UINT8, 1.0, queue)
-    chan_c = Channel("c", Primitive.BOOL, 1.0, queue, False)
+    chan_c = Channel("c", Primitive.BOOLEAN, 1.0, queue, False)
 
     time = float()
 

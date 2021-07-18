@@ -112,7 +112,7 @@ def test_telemetry_environment_basic():
     """Exercise some basic telemetry-environment operations."""
 
     start_time = time.time()
-    chan_1 = Channel("chan_1", Primitive.BOOL, 0.5)
+    chan_1 = Channel("chan_1", Primitive.BOOLEAN, 0.5)
     chan_2 = Channel("chan_2", Primitive.FLOAT, 0.25)
     env = TelemetryEnvironment(2 ** 8, start_time, None, [chan_1, chan_2])
 
@@ -138,9 +138,9 @@ def test_telemetry_environment_basic():
     frame = env.get_next_frame()
     assert frame.finalize() > 0
     assert not frame.add_event(
-        0, Primitive.BOOL, (False, float()), (False, float())
+        0, Primitive.BOOLEAN, (False, float()), (False, float())
     )
-    assert not frame.add(0, Primitive.BOOL, False)
+    assert not frame.add(0, Primitive.BOOLEAN, False)
 
     # set channel 'a' over and over
     for _ in range(100):

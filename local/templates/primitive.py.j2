@@ -1,8 +1,3 @@
-# =====================================
-# generator=datazen
-# version=1.7.8
-# hash=bf102d3292732c406f79594d63c7ec07
-# =====================================
 """
 vtelem - A definition of the supported primitive types for this library.
 """
@@ -36,17 +31,9 @@ class Primitive(Enum):
     format specifier.
     """
 
-    BOOLEAN = build_primitive("?", bool, 1, "boolean", False)
-    INT8 = build_primitive("b", int, 1, "int8", True)
-    UINT8 = build_primitive("B", int, 1, "uint8", False)
-    INT16 = build_primitive("h", int, 2, "int16", True)
-    UINT16 = build_primitive("H", int, 2, "uint16", False)
-    INT32 = build_primitive("i", int, 4, "int32", True)
-    UINT32 = build_primitive("I", int, 4, "uint32", False)
-    INT64 = build_primitive("q", int, 8, "int64", True)
-    UINT64 = build_primitive("Q", int, 8, "uint64", False)
-    FLOAT = build_primitive("f", float, 4, "float", True)
-    DOUBLE = build_primitive("d", float, 8, "double", True)
+{% for item in primitives["entries"] %}
+    {{item["name"]|upper}} = build_primitive("{{item["python"]["serdes"]}}", {{item["python"]["type"]}}, {{item["bytes"]}}, "{{item["name"]}}", {{item["signed"]}})
+{% endfor %}
 
 
 def random_integer(prim: Primitive) -> int:
@@ -54,9 +41,11 @@ def random_integer(prim: Primitive) -> int:
     Get a random integer that's guaranteed to fit in the provided primitive.
     """
 
-    assert prim != Primitive.BOOLEAN
-    assert prim != Primitive.FLOAT
-    assert prim != Primitive.DOUBLE
+{% for item in primitives["entries"] %}
+{% if not item["integer"] %}
+    assert prim != Primitive.{{item["name"]|upper}}
+{% endif %}
+{% endfor %}
     return random.randint(get_integer_min(prim), get_integer_max(prim))
 
 
@@ -71,9 +60,11 @@ def integer_can_hold(prim: Primitive, val: int) -> bool:
 def get_integer_max(prim: Primitive) -> int:
     """Get the maximum value for an integer type."""
 
-    assert prim != Primitive.BOOLEAN
-    assert prim != Primitive.FLOAT
-    assert prim != Primitive.DOUBLE
+{% for item in primitives["entries"] %}
+{% if not item["integer"] %}
+    assert prim != Primitive.{{item["name"]|upper}}
+{% endif %}
+{% endfor %}
 
     width = prim.value["size"] * 8
     if prim.value["signed"]:
@@ -85,9 +76,11 @@ def get_integer_max(prim: Primitive) -> int:
 def get_integer_min(prim: Primitive) -> int:
     """Get the minimum value for an integer type."""
 
-    assert prim != Primitive.BOOLEAN
-    assert prim != Primitive.FLOAT
-    assert prim != Primitive.DOUBLE
+{% for item in primitives["entries"] %}
+{% if not item["integer"] %}
+    assert prim != Primitive.{{item["name"]|upper}}
+{% endif %}
+{% endfor %}
 
     if not prim.value["signed"]:
         return 0
@@ -132,14 +125,11 @@ def default_val(inst: Primitive) -> Any:
 
 
 INTEGER_PRIMITIVES = [
-    Primitive.INT8,
-    Primitive.UINT8,
-    Primitive.INT16,
-    Primitive.UINT16,
-    Primitive.INT32,
-    Primitive.UINT32,
-    Primitive.INT64,
-    Primitive.UINT64,
+{% for item in primitives["entries"] %}
+{% if item["integer"] %}
+    Primitive.{{item["name"]|upper}},
+{% endif %}
+{% endfor %}
 ]
 
 for _prim in INTEGER_PRIMITIVES:

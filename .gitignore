@@ -13,3 +13,4 @@ htmlcov
 .manifest_cache
 .task_data_cache
 datazen-out
+tags
