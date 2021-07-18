@@ -9,7 +9,7 @@ import logging
 from typing import Tuple, List, Type
 
 # internal
-from . import ENUM_TYPE
+from . import ENUM_PRIM
 from .registry import Registry
 from .type_registry import TypeRegistry
 from .user_enum import UserEnum, from_enum, UserEnumEncoder
@@ -84,7 +84,7 @@ class EnumRegistry(Registry[UserEnum]):
 
                 # remember the mapping for this enum to the global type
                 # registry
-                result = registry.add(enum_data.name, ENUM_TYPE)
+                result = registry.add(enum_data.name, ENUM_PRIM)
                 assert result[0]
                 self.data["global_mappings"][result[1]] = enum_id
 

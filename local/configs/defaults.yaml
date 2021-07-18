@@ -1,0 +1,6 @@
+version: "uint8"
+enum: "uint8"
+timestamp: "uint64"
+metric: "uint32"
+count: "uint32"
+id: "uint16"

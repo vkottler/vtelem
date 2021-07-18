@@ -8,7 +8,7 @@ $(error target this Makefile with 'mk', not '$(MAKE)' ($(MK_INFO)))
 endif
 ###############################################################################
 
-.PHONY: all clean run run-help
+.PHONY: all clean run run-help readme
 
 .DEFAULT_GOAL := all
 
@@ -21,3 +21,9 @@ run: $(VENV_CONC)
 
 run-help: $(VENV_CONC)
 	@$(PYTHON_BIN)/python $($(PROJ)_DIR)/dev.py -h
+
+readme:
+	mk grip-render GRIP_PORT=0.0.0.0:9000
+
+render-%:
+	mk grip-render GRIP_FILE=docs/$*.md

@@ -10,7 +10,7 @@ from typing import Any, List, Tuple, Dict, Optional
 # internal
 from vtelem.enums.primitive import Primitive, get_size
 from vtelem.parsing import parse_data_frame, parse_event_frame
-from . import TIMESTAMP_PRIM, COUNT_PRIM, ENUM_TYPE, LOG_PERIOD, ID_PRIM
+from . import TIMESTAMP_PRIM, COUNT_PRIM, ENUM_PRIM, LOG_PERIOD, ID_PRIM
 from .byte_buffer import ByteBuffer
 from .channel import Channel
 from .channel_registry import ChannelRegistry
@@ -262,7 +262,7 @@ class ChannelEnvironment(TimeEntity):
         id_valid = True
         if expected_id is not None:
             id_valid = result["app_id"] == expected_id.get()
-        result["type"] = FRAME_TYPES.get_str(buf.read(ENUM_TYPE))
+        result["type"] = FRAME_TYPES.get_str(buf.read(ENUM_PRIM))
         result["timestamp"] = buf.read(TIMESTAMP_PRIM)
         result["size"] = buf.read(COUNT_PRIM)
 

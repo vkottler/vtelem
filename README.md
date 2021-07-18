@@ -2,7 +2,7 @@
     =====================================
     generator=datazen
     version=1.7.8
-    hash=d6906510c3a1e31bd88301ffd919c60b
+    hash=e82b108b64cd22a8156b3bcd703cade9
     =====================================
 -->
 
@@ -53,3 +53,7 @@ optional arguments:
                         specify a finite duration to run the server
 
 ```
+
+# Documentation
+
+* [Primitive Types](docs/primitive.md)

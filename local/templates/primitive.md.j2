@@ -1,0 +1,30 @@
+# Primitive Types
+
+All transmission of information over a physical medium that uses binary bits
+must be formatted so that receivers can understand it.
+
+This document describes fundamental types used to transfer data.
+
+## Standard Types
+
+All transmission of information uses these standard types, the telemetry
+runtime can only otherwise be extended with custom enumerations. Channels can
+only store the following primitive types:
+
+Name | Bytes | Signed | Integer
+-----|-------|--------|--------
+{% for item in primitives["entries"] %}
+`{{item["name"]}}` | {{item["bytes"]}} | `{{item["signed"]}}` | `{{item["integer"]}}`
+{% endfor %}
+
+## Defaults
+
+Some protocol constants must be understood ahead of trying to parse messages.
+Based on the purpose of a "header" or metadata field in a message, the default
+types used are as follows:
+
+Purpose | Type
+--------|-----
+{% for key, value in defaults.items() %}
+`{{key}}` | `{{value}}`
+{% endfor %}

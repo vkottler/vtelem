@@ -1,0 +1,11 @@
+renders:
+- name: "primitive.md"
+  output_dir: "docs"
+  dependencies:
+  - "compiles-enums"
+  - "compiles-local"
+
+groups:
+- name: "local-docs"
+  dependencies:
+  - "renders-primitive.md"

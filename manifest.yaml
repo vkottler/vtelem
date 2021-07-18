@@ -8,6 +8,8 @@ params:
 includes:
 - "config/includes/python.yaml"
 - "config/includes/help.yaml"
+- "local/docs.yaml"
+- "local/python.yaml"
 
 configs:
 - "local/configs"
@@ -31,10 +33,6 @@ renders:
   - "compiles-local"
   - "commands-help"
   - "renders-python_readme_header.md"
-- name: "primitive.py"
-  output_dir: "{{project}}/enums"
-  dependencies:
-  - "compiles-enums"
 - name: "LICENSE"
   key: "LICENSE_MIT"
   output_dir: "."
@@ -44,7 +42,7 @@ renders:
 groups:
 - name: "all"
   dependencies:
-  - "renders-LICENSE"
   - "renders-README.md"
-  - "renders-primitive.py"
-  - "groups-python"
+  - "renders-LICENSE"
+  - "groups-local-python"
+  - "groups-local-docs"

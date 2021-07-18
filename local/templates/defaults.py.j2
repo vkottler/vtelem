@@ -1,0 +1,17 @@
+"""
+vtelem - Class defaults.
+"""
+
+# built-in
+from typing import Tuple, Any
+
+# internal
+from vtelem.enums.primitive import Primitive
+
+{% for key, value in defaults.items() %}
+{{key|upper}}_PRIM = Primitive.{{value|upper}}
+{% endfor %}
+
+EventType = Tuple[Any, float]
+
+LOG_PERIOD: float = 0.25

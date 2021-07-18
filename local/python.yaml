@@ -1,0 +1,17 @@
+renders:
+- name: "defaults.py"
+  output_dir: "{{project}}/classes"
+  output_path: "__init__.py"
+  dependencies:
+  - "compiles-local"
+- name: "primitive.py"
+  output_dir: "{{project}}/enums"
+  dependencies:
+  - "compiles-enums"
+
+groups:
+- name: "local-python"
+  dependencies:
+  - "renders-defaults.py"
+  - "renders-primitive.py"
+  - "groups-python"
