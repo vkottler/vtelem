@@ -9,12 +9,12 @@ from typing import Dict, Tuple, List
 
 # internal
 from vtelem.enums.primitive import Primitive, random_integer
-from . import TIMESTAMP_PRIM, ID_PRIM
+from . import DEFAULTS
 from .channel import Channel
 from .channel_frame import ChannelFrame, time_to_int
 from .channel_registry import ChannelRegistry
 from .event_queue import EventQueue
-from .type_primitive import TypePrimitive
+from .type_primitive import TypePrimitive, new_default
 from .user_enum import UserEnum
 
 LOG = logging.getLogger(__name__)
@@ -30,7 +30,7 @@ def basis_to_int(basis: float) -> int:
     basis = abs(basis)
     if basis > 1.0:
         basis = 1.0 / basis
-    return int(float(ID_PRIM.value["max"]) * basis)
+    return int(float(DEFAULTS["id"].value["max"]) * basis)
 
 
 def create_app_id(basis: float = None) -> TypePrimitive:
@@ -39,9 +39,9 @@ def create_app_id(basis: float = None) -> TypePrimitive:
     provided.
     """
 
-    result = TypePrimitive(ID_PRIM)
+    result = new_default("id")
     if basis is None:
-        new_id = random_integer(ID_PRIM)
+        new_id = random_integer(DEFAULTS["id"])
     else:
         new_id = basis_to_int(basis)
     assert result.set(new_id)
@@ -65,14 +65,14 @@ class ChannelFramer:
         self.mtu = mtu
         self.registry = registry
         self.channels = channels
-        self.timestamp = TypePrimitive(TIMESTAMP_PRIM)
+        self.timestamp = new_default("timestamp")
         self.frame_types = FRAME_TYPES
 
         # build primitives to hold the frame types and timestamps
         self.timestamps: Dict[str, TypePrimitive] = {}
         self.primitives: Dict[str, TypePrimitive] = {}
         for name in FRAME_TYPES.enum.values():
-            self.timestamps[name] = TypePrimitive(TIMESTAMP_PRIM)
+            self.timestamps[name] = new_default("timestamp")
             self.primitives[name] = self.frame_types.get_primitive(name)
         self.primitives["app_id"] = create_app_id(app_id_basis)
         LOG.info(
@@ -211,7 +211,7 @@ def build_dummy_frame(
         overall_size,
         create_app_id(app_id_basis),
         FRAME_TYPES.get_primitive("invalid"),
-        TypePrimitive(TIMESTAMP_PRIM),
+        new_default("timestamp"),
     )
 
     while frame.add(0, Primitive.BOOLEAN, False):

@@ -3,14 +3,16 @@ vtelem - Class defaults.
 """
 
 # built-in
-from typing import Tuple, Any
+from typing import Any, Dict, Tuple
 
 # internal
 from vtelem.enums.primitive import Primitive
 
+DEFAULTS: Dict[str, Primitive] = {
 {% for key, value in defaults.items() %}
-{{key|upper}}_PRIM = Primitive.{{value|upper}}
+    "{{key}}": Primitive.{{value|upper}},
 {% endfor %}
+}
 
 EventType = Tuple[Any, float]
 

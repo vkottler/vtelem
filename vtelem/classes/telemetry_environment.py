@@ -9,7 +9,7 @@ from typing import List, Dict, Type, Tuple, Optional
 
 # internal
 from vtelem.enums.primitive import Primitive
-from . import ENUM_PRIM
+from . import DEFAULTS
 from .channel import Channel
 from .channel_environment import ChannelEnvironment
 from .enum_registry import EnumRegistry
@@ -92,7 +92,7 @@ class TelemetryEnvironment(ChannelEnvironment):
         """Add a channel that stores an enumeration value."""
 
         new_chan = self.add_channel(
-            name, ENUM_PRIM, rate, track_change, None, commandable
+            name, DEFAULTS["enum"], rate, track_change, None, commandable
         )
         enum_type = self.enum_registry.get_id(enum_name)
         assert enum_type is not None

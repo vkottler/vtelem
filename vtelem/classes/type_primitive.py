@@ -9,6 +9,7 @@ import threading
 
 # internal
 from vtelem.enums.primitive import Primitive, default_val, get_size
+from . import DEFAULTS
 from .byte_buffer import ByteBuffer
 
 LOG = logging.getLogger(__name__)
@@ -117,3 +118,10 @@ class TypePrimitive:
             result = buf.read(self.type)
         self.data = result
         return result
+
+
+def new_default(default: str, changed_cb: Callable = None) -> TypePrimitive:
+    """Construct a new type primitive from a default type alias."""
+
+    assert default in DEFAULTS
+    return TypePrimitive(DEFAULTS[default], changed_cb)

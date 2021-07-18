@@ -6,7 +6,7 @@ vtelem - A module for encapsulating software states.
 from typing import Callable, Optional
 
 # internal
-from . import METRIC_PRIM
+from . import DEFAULTS
 from .channel_group import ChannelGroup
 from .telemetry_environment import TelemetryEnvironment
 
@@ -34,11 +34,17 @@ class State:
         self.metrics: Optional[ChannelGroup] = None
         if env is not None:
             self.metrics = ChannelGroup("state." + self.name, env)
-            self.metrics.add_channel("enter_attempts", METRIC_PRIM, rate)
-            self.metrics.add_channel("enter_successes", METRIC_PRIM, rate)
-            self.metrics.add_channel("exit_attempts", METRIC_PRIM, rate)
-            self.metrics.add_channel("exit_successes", METRIC_PRIM, rate)
-            self.metrics.add_channel("iterations", METRIC_PRIM, rate)
+            self.metrics.add_channel(
+                "enter_attempts", DEFAULTS["metric"], rate
+            )
+            self.metrics.add_channel(
+                "enter_successes", DEFAULTS["metric"], rate
+            )
+            self.metrics.add_channel("exit_attempts", DEFAULTS["metric"], rate)
+            self.metrics.add_channel(
+                "exit_successes", DEFAULTS["metric"], rate
+            )
+            self.metrics.add_channel("iterations", DEFAULTS["metric"], rate)
         self.is_initial_state = False
 
     def __eq__(self, other) -> bool:

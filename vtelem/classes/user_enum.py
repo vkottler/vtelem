@@ -11,8 +11,8 @@ from typing import Dict, Callable, Optional, Type
 # internal
 from vtelem.enums.primitive import get_size
 from vtelem.names import to_snake, class_to_snake
-from . import ENUM_PRIM
-from .type_primitive import TypePrimitive
+from . import DEFAULTS
+from .type_primitive import TypePrimitive, new_default
 
 
 class UserEnum:
@@ -28,7 +28,7 @@ class UserEnum:
         for key, val in self.enum.items():
             self.enum[key] = val.lower()
         self.name = to_snake(name)
-        assert len(self.enum.keys()) <= (2 ** (get_size(ENUM_PRIM) * 8))
+        assert len(self.enum.keys()) <= (2 ** (get_size(DEFAULTS["enum"]) * 8))
         assert len(self.enum.keys()) > 0
 
         # maintain a reverse mapping for convenience
@@ -65,7 +65,7 @@ class UserEnum:
         Create a new primitive with an initial value from this enum definition.
         """
 
-        result = TypePrimitive(ENUM_PRIM, changed_cb)
+        result = new_default("enum", changed_cb)
         val = self.strings[value.lower()]
         assert val is not None
         assert result.set(val)

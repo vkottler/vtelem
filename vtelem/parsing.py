@@ -5,7 +5,7 @@ vtelem - Parsing frames into runtime data.
 # internal
 from .classes.byte_buffer import ByteBuffer
 from .classes.channel_registry import ChannelRegistry
-from .classes import TIMESTAMP_PRIM, ID_PRIM
+from .classes import DEFAULTS
 
 
 def parse_data_frame(
@@ -20,7 +20,7 @@ def parse_data_frame(
     # read channel IDs
     obj["channels"] = []
     for _ in range(obj["size"]):
-        chan = {"id": buf.read(ID_PRIM)}
+        chan = {"id": buf.read(DEFAULTS["id"])}
         chan["channel"] = registry.get_item(chan["id"])
         obj["channels"].append(chan)
 
@@ -41,13 +41,13 @@ def parse_event_frame(
     # read channel IDs
     obj["events"] = []
     for _ in range(obj["size"]):
-        event = {"id": buf.read(ID_PRIM)}
+        event = {"id": buf.read(DEFAULTS["id"])}
         event["channel"] = registry.get_item(event["id"])
         obj["events"].append(event)
 
     # read events
     for event in obj["events"]:
         event["previous"] = {"value": buf.read(event["channel"].type)}
-        event["previous"]["time"] = buf.read(TIMESTAMP_PRIM)
+        event["previous"]["time"] = buf.read(DEFAULTS["timestamp"])
         event["current"] = {"value": buf.read(event["channel"].type)}
-        event["current"]["time"] = buf.read(TIMESTAMP_PRIM)
+        event["current"]["time"] = buf.read(DEFAULTS["timestamp"])

@@ -9,7 +9,7 @@ from typing import Any, Dict, Tuple
 
 # internal
 from vtelem.enums.primitive import Primitive, get_size, random_integer
-from . import COUNT_PRIM, ID_PRIM, TIMESTAMP_PRIM, EventType
+from . import DEFAULTS, EventType
 from .byte_buffer import ByteBuffer
 from .type_primitive import TypePrimitive
 
@@ -37,7 +37,7 @@ class ChannelFrame:
         self.used: int = 0
         self.buffer = ByteBuffer(bytearray(self.mtu))
         self.elem_buffer = ByteBuffer(bytearray(self.mtu))
-        self.id_primitive = TypePrimitive(ID_PRIM)
+        self.id_primitive = TypePrimitive(DEFAULTS["id"])
         self.finalized = False
 
         # write frame header: (application) id, type, timestamp
@@ -47,7 +47,7 @@ class ChannelFrame:
 
         # write frame header: element count (placeholder)
         self.count: Dict[str, Any] = {}
-        self.count["primitive"] = TypePrimitive(COUNT_PRIM)
+        self.count["primitive"] = TypePrimitive(DEFAULTS["count"])
         self.count["position"] = self.buffer.get_pos()
         self.count["value"] = 0
         self.used += self.count["primitive"].write(self.buffer)
@@ -123,7 +123,7 @@ class ChannelFrame:
         # determine if this event element will fit in the current frame
         space_required = self.id_primitive.size()
         space_required += 2 * get_size(chan_type)
-        space_required += 2 * get_size(TIMESTAMP_PRIM)
+        space_required += 2 * get_size(DEFAULTS["timestamp"])
         if (self.used + space_required > self.mtu) or self.finalized:
             return False
 
@@ -133,7 +133,7 @@ class ChannelFrame:
 
         # write the event data into the element buffer
         data_prim = TypePrimitive(chan_type)
-        time_prim = TypePrimitive(TIMESTAMP_PRIM)
+        time_prim = TypePrimitive(DEFAULTS["timestamp"])
 
         # write 'prev'
         data_prim.set(prev[0])

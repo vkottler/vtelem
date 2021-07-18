@@ -14,7 +14,7 @@ from typing import Any, Callable, Dict, Optional, Iterator
 from vtelem.enums.daemon import DaemonState, DaemonOperation, str_to_operation
 from vtelem.enums.primitive import Primitive
 from vtelem.names import class_to_snake
-from . import METRIC_PRIM
+from . import DEFAULTS
 from .telemetry_environment import TelemetryEnvironment
 from .time_entity import TimeEntity
 from .user_enum import from_enum
@@ -174,7 +174,7 @@ class DaemonBase(TimeEntity):
                 )
 
     def set_env_metric(
-        self, name: str, value: Any, prim: Primitive = METRIC_PRIM
+        self, name: str, value: Any, prim: Primitive = DEFAULTS["metric"]
     ) -> None:
         """Set a metric channel value if an environment is registered."""
 
