@@ -2,7 +2,7 @@
     =====================================
     generator=datazen
     version=1.7.8
-    hash=3b642f3fbeb67f39d0e203249568240a
+    hash=6ad0ec99a4a6e3ad83c3e3bfe69b4390
     =====================================
 -->
 
@@ -55,6 +55,10 @@ optional arguments:
 ```
 
 # Documentation
+
+Project documentation can be found in
+[Markdown](https://www.markdownguide.org/) files in the [`docs/`](docs)
+directory.
 
 * [Primitive Types](docs/primitive.md)
 * [Message Types](docs/message.md)

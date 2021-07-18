@@ -2,11 +2,13 @@
     =====================================
     generator=datazen
     version=1.7.8
-    hash=7941b7bc49b40569438202344ffc3086
+    hash=d0b7dd46ba8490ea62c429970f7161cb
     =====================================
 -->
 
 # Primitive Types
+
+([back](README.md))
 
 All transmission of information over a physical medium that uses binary bits
 must be formatted so that receivers can understand it.
@@ -47,3 +49,12 @@ Purpose | Type
 `metric` | `uint32`
 `count` | `uint32`
 `id` | `uint16`
+
+**It is expected that clients and servers implementing protocols defined by
+this project understand these defaults ahead of encoding or decoding
+information.**
+
+These defaults can change based on `version`, so implementations should keep
+track of one or more "`version` to defaults" mappings in order to correctly
+encode and decode messages. It is assumed that the mapping of `version` to
+`uint8` will **never** change.

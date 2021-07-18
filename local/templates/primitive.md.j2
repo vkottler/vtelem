@@ -1,5 +1,7 @@
 # {{docs["primitive"]}}
 
+([back](README.md))
+
 All transmission of information over a physical medium that uses binary bits
 must be formatted so that receivers can understand it.
 
@@ -28,3 +30,12 @@ Purpose | Type
 {% for key, value in defaults.items() %}
 `{{key}}` | `{{value}}`
 {% endfor %}
+
+**It is expected that clients and servers implementing protocols defined by
+this project understand these defaults ahead of encoding or decoding
+information.**
+
+These defaults can change based on `version`, so implementations should keep
+track of one or more "`version` to defaults" mappings in order to correctly
+encode and decode messages. It is assumed that the mapping of `version` to
+`uint8` will **never** change.
