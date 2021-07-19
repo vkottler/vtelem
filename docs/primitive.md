@@ -2,7 +2,7 @@
     =====================================
     generator=datazen
     version=1.7.8
-    hash=c82613aec0cb315fe0dc754f0746e96d
+    hash=e1452f27a343f9a622312b4abbf3f7a1
     =====================================
 -->
 
@@ -48,6 +48,7 @@ Purpose | Type
 `timestamp` | `uint64`
 `metric` | `uint32`
 `count` | `uint32`
+`crc` | `uint32`
 `id` | `uint16`
 
 **It is expected that clients and servers implementing protocols defined by

@@ -1,0 +1,19 @@
+type: list
+schema:
+  type: dict
+  schema:
+    name:
+      type: string
+    bytes:
+      type: number
+    signed:
+      type: boolean
+    integer:
+      type: boolean
+    python:
+      type: dict
+      schema:
+        type:
+          type: string
+        serdes:
+          type: string

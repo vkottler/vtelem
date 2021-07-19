@@ -1,0 +1,16 @@
+"""
+vtelem - A definition of the supported frame types for this library.
+"""
+
+# built-in
+from typing import Dict
+
+# internal
+from vtelem.classes.user_enum import UserEnum
+
+FRAME_TYPE_MAP: Dict[int, str] = {
+{% for item in frames["entries"] %}
+    {{item["value"]}}: "{{item["name"]}}",
+{% endfor %}
+}
+FRAME_TYPES = UserEnum("frame_type", FRAME_TYPE_MAP)

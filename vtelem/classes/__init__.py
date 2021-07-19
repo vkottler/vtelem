@@ -1,7 +1,7 @@
 # =====================================
 # generator=datazen
 # version=1.7.8
-# hash=93606f47f8ebcedde98631ef9d81bfd2
+# hash=8037b097b2a931af74e265e2bba7f402
 # =====================================
 """
 vtelem - Class defaults.
@@ -19,6 +19,7 @@ DEFAULTS: Dict[str, Primitive] = {
     "timestamp": Primitive.UINT64,
     "metric": Primitive.UINT32,
     "count": Primitive.UINT32,
+    "crc": Primitive.UINT32,
     "id": Primitive.UINT16,
 }
 

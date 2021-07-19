@@ -1,7 +1,52 @@
+{% macro sentence_case(text) %}{{text[0]|upper}}{{text[1:]}}{% endmacro %}
 # {{docs["message"]}}
 
 ([back](../README.md#documentation))
 
 *See [{{docs["primitive"]}}](primitive.md) for default-type mappings.*
 
-TODO.
+This document describes frames: the discrete unit of information transfer for
+this project. General frame structure as well as frame-specific schemas are
+covered.
+
+**All fields are packed in
+[network byte-order](https://en.wikipedia.org/wiki/Endianness#Networking)
+(big-endian).**
+
+## Frame Header
+
+These header fields appear in every message, regardless of the frame type.
+Given this header schema and the frame-specific interpretation of `size` it
+becomes possible to determine a frame's boundary.
+
+Depending on the transport mechanism, the start of the next frame may come
+at the start of the next byte or the entire protocol may be wrapped in yet
+another framing mechanism (such as some form of
+[consistent overhead byte stuffing](https://ieeexplore.ieee.org/document/769765)).
+
+Semantics of frame transfer based on the transport mechanism is not covered in
+this document.
+
+Field | Type | Description
+------|------|------------
+{% for item in header["entries"] %}
+`{{item["field"]}}` | [`defaults`](primitive.md#defaults)`.{{item["type"]}}` | {{item["description"]}}
+{% endfor %}
+
+## Frame Types
+
+Note that frame types are considered a type of `enum` so it's packed as
+`{{defaults["enum"]}}` when transported. As this protocol is updated, it's
+possible that new frame types will be added.
+
+Name | Value | Description
+-----|-------|------------
+{% for item in frames["entries"] %}
+[`{{item["name"]}}`](#{{item["name"]}}) | {{item["value"]}} | {{item["summary"]}}
+{% endfor %}
+{% for item in frames["entries"] %}
+
+### {{sentence_case(item["name"])}}
+
+{{item["description"]}}
+{% endfor %}

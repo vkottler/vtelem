@@ -11,7 +11,7 @@ from typing import Any, Dict, Tuple
 from vtelem.enums.primitive import Primitive, get_size, random_integer
 from . import DEFAULTS, EventType
 from .byte_buffer import ByteBuffer
-from .type_primitive import TypePrimitive
+from .type_primitive import TypePrimitive, new_default
 
 
 def time_to_int(time: float, precision: int = 1000) -> int:
@@ -37,7 +37,7 @@ class ChannelFrame:
         self.used: int = 0
         self.buffer = ByteBuffer(bytearray(self.mtu))
         self.elem_buffer = ByteBuffer(bytearray(self.mtu))
-        self.id_primitive = TypePrimitive(DEFAULTS["id"])
+        self.id_primitive = new_default("id")
         self.finalized = False
 
         # write frame header: (application) id, type, timestamp
@@ -47,13 +47,13 @@ class ChannelFrame:
 
         # write frame header: element count (placeholder)
         self.count: Dict[str, Any] = {}
-        self.count["primitive"] = TypePrimitive(DEFAULTS["count"])
+        self.count["primitive"] = new_default("count")
         self.count["position"] = self.buffer.get_pos()
         self.count["value"] = 0
         self.used += self.count["primitive"].write(self.buffer)
 
         # reserve space for crc
-        self.crc = TypePrimitive(Primitive.UINT32)
+        self.crc = new_default("crc")
         self.used += self.crc.size()
 
         assert self.used < self.mtu
@@ -133,7 +133,7 @@ class ChannelFrame:
 
         # write the event data into the element buffer
         data_prim = TypePrimitive(chan_type)
-        time_prim = TypePrimitive(DEFAULTS["timestamp"])
+        time_prim = new_default("timestamp")
 
         # write 'prev'
         data_prim.set(prev[0])

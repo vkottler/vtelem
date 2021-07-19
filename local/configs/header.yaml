@@ -1,0 +1,22 @@
+entries:
+- field: "app_id"
+  type: "id"
+  description: >-
+    An application identifier used to allow unique identification of the
+    sender (not a security feature). It is assumed that users control both
+    client and server, so an application identifier can be used to perform
+    arbitration on multiple data sources. If this feature isn't needed, this
+    field can be ignored.
+- field: "type"
+  type: "enum"
+  description: >-
+    The type of frame that should be parsed after this header. Information on
+    parsing each frame is below.
+- field: "timestamp"
+  type: "timestamp"
+  description: >-
+    An integer timestamp for the frame. Neither an exact epoch or unit is
+    strictly defined.
+- field: "size"
+  type: "count"
+  description: "A size parameter to be interpreted based on the frame type."

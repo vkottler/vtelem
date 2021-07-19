@@ -11,6 +11,12 @@ includes:
 - "local/docs.yaml"
 - "local/python.yaml"
 
+schemas:
+- "local/schemas"
+
+schema_types:
+- "local/schema_types"
+
 configs:
 - "local/configs"
 

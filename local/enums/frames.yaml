@@ -1,0 +1,29 @@
+entries:
+- name: "invalid"
+  value: 0
+  summary: >-
+    A frame type of zero is not considered any kind of frame, though it is
+    sometimes useful to use when testing protocol or client/server machinery
+    without any real data to transfer.
+  description: |
+    No further interpretation of an `invalid` frame can be made. If a client
+    is expecting to process real data and encounters this frame, discard and
+    move on to the next delivery of the frame-encapsulating transmission.
+
+    If the transport mechanism is stream-oriented and can't distinguish
+    discrete transmissions, the client should close the stream and indicate
+    error.
+- name: "data"
+  value: 1
+  summary: >-
+    A simple frame containing an array of channel indices followed by channel
+    data appearing in the same order as indicated by the array of indices.
+  description: "TODO."
+- name: "event"
+  value: 2
+  summary: >-
+    A simple frame containing an array of channel indices followed by an
+    "event" structure containing a "previous" and "current" pair of values and
+    timestamps. This frame is useful for data that warrants asynchronous
+    updates more than synchronous ones.
+  description: "TODO."

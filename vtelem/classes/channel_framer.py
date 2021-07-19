@@ -10,6 +10,7 @@ from typing import Dict, Tuple, List
 
 # internal
 from vtelem.enums.primitive import Primitive, random_integer
+from vtelem.enums.frame import FRAME_TYPES
 from . import DEFAULTS
 from .channel import Channel
 from .channel_frame import ChannelFrame, time_to_int
@@ -19,7 +20,6 @@ from .type_primitive import TypePrimitive, new_default
 from .user_enum import UserEnum
 
 LOG = logging.getLogger(__name__)
-FRAME_TYPES = UserEnum("frame_type", {0: "invalid", 1: "data", 2: "event"})
 
 
 def basis_to_int(basis: float) -> int:
