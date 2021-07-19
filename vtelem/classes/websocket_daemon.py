@@ -82,10 +82,10 @@ class WebsocketDaemon(EventLoopDaemon):
                     "closing client connection '%s:%d'", raddr[0], raddr[1]
                 )
 
-                # handle closing this connection ourselves, because it's
-                # difficult to pend on otherwise
-                await websocket.close()
+                # post the semaphore first because if we never cleanly close
+                # the connection, we can't pend on it indefinitely
                 self.wait_poster.release()
+                await websocket.close()
 
         def run_init(
             *_,

@@ -5,7 +5,7 @@ vtelem - An interface for managing websocket servers that serve telemetry data.
 # built-in
 import asyncio
 from queue import Queue
-from typing import Any, Tuple, Set
+from typing import Any, List, Tuple, Set
 
 # third-party
 from websockets.exceptions import WebSocketException
@@ -20,6 +20,20 @@ from .websocket_daemon import WebsocketDaemon
 class WebsocketTelemetryDaemon(WebsocketDaemon):
     """A class for creating telemetry-serving websocket servers."""
 
+    def close_clients(self) -> int:
+        """
+        Attempt to remove all active client-writing queues from the stream
+        writer. This should initiate our side of the connections to begin
+        closing.
+        """
+
+        closed = 0
+        with self.lock:
+            for queue_id in self.active_client_queues:
+                if self.writer.remove_queue(queue_id):
+                    closed += 1
+        return closed
+
     def __init__(
         self,
         name: str,
@@ -30,13 +44,18 @@ class WebsocketTelemetryDaemon(WebsocketDaemon):
     ) -> None:
         """Construct a new, telemetry-serving websocket server."""
 
+        self.writer = writer
+        self.active_client_queues: List[int] = []
+
         async def telem_handle(websocket, _) -> None:
             """
             Write telemetry to this connection, for as long as it's connected.
             """
 
             frame_queue: Any = Queue()
-            queue_id = writer.add_queue(frame_queue)
+            with self.lock:
+                queue_id = self.writer.add_queue(frame_queue)
+                self.active_client_queues.append(queue_id)
             should_continue = True
             complete: Set[asyncio.Future] = set()
             pending: Set[asyncio.Future] = set()
@@ -67,7 +86,7 @@ class WebsocketTelemetryDaemon(WebsocketDaemon):
                     except WebSocketException:
                         should_continue = False
             finally:
-                writer.remove_queue(queue_id, False)
+                self.writer.remove_queue(queue_id, False)
                 for pend in pending:
                     pend.cancel()
 
