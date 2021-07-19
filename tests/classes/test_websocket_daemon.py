@@ -52,3 +52,4 @@ def test_websocket_daemon_basic():
                     assert response == msg
 
             asyncio.get_event_loop().run_until_complete(ping_test())
+            time.sleep(0.25)

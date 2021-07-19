@@ -58,4 +58,4 @@ def test_websocket_telemetry_daemon_server_close_first():
                     await websocket.wait_closed()
 
         asyncio.get_event_loop().run_until_complete(read_test())
-        time.sleep(0.2)
+        time.sleep(0.25)
