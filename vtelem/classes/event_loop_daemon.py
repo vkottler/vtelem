@@ -42,6 +42,10 @@ class EventLoopDaemon(DaemonBase):
             for task in tasks:
                 task.cancel()
 
+            # schedule event-loop shutdown, if we leave un-finished work behind
+            # it's better than hanging
+            self.eloop.call_soon_threadsafe(self.eloop.stop)
+
             # decrement the semaphore the required number of times
             for _ in range(waits):
                 sig = self.wait_poster
@@ -49,8 +53,6 @@ class EventLoopDaemon(DaemonBase):
 
             with self.lock:
                 self.wait_count -= waits
-
-            self.eloop.call_soon_threadsafe(self.eloop.stop)
 
         self.function["inject_stop"] = event_loop_stopper
 

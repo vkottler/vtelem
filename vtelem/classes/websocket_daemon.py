@@ -81,11 +81,10 @@ class WebsocketDaemon(EventLoopDaemon):
                 LOG.warning(
                     "closing client connection '%s:%d'", raddr[0], raddr[1]
                 )
-                # schedule connection close and signal that we have no more
-                # work to do, if the connection closing is cancelled too early
-                # it won't matter
-                await websocket.close()
+                # post first, if we never finish closing the connection that's
+                # okay
                 self.wait_poster.release()
+                await websocket.close()
 
         def run_init(
             *_,
