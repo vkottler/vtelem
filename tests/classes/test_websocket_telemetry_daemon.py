@@ -39,7 +39,7 @@ def test_websocket_telemetry_daemon_server_close_first():
             """
 
             uri = "ws://localhost:{}".format(port)
-            async with websockets.connect(uri) as websocket:
+            async with websockets.connect(uri, close_timeout=1) as websocket:
 
                 # transfer some frames
                 for elem in [build_dummy_frame(64) for _ in range(num_frames)]:

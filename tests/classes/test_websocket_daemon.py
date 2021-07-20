@@ -45,7 +45,9 @@ def test_websocket_daemon_basic():
                 """Send an arbitrary message and expect the same back."""
 
                 uri = "ws://localhost:{}".format(port)
-                async with websockets.connect(uri) as websocket:
+                async with websockets.connect(
+                    uri, close_timeout=1
+                ) as websocket:
                     msg = "hello!"
                     await websocket.send(msg)
                     response = await websocket.recv()
