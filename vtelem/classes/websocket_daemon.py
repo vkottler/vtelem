@@ -75,17 +75,17 @@ class WebsocketDaemon(EventLoopDaemon):
                 asyncio.CancelledError,
                 GeneratorExit,
                 websockets.exceptions.WebSocketException,
-            ):  # type: ignore
+            ):
                 pass
             finally:
                 LOG.warning(
                     "closing client connection '%s:%d'", raddr[0], raddr[1]
                 )
-
-                # post the semaphore first because if we never cleanly close
-                # the connection, we can't pend on it indefinitely
-                self.wait_poster.release()
+                # schedule connection close and signal that we have no more
+                # work to do, if the connection closing is cancelled too early
+                # it won't matter
                 await websocket.close()
+                self.wait_poster.release()
 
         def run_init(
             *_,
@@ -105,7 +105,10 @@ class WebsocketDaemon(EventLoopDaemon):
                     """Capture the server object once we begint serving."""
 
                     self.server = await websockets.serve(  # type: ignore
-                        handler, self.address[0], self.address[1]
+                        handler,
+                        self.address[0],
+                        self.address[1],
+                        close_timeout=1,
                     )
                     if first_start and service_registry is not None:
                         socks = self.server.sockets

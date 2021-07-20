@@ -54,8 +54,5 @@ def test_websocket_telemetry_daemon_server_close_first():
                     assert False
                 except websockets.exceptions.ConnectionClosedOK:
                     pass
-                finally:
-                    await websocket.wait_closed()
 
         asyncio.get_event_loop().run_until_complete(read_test())
-        time.sleep(0.25)
