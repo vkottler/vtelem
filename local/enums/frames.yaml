@@ -18,7 +18,19 @@ entries:
   summary: >-
     A simple frame containing an array of channel indices followed by channel
     data appearing in the same order as indicated by the array of indices.
-  description: "TODO."
+  description: |
+    A data frame stores `size` channel-data elements where the frame body
+    consists of two `size` length arrays:
+    1. The first array contains `defaults.id` elements that hold the channel
+    identifiers (TODO: reference for this).
+    1. The second array contains channel data in the order that the indices
+    appeared where each element's size in bytes must be understood in advance
+    by mapping the channel index to a specific [primitive](primitive.md) type.
+
+    #### Structure
+
+    [`header`](#frame-header) | `channel_id[0]` | . . . | `channel_id[size - 1]` | `channel_data[0]` | . . . | `channel_data[size - 1]`
+    --------------------------|-----------------|-------|------------------------|-------------------|-------|-------------------------
 - name: "event"
   value: 2
   summary: >-
@@ -26,4 +38,26 @@ entries:
     "event" structure containing a "previous" and "current" pair of values and
     timestamps. This frame is useful for data that warrants asynchronous
     updates more than synchronous ones.
-  description: "TODO."
+  description: |
+    An event frame stores `size` channel-event elements where the frame body
+    also (like the [data](#data) frame) consists of two `size` length arrays:
+    1. The first array contains `defaults.id` elements that hold the channel
+    identifiers (TODO: reference for this).
+    1. The second array contains event data in the order that the indices
+    appeared where an event structure is as follows:
+
+        Field | Type
+        ------|-----
+        Previous Channel Value | Channel's Primitive Type
+        Previous Timestamp | `defaults.timestamp`
+        Current Channel Value | Channel's Primitive Type
+        Current Channel Timestamp | `defaults.timestamp`
+
+        Timestamps should be considered the times that the channel value was
+        last assigned a value, even if it was the same value. *This is true
+        for all channels whether they emit events or not.*
+
+    #### Structure
+
+    [`header`](#frame-header) | `channel_id[0]` | . . . | `channel_id[size - 1]` | `channel_event[0]` | . . . | `channel_event[size - 1]`
+    --------------------------|-----------------|-------|------------------------|--------------------|-------|--------------------------

@@ -30,8 +30,10 @@ this document.
 Field | Type | Description
 ------|------|------------
 {% for item in header["entries"] %}
-`{{item["field"]}}` | [`defaults`](primitive.md#defaults)`.{{item["type"]}}` | {{item["description"]}}
+`{{item["field"]}}` | `defaults.{{item["type"]}}` | {{item["description"]}}
 {% endfor %}
+
+See [`defaults`](primitive.md#defaults) for exact primitive types.
 
 ## Frame Types
 

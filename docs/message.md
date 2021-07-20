@@ -1,8 +1,8 @@
 <!--
     =====================================
     generator=datazen
-    version=1.7.8
-    hash=598f255c994f0029f68c4f0062410973
+    version=1.7.9
+    hash=76cfa1fafd29800452d47e5f0855db21
     =====================================
 -->
 
@@ -36,10 +36,12 @@ this document.
 
 Field | Type | Description
 ------|------|------------
-`app_id` | [`defaults`](primitive.md#defaults)`.id` | An application identifier used to allow unique identification of the sender (not a security feature). It is assumed that users control both client and server, so an application identifier can be used to perform arbitration on multiple data sources. If this feature isn't needed, this field can be ignored.
-`type` | [`defaults`](primitive.md#defaults)`.enum` | The type of frame that should be parsed after this header. Information on parsing each frame is below.
-`timestamp` | [`defaults`](primitive.md#defaults)`.timestamp` | An integer timestamp for the frame. Neither an exact epoch or unit is strictly defined.
-`size` | [`defaults`](primitive.md#defaults)`.count` | A size parameter to be interpreted based on the frame type.
+`app_id` | `defaults.id` | An application identifier used to allow unique identification of the sender (not a security feature). It is assumed that users control both client and server, so an application identifier can be used to perform arbitration on multiple data sources. If this feature isn't needed, this field can be ignored.
+`type` | `defaults.enum` | The type of frame that should be parsed after this header. Information on parsing each frame is below.
+`timestamp` | `defaults.timestamp` | An integer timestamp for the frame. Neither an exact epoch or unit is strictly defined.
+`size` | `defaults.count` | A size parameter to be interpreted based on the frame type.
+
+See [`defaults`](primitive.md#defaults) for exact primitive types.
 
 ## Frame Types
 
@@ -66,8 +68,41 @@ error.
 
 ### Data
 
-TODO.
+A data frame stores `size` channel-data elements where the frame body
+consists of two `size` length arrays:
+1. The first array contains `defaults.id` elements that hold the channel
+identifiers (TODO: reference for this).
+1. The second array contains channel data in the order that the indices
+appeared where each element's size in bytes must be understood in advance
+by mapping the channel index to a specific [primitive](primitive.md) type.
+
+#### Structure
+
+[`header`](#frame-header) | `channel_id[0]` | . . . | `channel_id[size - 1]` | `channel_data[0]` | . . . | `channel_data[size - 1]`
+--------------------------|-----------------|-------|------------------------|-------------------|-------|-------------------------
+
 
 ### Event
 
-TODO.
+An event frame stores `size` channel-event elements where the frame body
+also (like the [data](#data) frame) consists of two `size` length arrays:
+1. The first array contains `defaults.id` elements that hold the channel
+identifiers (TODO: reference for this).
+1. The second array contains event data in the order that the indices
+appeared where an event structure is as follows:
+
+    Field | Type
+    ------|-----
+    Previous Channel Value | Channel's Primitive Type
+    Previous Timestamp | `defaults.timestamp`
+    Current Channel Value | Channel's Primitive Type
+    Current Channel Timestamp | `defaults.timestamp`
+
+    Timestamps should be considered the times that the channel value was
+    last assigned a value, even if it was the same value. *This is true
+    for all channels whether they emit events or not.*
+
+#### Structure
+
+[`header`](#frame-header) | `channel_id[0]` | . . . | `channel_id[size - 1]` | `channel_event[0]` | . . . | `channel_event[size - 1]`
+--------------------------|-----------------|-------|------------------------|--------------------|-------|--------------------------
