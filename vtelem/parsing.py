@@ -2,10 +2,24 @@
 vtelem - Parsing frames into runtime data.
 """
 
+# built-in
+import logging
+
 # internal
 from .classes.byte_buffer import ByteBuffer
 from .classes.channel_registry import ChannelRegistry
 from .classes import DEFAULTS
+
+LOG = logging.getLogger(__name__)
+
+
+def parse_invalid_frame(
+    obj: dict, __: ByteBuffer, ___: ChannelRegistry
+) -> None:
+    """A default parser for frames we can't interpret."""
+
+    LOG.warning("can't decode frame type '%s'", obj["type"])
+    obj["valid"] = False
 
 
 def parse_data_frame(
@@ -14,8 +28,6 @@ def parse_data_frame(
     """
     From an object that contains frame-header data, parse the telemetry data.
     """
-
-    assert obj["type"] == "data"
 
     # read channel IDs
     obj["channels"] = []
@@ -35,8 +47,6 @@ def parse_event_frame(
     """
     From an object that contains frame-header data, parse the event data.
     """
-
-    assert obj["type"] == "event"
 
     # read channel IDs
     obj["events"] = []

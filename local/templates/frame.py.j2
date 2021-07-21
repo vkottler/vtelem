@@ -3,10 +3,24 @@ vtelem - A definition of the supported frame types for this library.
 """
 
 # built-in
-from typing import Dict
+from typing import Callable, Dict
 
 # internal
+from vtelem.classes.byte_buffer import ByteBuffer
+from vtelem.classes.channel_registry import ChannelRegistry
 from vtelem.classes.user_enum import UserEnum
+from vtelem.parsing import (
+{% for item in frames["entries"] %}
+    parse_{{item["name"]}}_frame,
+{% endfor %}
+)
+
+FrameParser = Callable[[dict, ByteBuffer, ChannelRegistry], None]
+PARSERS: Dict[str, FrameParser] = {
+{% for item in frames["entries"] %}
+    "{{item["name"]}}": parse_{{item["name"]}}_frame,
+{% endfor %}
+}
 
 FRAME_TYPE_MAP: Dict[int, str] = {
 {% for item in frames["entries"] %}

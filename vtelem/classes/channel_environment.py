@@ -9,7 +9,7 @@ from typing import Any, List, Tuple, Dict, Optional
 
 # internal
 from vtelem.enums.primitive import Primitive, get_size
-from vtelem.parsing import parse_data_frame, parse_event_frame
+from vtelem.enums.frame import PARSERS
 from . import DEFAULTS, LOG_PERIOD
 from .byte_buffer import ByteBuffer
 from .channel import Channel
@@ -273,30 +273,27 @@ class ChannelEnvironment(TimeEntity):
         result["size"] = buf.read(DEFAULTS["count"])
 
         # read channel IDs
-        if result["type"] == "data" and id_valid:
-            parse_data_frame(result, buf, self.channel_registry)
+        if id_valid:
             result["valid"] = True
-        elif result["type"] == "event" and id_valid:
-            parse_event_frame(result, buf, self.channel_registry)
-            result["valid"] = True
-        elif not id_valid:
+            PARSERS.get(result["type"], PARSERS["invalid"])(
+                result, buf, self.channel_registry
+            )
+
+            # read crc and check it
+            result["crc"] = buf.read(Primitive.UINT32)
+            buf.size = buf.get_pos()
+            buf.size -= get_size(Primitive.UINT32)
+            result["valid"] = result["crc"] == buf.crc32()
+            if not result["valid"]:
+                LOG.error(
+                    "invalid crc on frame: %d != %d",
+                    result["crc"],
+                    buf.crc32(),
+                )
+        else:
             assert expected_id is not None
             LOG.error(
                 "id mismatch: %d != %d", result["app_id"], expected_id.get()
-            )
-            return result
-        else:
-            LOG.warning("can't decode frame type '%s'", result["type"])
-            return result
-
-        # read crc and check it
-        result["crc"] = buf.read(Primitive.UINT32)
-        buf.size = buf.get_pos()
-        buf.size -= get_size(Primitive.UINT32)
-        result["valid"] = result["crc"] == buf.crc32()
-        if not result["valid"]:
-            LOG.error(
-                "invalid crc on frame: %d != %d", result["crc"], buf.crc32()
             )
 
         return result
