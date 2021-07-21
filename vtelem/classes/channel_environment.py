@@ -156,7 +156,8 @@ class ChannelEnvironment(TimeEntity):
         if self.metrics is not None and name in self.metrics:
             chan = self.channel_registry.get_item(self.metrics[name])
             assert chan is not None
-            assert chan.add(data, time)
+            with self.lock:
+                assert chan.add(data, time)
 
     def set_channel_rate(self, chan_id: int, rate: float) -> None:
         """Set the update-rate of a channel."""
@@ -248,8 +249,7 @@ class ChannelEnvironment(TimeEntity):
     def get_next_frame(self) -> ChannelFrame:
         """Get the next available frame from the queue."""
 
-        frame = self.frame_queue.get()
-        return frame
+        return self.frame_queue.get()
 
     def decode_frame(
         self,
