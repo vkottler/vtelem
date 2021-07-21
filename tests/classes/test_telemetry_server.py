@@ -93,6 +93,7 @@ def test_telemetry_server_ws_telemetry():
 
             uri = "ws://localhost:{}".format(port)
             async with websockets.connect(uri, close_timeout=1) as websocket:
+                time.sleep(0.1)
                 for _ in range(10):
                     frame = await websocket.recv()
                     telem = server.daemons.get("telemetry")
@@ -129,6 +130,7 @@ def test_telemetry_server_ws_commands():
             nonlocal fails
             uri = "ws://localhost:{}".format(port)
             async with websockets.connect(uri, close_timeout=1) as websocket:
+                time.sleep(0.1)
 
                 # test invalid json
                 status, _ = await ws_command(

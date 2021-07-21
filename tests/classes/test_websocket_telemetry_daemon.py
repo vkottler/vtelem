@@ -44,15 +44,17 @@ def test_websocket_telemetry_daemon_server_close_first():
 
             uri = "ws://localhost:{}".format(port)
             async with websockets.connect(uri, close_timeout=1) as websocket:
+                time.sleep(0.1)
 
-                # transfer some frames
+                # prepare frames for transfer
                 for elem in [build_dummy_frame(64) for _ in range(num_frames)]:
                     frames.put(elem)
+
+                for _ in range(num_frames):
                     frame = await websocket.recv()
                     assert frame
 
                 # close the server end of the connection
-                time.sleep(0.1)
                 assert daemon.close_clients() == 1
                 try:
                     await websocket.recv()
