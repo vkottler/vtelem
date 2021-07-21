@@ -33,7 +33,7 @@ def test_websocket_telemetry_daemon_server_close_first():
     daemon = WebsocketTelemetryDaemon("test", writer, ("0.0.0.0", port))
 
     num_frames = 10
-    with daemon.booted(), writer.booted():
+    with writer.booted(), daemon.booted():
         time.sleep(0.1)
 
         async def read_test():
@@ -52,6 +52,7 @@ def test_websocket_telemetry_daemon_server_close_first():
                     assert frame
 
                 # close the server end of the connection
+                time.sleep(0.1)
                 assert daemon.close_clients() == 1
                 try:
                     await websocket.recv()
