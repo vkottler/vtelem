@@ -4,8 +4,8 @@ vtelem - An interface for managing websocket servers that serve telemetry data.
 
 # built-in
 import asyncio
-from queue import Queue
-from typing import Any, List, Tuple, Set
+from queue import Empty, Queue
+from typing import Any, List, Tuple, Set, Optional
 
 # third-party
 from websockets.exceptions import WebSocketException
@@ -15,6 +15,18 @@ from .channel_frame import ChannelFrame
 from .stream_writer import StreamWriter
 from .telemetry_environment import TelemetryEnvironment
 from .websocket_daemon import WebsocketDaemon
+
+
+def queue_get(queue: Queue, timeout: int = 2) -> Optional[Any]:
+    """
+    Wrap a de-queue operation into one that will return None if the timeout
+    is met.
+    """
+
+    try:
+        return queue.get(timeout=timeout)
+    except Empty:
+        return None
 
 
 class WebsocketTelemetryDaemon(WebsocketDaemon):
@@ -63,7 +75,7 @@ class WebsocketTelemetryDaemon(WebsocketDaemon):
             try:
                 while should_continue:
                     try:
-                        frame: ChannelFrame = frame_queue.get()
+                        frame: Optional[ChannelFrame] = queue_get(frame_queue)
                         if frame is None:
                             should_continue = False
                             break

@@ -13,7 +13,10 @@ import websockets
 # module under test
 from vtelem.classes.channel_framer import build_dummy_frame
 from vtelem.classes.stream_writer import StreamWriter
-from vtelem.classes.websocket_telemetry_daemon import WebsocketTelemetryDaemon
+from vtelem.classes.websocket_telemetry_daemon import (
+    WebsocketTelemetryDaemon,
+    queue_get,
+)
 from vtelem.mtu import get_free_tcp_port
 
 
@@ -24,6 +27,7 @@ def test_websocket_telemetry_daemon_server_close_first():
     """
 
     frames = Queue()
+    assert queue_get(frames, 0.1) is None
     writer = StreamWriter("frames", frames)
     port = get_free_tcp_port()
     daemon = WebsocketTelemetryDaemon("test", writer, ("0.0.0.0", port))
