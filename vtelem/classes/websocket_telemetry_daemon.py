@@ -32,6 +32,19 @@ def queue_get(queue: Queue, timeout: int = 2) -> Optional[Any]:
 class WebsocketTelemetryDaemon(WebsocketDaemon):
     """A class for creating telemetry-serving websocket servers."""
 
+    def add_client_queue(
+        self, addr: Tuple[str, int] = None
+    ) -> Tuple[int, Queue]:
+        """Register a new frame queue for a connected client."""
+
+        name = None
+        if addr is not None:
+            name = "{}:{}".format(addr[0], [1])
+        queue_id, frame_queue = self.writer.registered_queue(name)
+        with self.lock:
+            self.active_client_queues.append(queue_id)
+        return queue_id, frame_queue
+
     def close_clients(self) -> int:
         """
         Attempt to remove all active client-writing queues from the stream
@@ -65,7 +78,9 @@ class WebsocketTelemetryDaemon(WebsocketDaemon):
             """
 
             with self.lock:
-                queue_id, frame_queue = self.writer.registered_queue()
+                queue_id, frame_queue = self.add_client_queue(
+                    websocket.remote_address
+                )
                 self.active_client_queues.append(queue_id)
             should_continue = True
             complete: Set[asyncio.Future] = set()

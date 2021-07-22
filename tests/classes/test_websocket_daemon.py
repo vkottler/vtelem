@@ -27,7 +27,7 @@ def test_websocket_daemon_boot():
     # make sure the loop can be started again
     for _ in range(5):
         with daemon.booted():
-            time.sleep(0.01)
+            time.sleep(1)
 
 
 def test_websocket_daemon_basic():
