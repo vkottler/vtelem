@@ -21,14 +21,11 @@ def test_telemetry_server_basic():
     """Test that the telemetry server can boot."""
 
     server = TelemetryServer(0.01, 0.10, ("0.0.0.0", 0), 0.25)
-    assert server.start()
-    assert server.daemons.perform_str_all("start")
-    time.sleep(1.0)
-    server.scale_speed(2.0)
-    time.sleep(1.0)
-    assert server.daemons.perform_str_all("stop")
     assert server.daemons.get("stream").get_queue("test")
-    assert server.stop()
+    with server.booted():
+        time.sleep(1.0)
+        server.scale_speed(2.0)
+        time.sleep(1.0)
 
 
 def test_telemetry_server_get_types():
