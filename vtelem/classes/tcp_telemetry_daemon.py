@@ -8,6 +8,7 @@ from typing import Any, Tuple
 
 # internal
 from .daemon_base import DaemonBase
+from .stream_writer import StreamWriter, QueueClientManager
 from .telemetry_environment import TelemetryEnvironment
 
 
@@ -24,19 +25,22 @@ class TcpTelemetryHandler(socketserver.StreamRequestHandler):
         # how to not deplete the queue for other clients, tricky
 
 
-class TcpTelemetryDaemon(DaemonBase):
+class TcpTelemetryDaemon(QueueClientManager, DaemonBase):
     """A class for serving telemetry frames to tcp clients."""
 
     def __init__(
         self,
         name: str,
+        writer: StreamWriter,
         env: TelemetryEnvironment,
         address: Tuple[str, int] = ("0.0.0.0", 0),
         time_keeper: Any = None,
     ) -> None:
         """Construct a new tcp telemetry daemon."""
 
-        super().__init__(name, env, time_keeper)
+        QueueClientManager.__init__(self, name, writer)
+        DaemonBase.__init__(self, name, env, time_keeper)
+
         self.server = socketserver.ThreadingTCPServer(
             address, TcpTelemetryHandler
         )
