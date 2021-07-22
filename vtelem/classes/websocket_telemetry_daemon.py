@@ -5,14 +5,14 @@ vtelem - An interface for managing websocket servers that serve telemetry data.
 # built-in
 import asyncio
 from queue import Empty, Queue
-from typing import Any, List, Tuple, Set, Optional
+from typing import Any, Tuple, Set, Optional
 
 # third-party
 from websockets.exceptions import WebSocketException
 
 # internal
 from .channel_frame import ChannelFrame
-from .stream_writer import StreamWriter
+from .stream_writer import StreamWriter, QueueClientManager
 from .telemetry_environment import TelemetryEnvironment
 from .websocket_daemon import WebsocketDaemon
 
@@ -29,35 +29,8 @@ def queue_get(queue: Queue, timeout: int = 2) -> Optional[Any]:
         return None
 
 
-class WebsocketTelemetryDaemon(WebsocketDaemon):
+class WebsocketTelemetryDaemon(QueueClientManager, WebsocketDaemon):
     """A class for creating telemetry-serving websocket servers."""
-
-    def add_client_queue(
-        self, addr: Tuple[str, int] = None
-    ) -> Tuple[int, Queue]:
-        """Register a new frame queue for a connected client."""
-
-        name = None
-        if addr is not None:
-            name = "{}:{}".format(addr[0], [1])
-        queue_id, frame_queue = self.writer.registered_queue(name)
-        with self.lock:
-            self.active_client_queues.append(queue_id)
-        return queue_id, frame_queue
-
-    def close_clients(self) -> int:
-        """
-        Attempt to remove all active client-writing queues from the stream
-        writer. This should initiate our side of the connections to begin
-        closing.
-        """
-
-        closed = 0
-        with self.lock:
-            for queue_id in self.active_client_queues:
-                if self.writer.remove_queue(queue_id):
-                    closed += 1
-        return closed
 
     def __init__(
         self,
@@ -69,8 +42,7 @@ class WebsocketTelemetryDaemon(WebsocketDaemon):
     ) -> None:
         """Construct a new, telemetry-serving websocket server."""
 
-        self.writer = writer
-        self.active_client_queues: List[int] = []
+        QueueClientManager.__init__(self, name, writer)
 
         async def telem_handle(websocket, _) -> None:
             """
@@ -116,4 +88,6 @@ class WebsocketTelemetryDaemon(WebsocketDaemon):
                 for pend in pending:
                     pend.cancel()
 
-        super().__init__(name, None, address, env, time_keeper, telem_handle)
+        WebsocketDaemon.__init__(
+            self, name, None, address, env, time_keeper, telem_handle
+        )

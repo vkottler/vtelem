@@ -7,13 +7,14 @@ vtelem - Uses daemon machinery to build the task that can consume outgoing
 from io import BytesIO
 import logging
 from queue import Queue
-from typing import Any, Callable, Dict, Optional, Tuple
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
 # internal
 from .channel_frame import ChannelFrame
 from .telemetry_environment import TelemetryEnvironment
 from .metered_queue import create, MAX_SIZE
 from .queue_daemon import QueueDaemon
+from .time_entity import LockEntity
 
 LOG = logging.getLogger(__name__)
 
@@ -156,6 +157,47 @@ class StreamWriter(QueueDaemon):
         if result:
             self.decrement_metric("queue_count")
         return result
+
+
+class QueueClientManager(LockEntity):
+    """
+    A class for exposing common stream-writer queue registration operations.
+    """
+
+    def __init__(self, name: str, writer: StreamWriter) -> None:
+        """Construct a new queue-client manager."""
+
+        LockEntity.__init__(self)
+        self.name = name
+        self.writer = writer
+        self.active_client_queues: List[int] = []
+
+    def add_client_queue(
+        self, addr: Tuple[str, int] = None
+    ) -> Tuple[int, Queue]:
+        """Register a new frame queue for a connected client."""
+
+        name = None
+        if addr is not None:
+            name = "{}.{}:{}".format(self.name, addr[0], [1])
+        queue_id, frame_queue = self.writer.registered_queue(name)
+        with self.lock:
+            self.active_client_queues.append(queue_id)
+        return queue_id, frame_queue
+
+    def close_clients(self) -> int:
+        """
+        Attempt to remove all active client-writing queues from the stream
+        writer. This should initiate our side of the connections to begin
+        closing.
+        """
+
+        closed = 0
+        with self.lock:
+            for queue_id in self.active_client_queues:
+                if self.writer.remove_queue(queue_id):
+                    closed += 1
+        return closed
 
 
 def default_writer(
