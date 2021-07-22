@@ -23,9 +23,9 @@ def test_telemetry_server_basic():
     server = TelemetryServer(0.01, 0.10, ("0.0.0.0", 0), 0.25)
     assert server.daemons.get("stream").get_queue("test")
     with server.booted():
-        time.sleep(1.0)
+        time.sleep(2.0)
         server.scale_speed(2.0)
-        time.sleep(1.0)
+        time.sleep(2.0)
 
 
 def test_telemetry_server_get_types():
