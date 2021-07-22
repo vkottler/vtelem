@@ -47,10 +47,13 @@ class EventLoopDaemon(DaemonBase):
             self.eloop.call_soon_threadsafe(self.eloop.stop)
 
             # decrement the semaphore the required number of times
+            waited = 0
             for _ in range(waits):
                 sig = self.wait_poster
-                sig.acquire()  # pylint:disable=consider-using-with
+                if sig.acquire(True, 2):  # pylint:disable=consider-using-with
+                    waited += 1
 
+            assert waited == waits
             with self.lock:
                 self.wait_count -= waits
 
