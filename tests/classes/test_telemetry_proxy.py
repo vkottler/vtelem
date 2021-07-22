@@ -2,12 +2,9 @@
 vtelem - Test the telemetry proxy's correctness.
 """
 
-# built-in
-from queue import Queue
-
 # module under test
 from vtelem.classes.channel_framer import create_app_id, build_dummy_frame
-from vtelem.classes.stream_writer import StreamWriter
+from vtelem.classes.stream_writer import default_writer
 from vtelem.classes.telemetry_environment import TelemetryEnvironment
 from vtelem.classes.telemetry_proxy import TelemetryProxy
 from vtelem.classes.udp_client_manager import UdpClientManager
@@ -23,15 +20,19 @@ def setup_environment() -> dict:
     # set up an environment
     env = TelemetryEnvironment(DEFAULT_MTU, metrics_rate=1.0)
 
+    # set up a stream-writer
+    writer, frame_queue = default_writer("test_writer", env=env)
+
     # set up the proxy
     app_basis = 0.5
     proxy = TelemetryProxy(
-        ("localhost", 0), Queue(), create_app_id(app_basis), env, DEFAULT_MTU
+        ("localhost", 0),
+        writer.get_queue("proxy"),
+        create_app_id(app_basis),
+        env,
+        DEFAULT_MTU,
     )
 
-    # set up a stream-writer
-    frame_queue: Queue = Queue()
-    writer = StreamWriter("test_writer", frame_queue)
     manager = UdpClientManager(writer)
     client = manager.add_client(("localhost", proxy.socket.getsockname()[1]))
     proxy.update_mtu(client[1])

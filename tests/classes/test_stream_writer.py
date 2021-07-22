@@ -3,14 +3,13 @@ vtelem - Test the stream-writer class's correctness.
 """
 
 # built-in
-from queue import Queue
 import random
 import sys
 import tempfile
 from typing import Tuple
 
 # module under test
-from vtelem.classes.stream_writer import StreamWriter
+from vtelem.classes.stream_writer import default_writer
 
 
 class DummyFrame:
@@ -41,8 +40,7 @@ def random_garbage_factory() -> DummyFrame:
 def test_stream_writer_basic():
     """Test basic functionality of a stream writer."""
 
-    frame_queue = Queue()
-    writer = StreamWriter("test_writer", frame_queue)
+    writer, frame_queue = default_writer("test_writer")
     assert writer.start()
 
     # add streams
@@ -55,8 +53,8 @@ def test_stream_writer_basic():
     writer.add_stream(stream_c)
 
     # add a queue
-    queue_id = writer.add_queue(Queue())
-    writer.remove_queue(writer.add_queue(Queue()))
+    queue_id = writer.registered_queue()[0]
+    writer.remove_queue(writer.registered_queue()[0])
 
     # enqueue some frames
     for _ in range(100):

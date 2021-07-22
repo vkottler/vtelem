@@ -7,7 +7,6 @@ vtelem - A module that helps aggregate command-consuming entities and dispatch
 from collections import defaultdict
 import json
 import logging
-from queue import Queue
 from threading import Semaphore
 from typing import Any, Dict, List, Tuple, Optional
 
@@ -17,6 +16,7 @@ from vtelem.types.command_queue_daemon import (
     ResultCbType,
     HandlersType,
 )
+from .metered_queue import create
 from .queue_daemon import QueueDaemon
 from .telemetry_environment import TelemetryEnvironment
 
@@ -95,7 +95,9 @@ class CommandQueueDaemon(QueueDaemon):
                 )
             return None
 
-        super().__init__(name, Queue(), elem_handle, env, time_keeper)
+        super().__init__(
+            name, create(name + ".queue", env), elem_handle, env, time_keeper
+        )
         self.reset_metric("command_count")
         self.reset_metric("success_count")
         self.reset_metric("failure_count")

@@ -64,9 +64,8 @@ class WebsocketTelemetryDaemon(WebsocketDaemon):
             Write telemetry to this connection, for as long as it's connected.
             """
 
-            frame_queue: Any = Queue()
             with self.lock:
-                queue_id = self.writer.add_queue(frame_queue)
+                queue_id, frame_queue = self.writer.registered_queue()
                 self.active_client_queues.append(queue_id)
             should_continue = True
             complete: Set[asyncio.Future] = set()

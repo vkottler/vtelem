@@ -7,10 +7,12 @@ vtelem - Uses daemon machinery to build the task that can consume outgoing
 from io import BytesIO
 import logging
 from queue import Queue
-from typing import Callable, Dict, Optional
+from typing import Any, Callable, Dict, Optional, Tuple
 
 # internal
 from .channel_frame import ChannelFrame
+from .telemetry_environment import TelemetryEnvironment
+from .metered_queue import create, MAX_SIZE
 from .queue_daemon import QueueDaemon
 
 LOG = logging.getLogger(__name__)
@@ -27,6 +29,8 @@ class StreamWriter(QueueDaemon):
         name: str,
         frame_queue: Queue,
         error_handle: Callable[[int], None] = None,
+        env: TelemetryEnvironment = None,
+        time_keeper: Any = None,
     ) -> None:
         """Construct a new stream-writer daemon."""
 
@@ -81,14 +85,23 @@ class StreamWriter(QueueDaemon):
             with self.lock:
                 for queue in self.queues.values():
                     queue.put(frame)
+                    self.increment_metric("queue_writes")
 
-        super().__init__(name, frame_queue, frame_handle)
+        super().__init__(name, frame_queue, frame_handle, env, time_keeper)
 
         # register and reset additional metrics
         self.reset_metric("stream_writes")
         self.reset_metric("stream_count")
         self.reset_metric("queue_writes")
         self.reset_metric("queue_count")
+
+    def get_queue(self, name: str = None, maxsize: int = MAX_SIZE) -> Queue:
+        """Get a default queue."""
+
+        env: Any = None
+        if name is not None:
+            env = self.env
+        return create(name, env, maxsize)
 
     def add_queue(self, queue: Queue) -> int:
         """Add a queue and return its integer identifier."""
@@ -99,6 +112,16 @@ class StreamWriter(QueueDaemon):
             self.queue_id += 1
         self.increment_metric("queue_count")
         return result
+
+    def registered_queue(
+        self,
+        name: str = None,
+        maxsize: int = MAX_SIZE,
+    ) -> Tuple[int, Queue]:
+        """Construct a default queue, register it and return the result."""
+
+        queue = self.get_queue(name, maxsize)
+        return self.add_queue(queue), queue
 
     def add_stream(self, stream: BytesIO) -> int:
         """Add a stream and return its integer identifier."""
@@ -133,3 +156,16 @@ class StreamWriter(QueueDaemon):
         if result:
             self.decrement_metric("queue_count")
         return result
+
+
+def default_writer(
+    name: str = "writer",
+    error_handle: Callable[[int], None] = None,
+    env: TelemetryEnvironment = None,
+    time_keeper: Any = None,
+    maxsize: int = MAX_SIZE,
+) -> Tuple[StreamWriter, Queue]:
+    """Construct a queue and a stream writer, return both."""
+
+    queue = create(name + ".queue", env, maxsize)
+    return StreamWriter(name, queue, error_handle, env, time_keeper), queue

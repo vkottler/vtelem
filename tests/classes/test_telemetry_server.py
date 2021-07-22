@@ -27,6 +27,7 @@ def test_telemetry_server_basic():
     server.scale_speed(2.0)
     time.sleep(1.0)
     assert server.daemons.perform_str_all("stop")
+    assert server.daemons.get("stream").get_queue("test")
     assert server.stop()
 
 

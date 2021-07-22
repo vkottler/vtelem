@@ -76,7 +76,13 @@ class TelemetryServer(HttpDaemon):
         assert self.daemons.add_daemon(telem)
 
         # add the telemetry-stream writer
-        writer = StreamWriter("stream", telem.frame_queue)
+        writer = StreamWriter(
+            "stream",
+            telem.frame_queue,
+            None,
+            telem,
+            self.time_keeper,
+        )
         self.udp_clients = UdpClientManager(writer)
         assert self.daemons.add_daemon(writer)
 

@@ -2,21 +2,17 @@
 vtelem - Test the UDP-client manager module's correctness.
 """
 
-# built-in
-from queue import Queue
-
 # module under test
 from vtelem.classes.channel_framer import build_dummy_frame
 from vtelem.classes.udp_client_manager import UdpClientManager
-from vtelem.classes.stream_writer import StreamWriter
+from vtelem.classes.stream_writer import default_writer
 from vtelem.mtu import DEFAULT_MTU
 
 
 def test_udp_client_manager_basic():
     """Test that adding clients and sending data is functional."""
 
-    frame_queue = Queue()
-    writer = StreamWriter("test_writer", frame_queue)
+    writer, frame_queue = default_writer("test_writer")
     manager = UdpClientManager(writer)
 
     with writer.booted():

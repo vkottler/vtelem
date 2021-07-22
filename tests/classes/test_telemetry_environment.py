@@ -135,7 +135,9 @@ def test_telemetry_environment_basic():
     env.dispatch_now()
     env.dispatch_now()
 
+    print("waiting for frame")
     frame = env.get_next_frame()
+    print("got frame")
     assert frame.finalize() > 0
     assert not frame.add_event(
         0, Primitive.BOOLEAN, (False, float()), (False, float())

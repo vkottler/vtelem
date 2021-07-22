@@ -4,12 +4,13 @@ vtelem - A queue that stores change events that can be completely drained on
 """
 
 # built-in
-from queue import Queue
+from queue import Queue, Full
 import threading
 from typing import List, Tuple
 
 # internal
 from . import EventType
+from .metered_queue import create
 
 
 class EventQueue:
@@ -18,13 +19,17 @@ class EventQueue:
     def __init__(self) -> None:
         """Construct an empty queue."""
 
-        self.queue: Queue = Queue()
+        self.queue: Queue = create()
         self.lock = threading.Lock()
 
-    def enqueue(self, channel: str, prev: EventType, curr: EventType) -> None:
+    def enqueue(self, channel: str, prev: EventType, curr: EventType) -> bool:
         """Put an event into the queue."""
 
-        self.queue.put((channel, prev, curr))
+        try:
+            self.queue.put_nowait((channel, prev, curr))
+            return True
+        except Full:
+            return False
 
     def consume(self) -> List[Tuple[str, EventType, EventType]]:
         """Get all of the current events in the queue as a list."""

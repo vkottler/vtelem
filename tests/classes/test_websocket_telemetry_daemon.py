@@ -4,7 +4,6 @@ vtelem - Test the websocket telemetry daemon's correctness.
 
 # built-in
 import asyncio
-from queue import Queue
 import time
 
 # third-party
@@ -12,7 +11,7 @@ import websockets
 
 # module under test
 from vtelem.classes.channel_framer import build_dummy_frame
-from vtelem.classes.stream_writer import StreamWriter
+from vtelem.classes.stream_writer import default_writer
 from vtelem.classes.websocket_telemetry_daemon import (
     WebsocketTelemetryDaemon,
     queue_get,
@@ -26,9 +25,8 @@ def test_websocket_telemetry_daemon_server_close_first():
     shutdown gracefully.
     """
 
-    frames = Queue()
+    writer, frames = default_writer("frames")
     assert queue_get(frames, 0.1) is None
-    writer = StreamWriter("frames", frames)
     port = get_free_tcp_port()
     daemon = WebsocketTelemetryDaemon("test", writer, ("0.0.0.0", port))
 

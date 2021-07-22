@@ -3,10 +3,10 @@ vtelem - Test the queue-daemon class's correctness.
 """
 
 # built-in
-from queue import Queue
 from typing import Any
 
 # module under test
+from vtelem.classes.metered_queue import create
 from vtelem.classes.queue_daemon import QueueDaemon
 
 
@@ -21,7 +21,7 @@ def test_queue_daemon_basic():
         nonlocal count
         count += queue_elem
 
-    test_queue = Queue()
+    test_queue = create()
     daemon = QueueDaemon("queue_test", test_queue, handle_elem)
     assert daemon.start()
     test_queue.put(1)

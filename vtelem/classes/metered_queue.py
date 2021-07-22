@@ -9,6 +9,8 @@ from typing import Any
 # internal
 from vtelem.enums.primitive import Primitive
 
+MAX_SIZE = 256
+
 
 class MeteredQueue(Queue):
     """
@@ -16,7 +18,7 @@ class MeteredQueue(Queue):
     telemetry-capable environment.
     """
 
-    def __init__(self, name: str, env: Any, maxsize: int = 0) -> None:
+    def __init__(self, name: str, env: Any, maxsize: int = MAX_SIZE) -> None:
         """Construct a new queue that publishes metrics to an environment."""
 
         super().__init__(maxsize)
@@ -53,7 +55,18 @@ class MeteredQueue(Queue):
     ) -> None:
         """Enqueue an element."""
 
-        super().put(item, block, timeout)
         time = self.env.get_time()
         self.env.metric_add("{}.elements".format(self.name), 1, time)
         self.env.metric_add("{}.total_enqueued".format(self.name), 1, time)
+        super().put(item, block, timeout)
+
+
+def create(
+    name: str = None, env: Any = None, maxsize: int = MAX_SIZE
+) -> Queue:
+    """Create a metered queue or regular queue depending on the arguments."""
+
+    if env is None:
+        return Queue(maxsize=maxsize)
+    assert name is not None
+    return MeteredQueue(name, env, maxsize)
