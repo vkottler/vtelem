@@ -38,6 +38,7 @@ class StreamWriter(QueueDaemon):
         self.curr_id: int = 0
         self.queue_id: int = 0
         self.streams: Dict[int, BytesIO] = {}
+        self.stream_closers: Dict[int, Optional[Callable]] = {}
         self.queues: Dict[int, Queue] = {}
         self.error_handle = error_handle
 
@@ -124,23 +125,31 @@ class StreamWriter(QueueDaemon):
         queue = self.get_queue(name, maxsize)
         return self.add_queue(queue), queue
 
-    def add_stream(self, stream: BytesIO) -> int:
+    def add_stream(
+        self, stream: BytesIO, stream_closer: Callable = None
+    ) -> int:
         """Add a stream and return its integer identifier."""
 
         with self.lock:
             result = self.curr_id
             self.streams[result] = stream
+            self.stream_closers[result] = stream_closer
             self.curr_id += 1
         self.increment_metric("stream_count")
         return result
 
-    def remove_stream(self, stream_id: int) -> bool:
+    def remove_stream(self, stream_id: int, call_closer: bool = True) -> bool:
         """Remove a stream, if one is present with this identifier."""
 
+        closer = None
         with self.lock:
             result = stream_id in self.streams
             if result:
                 del self.streams[stream_id]
+                closer = self.stream_closers[stream_id]
+                del self.stream_closers[stream_id]
+        if closer is not None and call_closer:
+            closer()
         if result:
             self.decrement_metric("stream_count")
         return result

@@ -49,11 +49,9 @@ class WebsocketTelemetryDaemon(QueueClientManager, WebsocketDaemon):
             Write telemetry to this connection, for as long as it's connected.
             """
 
-            with self.lock:
-                queue_id, frame_queue = self.add_client_queue(
-                    websocket.remote_address
-                )
-                self.active_client_queues.append(queue_id)
+            queue_id, frame_queue = self.add_client_queue(
+                websocket.remote_address
+            )
             should_continue = True
             complete: Set[asyncio.Future] = set()
             pending: Set[asyncio.Future] = set()
