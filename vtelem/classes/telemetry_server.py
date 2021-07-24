@@ -68,6 +68,7 @@ class TelemetryServer(HttpDaemon):
             self.time_keeper,
             metrics_rate,
             app_id_basis=app_id_basis,
+            use_crc=False,
         )
         telem.handle_new_mtu(DEFAULT_MTU)
         self.channel_groups = ChannelGroupRegistry(telem)

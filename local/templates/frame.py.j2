@@ -9,7 +9,7 @@ from typing import Callable, Dict
 from vtelem.classes.byte_buffer import ByteBuffer
 from vtelem.classes.channel_registry import ChannelRegistry
 from vtelem.classes.user_enum import UserEnum
-from vtelem.parsing import (
+from vtelem.parsing.frames import (
 {% for item in frames["entries"] %}
     parse_{{item["name"]}}_frame,
 {% endfor %}

@@ -61,6 +61,7 @@ class ChannelFramer:
         channels: List[Channel],
         channel_lock: RLock,
         app_id_basis: float = None,
+        use_crc: bool = True,
     ) -> None:
         """Construct a new channel framer."""
 
@@ -78,6 +79,7 @@ class ChannelFramer:
             self.timestamps[name] = new_default("timestamp")
             self.primitives[name] = self.frame_types.get_primitive(name)
         self.primitives["app_id"] = create_app_id(app_id_basis)
+        self.use_crc = use_crc
         LOG.info(
             "using application identifier '%d'",
             self.primitives["app_id"].get(),
@@ -101,6 +103,7 @@ class ChannelFramer:
             self.primitives["app_id"],
             self.primitives[frame_type],
             timestamp,
+            self.use_crc,
         )
 
     def new_event_frame(
@@ -148,7 +151,7 @@ class ChannelFramer:
             if not curr_frame.add_event(
                 chan_id, chan_type, event[1], event[2]
             ):
-                curr_frame.finalize(write_crc)
+                curr_frame.finalize(write_crc and self.use_crc)
                 queue.put(curr_frame)
                 frame_count += 1
                 curr_frame = self.new_event_frame(time, False)
@@ -158,7 +161,7 @@ class ChannelFramer:
 
         # finalize the last frame if necessary
         if event_count and not curr_frame.finalized:
-            curr_frame.finalize(write_crc)
+            curr_frame.finalize(write_crc and self.use_crc)
             queue.put(curr_frame)
             frame_count += 1
 
@@ -191,7 +194,7 @@ class ChannelFramer:
                     # if we failed to add this emit to the current frame,
                     # finalize it and start a new one
                     if not curr_frame.add(chan_id, channel.type, result):
-                        curr_frame.finalize(write_crc)
+                        curr_frame.finalize(write_crc and self.use_crc)
                         queue.put(curr_frame)
                         frame_count += 1
                         curr_frame = self.new_data_frame(time, False)
@@ -199,7 +202,7 @@ class ChannelFramer:
 
         # finalize the last frame if necessary
         if emit_count and not curr_frame.finalized:
-            curr_frame.finalize(write_crc)
+            curr_frame.finalize(write_crc and self.use_crc)
             queue.put(curr_frame)
             frame_count += 1
 

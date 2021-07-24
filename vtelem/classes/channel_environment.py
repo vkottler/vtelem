@@ -8,14 +8,13 @@ import logging
 from typing import Any, List, Tuple, Dict, Optional
 
 # internal
-from vtelem.enums.primitive import Primitive, get_size
-from vtelem.enums.frame import PARSERS
-from . import DEFAULTS, LOG_PERIOD
-from .byte_buffer import ByteBuffer
+from vtelem.enums.primitive import Primitive
+from vtelem.parsing.encapsulation import decode_frame
+from . import LOG_PERIOD
 from .channel import Channel
 from .channel_registry import ChannelRegistry
 from .channel_frame import ChannelFrame
-from .channel_framer import ChannelFramer, FRAME_TYPES
+from .channel_framer import ChannelFramer
 from .event_queue import EventQueue
 from .metered_queue import MeteredQueue
 from .time_entity import TimeEntity
@@ -38,6 +37,7 @@ class ChannelEnvironment(TimeEntity):
         metrics_rate: float = None,
         init_time: float = None,
         app_id_basis: float = None,
+        use_crc: bool = True,
     ) -> None:
         """Construct a new channel environment."""
 
@@ -53,6 +53,7 @@ class ChannelEnvironment(TimeEntity):
             initial_channels,
             self.lock,
             app_id_basis,
+            use_crc,
         )
         self.write_crc = True
 
@@ -258,44 +259,7 @@ class ChannelEnvironment(TimeEntity):
     ) -> dict:
         """Unpack a frame from an array of bytes."""
 
-        result: dict = {}
-        buf = ByteBuffer(data, False, size)
-
-        # read header
-        result["valid"] = False
-        result["app_id"] = buf.read(DEFAULTS["id"])
-        id_valid = True
-        if expected_id is not None:
-            id_valid = result["app_id"] == expected_id.get()
-        result["type"] = FRAME_TYPES.get_str(buf.read(DEFAULTS["enum"]))
-        result["timestamp"] = buf.read(DEFAULTS["timestamp"])
-        result["size"] = buf.read(DEFAULTS["count"])
-
-        # read channel IDs
-        if id_valid:
-            result["valid"] = True
-            PARSERS.get(result["type"], PARSERS["invalid"])(
-                result, buf, self.channel_registry
-            )
-
-            # read crc and check it
-            result["crc"] = buf.read(Primitive.UINT32)
-            buf.size = buf.get_pos()
-            buf.size -= get_size(Primitive.UINT32)
-            result["valid"] = result["crc"] == buf.crc32()
-            if not result["valid"]:
-                LOG.error(
-                    "invalid crc on frame: %d != %d",
-                    result["crc"],
-                    buf.crc32(),
-                )
-        else:
-            assert expected_id is not None
-            LOG.error(
-                "id mismatch: %d != %d", result["app_id"], expected_id.get()
-            )
-
-        return result
+        return decode_frame(self.channel_registry, data, size, expected_id)
 
     def dispatch_events(self, time: float) -> Tuple[int, int]:
         """Process all queued events (build frames)."""

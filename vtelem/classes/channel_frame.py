@@ -30,6 +30,7 @@ class ChannelFrame:
         frame_id: TypePrimitive,
         frame_type: TypePrimitive,
         timestamp: TypePrimitive,
+        use_crc: bool = True,
     ) -> None:
         """Construct an empty channel frame."""
 
@@ -53,8 +54,10 @@ class ChannelFrame:
         self.used += self.count["primitive"].write(self.buffer)
 
         # reserve space for crc
-        self.crc = new_default("crc")
-        self.used += self.crc.size()
+        self.crc = None
+        if use_crc:
+            self.crc = new_default("crc")
+            self.used += self.crc.size()
 
         assert self.used < self.mtu
 
@@ -75,11 +78,12 @@ class ChannelFrame:
         self.buffer.append(self.elem_buffer.data, self.elem_buffer.size)
 
         # compute and write the crc
-        if write_crc:
-            self.crc.set(self.buffer.crc32())
-        else:
-            self.crc.set(random_integer(self.crc.type))
-        self.crc.write(self.buffer)
+        if self.crc is not None:
+            if write_crc:
+                self.crc.set(self.buffer.crc32())
+            else:
+                self.crc.set(random_integer(self.crc.type))
+            self.crc.write(self.buffer)
 
         self.finalized = True
         assert self.buffer.size == self.used

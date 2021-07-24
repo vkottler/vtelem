@@ -1,14 +1,14 @@
 """
-vtelem - Parsing frames into runtime data.
+vtelem - Parsing specific frame payloads.
 """
 
 # built-in
 import logging
 
 # internal
-from .classes.byte_buffer import ByteBuffer
-from .classes.channel_registry import ChannelRegistry
-from .classes import DEFAULTS
+from vtelem.classes import DEFAULTS
+from vtelem.classes.byte_buffer import ByteBuffer
+from vtelem.classes.channel_registry import ChannelRegistry
 
 LOG = logging.getLogger(__name__)
 

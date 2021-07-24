@@ -3,6 +3,7 @@ vtelem - An interface for managing telemetry-serving tcp servers.
 """
 
 # built-in
+from io import BytesIO
 import logging
 import socketserver
 from threading import Semaphore
@@ -29,20 +30,22 @@ class TcpTelemetryHandler(socketserver.StreamRequestHandler):
             "%s:%d connected", self.client_address[0], self.client_address[1]
         )
 
-        sem = Semaphore(0)
-
-        def closer() -> None:
-            """Increment the semaphore, signaling connection close."""
-            sem.release()
-
         daemon: TcpTelemetryDaemon = self.server.daemon  # type: ignore
-        writer: StreamWriter = daemon.writer
-        self.wfile.name = "tcp://{}:{}".format(  # type: ignore
+        daemon.increment_metric("clients")
+
+        # make sure our stream has a name attribute
+        stream: BytesIO = self.wfile  # type: ignore
+        stream.name = "{}:{}".format(
             self.client_address[0], self.client_address[1]
         )
+
+        # add the socket to the stream writer
+        writer: StreamWriter = daemon.writer
         with daemon.lock:
-            stream_id = writer.add_stream(self.wfile, closer)  # type: ignore
+            stream_id, sem = writer.add_semaphore_stream(stream)
             daemon.client_sems[stream_id] = sem
+
+        # wait for something to signal us to close the connection
         try:
             sem.acquire()  # pylint:disable=consider-using-with
         finally:
@@ -52,6 +55,7 @@ class TcpTelemetryHandler(socketserver.StreamRequestHandler):
                 self.client_address[0],
                 self.client_address[1],
             )
+            daemon.decrement_metric("clients")
 
 
 class TcpTelemetryDaemon(QueueClientManager, DaemonBase):
@@ -74,6 +78,7 @@ class TcpTelemetryDaemon(QueueClientManager, DaemonBase):
             address, TcpTelemetryHandler
         )
         self.client_sems: Dict[int, Semaphore] = {}
+        self.reset_metric("clients")
 
         def stopper() -> None:
             """Stop running this server and close active client connections."""

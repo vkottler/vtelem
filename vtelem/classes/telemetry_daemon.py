@@ -26,6 +26,7 @@ class TelemetryDaemon(TelemetryEnvironment, Daemon):
         initial_channels: List[Channel] = None,
         initial_enums: List[UserEnum] = None,
         app_id_basis: float = None,
+        use_crc: bool = True,
     ) -> None:
         """Construct a new telemetry daemon."""
 
@@ -37,6 +38,7 @@ class TelemetryDaemon(TelemetryEnvironment, Daemon):
             initial_channels,
             initial_enums,
             app_id_basis,
+            use_crc,
         )
         Daemon.__init__(
             self, name, self.dispatch_now, rate, None, None, self, time_keeper

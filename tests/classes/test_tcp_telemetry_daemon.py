@@ -25,6 +25,23 @@ def test_tcp_telemetry_daemon_boot():
             assert daemon.address[1] is not None
 
 
+def test_tcp_telemetry_many_clients():
+    """Connect many clients, send each a few frames."""
+
+    writer, frame_queue = default_writer("frames")
+    env = TelemetryEnvironment(64, metrics_rate=1.0)
+    daemon = TcpTelemetryDaemon("test", writer, env)
+    for _ in range(3):
+        with daemon.booted():
+            sockets = []
+            for _ in range(25):
+                sockets.append(socket.create_connection(daemon.address))
+            for _ in range(5):
+                frame_queue.put(build_dummy_frame(1024))
+            for sock in sockets:
+                sock.close()
+
+
 def test_tcp_telemetry_simple_client():
     """Transfer data from server to client."""
 

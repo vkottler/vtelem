@@ -47,7 +47,8 @@ class UdpClientManager(LockEntity):
                 sock_file.close()
             except ConnectionRefusedError:
                 pass
-            sock.close()
+            finally:
+                sock.close()
 
         self.closer = closer
         self.writer.error_handle = self.closer

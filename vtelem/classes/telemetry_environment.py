@@ -31,11 +31,17 @@ class TelemetryEnvironment(ChannelEnvironment):
         initial_channels: List[Channel] = None,
         initial_enums: List[UserEnum] = None,
         app_id_basis: float = None,
+        use_crc: bool = True,
     ) -> None:
         """Construct a new telemetry environment."""
 
         super().__init__(
-            mtu, initial_channels, metrics_rate, init_time, app_id_basis
+            mtu,
+            initial_channels,
+            metrics_rate,
+            init_time,
+            app_id_basis,
+            use_crc,
         )
         self.enum_registry = EnumRegistry(initial_enums)
         self.type_registry = get_default()

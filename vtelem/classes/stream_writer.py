@@ -7,6 +7,7 @@ vtelem - Uses daemon machinery to build the task that can consume outgoing
 from io import BytesIO
 import logging
 from queue import Queue
+from threading import Semaphore
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
 # internal
@@ -85,9 +86,10 @@ class StreamWriter(QueueDaemon):
 
             # add to queues
             with self.lock:
-                for queue in self.queues.values():
-                    queue.put(frame)
-                    self.increment_metric("queue_writes")
+                queues = list(self.queues.values())
+            for queue in queues:
+                queue.put(frame)
+            self.increment_metric("queue_writes", len(queues))
 
         super().__init__(name, frame_queue, frame_handle, env, time_keeper)
 
@@ -137,6 +139,14 @@ class StreamWriter(QueueDaemon):
             self.curr_id += 1
         self.increment_metric("stream_count")
         return result
+
+    def add_semaphore_stream(self, stream: BytesIO) -> Tuple[int, Semaphore]:
+        """
+        Add a stream that waits for a semaphore to increment when closing.
+        """
+
+        sem = Semaphore(0)
+        return self.add_stream(stream, sem.release), sem
 
     def remove_stream(self, stream_id: int, call_closer: bool = True) -> bool:
         """Remove a stream, if one is present with this identifier."""

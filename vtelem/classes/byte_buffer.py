@@ -90,12 +90,23 @@ class ByteBuffer:
 
         return self.order + get_fstring(inst)
 
+    @property
+    def remaining(self) -> int:
+        """Determine the amout of space (or data) remaining in the buffer."""
+
+        return self.size - self.get_pos()
+
+    def can_read(self, inst: Primitive) -> bool:
+        """Determine if a specific primitive type can be read."""
+
+        return self.remaining >= get_size(inst)
+
     def read(self, inst: Primitive) -> Any:
         """Read a primitive out of a buffer, at its current position."""
 
         with self.lock:
+            assert self.can_read(inst)
             elem_size = get_size(inst)
-            assert self.get_pos() + elem_size <= self.size
             end_pos = self.get_pos() + elem_size
             buffer_slice = self.data[self.get_pos() : end_pos]
             result = struct.unpack(self.fstring(inst), buffer_slice)[0]

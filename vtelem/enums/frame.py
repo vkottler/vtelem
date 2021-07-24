@@ -1,7 +1,7 @@
 # =====================================
 # generator=datazen
-# version=1.7.9
-# hash=b31b1d5b38fcfacd0b9e99f2a016918a
+# version=1.7.8
+# hash=c8e99a6b165935e40c73fc1987149af2
 # =====================================
 """
 vtelem - A definition of the supported frame types for this library.
@@ -14,7 +14,7 @@ from typing import Callable, Dict
 from vtelem.classes.byte_buffer import ByteBuffer
 from vtelem.classes.channel_registry import ChannelRegistry
 from vtelem.classes.user_enum import UserEnum
-from vtelem.parsing import (
+from vtelem.parsing.frames import (
     parse_invalid_frame,
     parse_data_frame,
     parse_event_frame,
