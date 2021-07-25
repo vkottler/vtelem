@@ -1,8 +1,8 @@
 <!--
     =====================================
     generator=datazen
-    version=1.7.8
-    hash=76cfa1fafd29800452d47e5f0855db21
+    version=1.7.9
+    hash=81183b327d476d2ee6ceae79b5679f8b
     =====================================
 -->
 
@@ -10,7 +10,8 @@
 
 ([back](../README.md#documentation))
 
-*See [Primitive Types](primitive.md) for default-type mappings.*
+*See [Primitive Types](primitive.md#defaults) for `default` type
+mappings.*
 
 This document describes frames: the discrete unit of information transfer for
 this project. General frame structure as well as frame-specific schemas are
@@ -41,7 +42,14 @@ Field | Type | Description
 `timestamp` | `defaults.timestamp` | An integer timestamp for the frame. Neither an exact epoch or unit is strictly defined.
 `size` | `defaults.count` | A size parameter to be interpreted based on the frame type.
 
-See [`defaults`](primitive.md#defaults) for exact primitive types.
+## Frame Footer
+
+The footer is **not required** and its presence should be checked once the
+rest of a frame's contents have been parsed.
+
+Field | Type | Description
+------|------|------------
+`crc` | `defaults.crc` | An optional checksum for the frame. In [Python](https://www.python.org/) this is done with [`zlib.crc32`](https://docs.python.org/3/library/zlib.html#zlib.crc32) on the entire frame's contents minus the checksum field itself.
 
 ## Frame Types
 

@@ -3,7 +3,8 @@
 
 ([back](../README.md#documentation))
 
-*See [{{docs["primitive"]}}](primitive.md) for default-type mappings.*
+*See [{{docs["primitive"]}}](primitive.md#defaults) for `default` type
+mappings.*
 
 This document describes frames: the discrete unit of information transfer for
 this project. General frame structure as well as frame-specific schemas are
@@ -33,7 +34,16 @@ Field | Type | Description
 `{{item["field"]}}` | `defaults.{{item["type"]}}` | {{item["description"]}}
 {% endfor %}
 
-See [`defaults`](primitive.md#defaults) for exact primitive types.
+## Frame Footer
+
+The footer is **not required** and its presence should be checked once the
+rest of a frame's contents have been parsed.
+
+Field | Type | Description
+------|------|------------
+{% for item in footer["entries"] %}
+`{{item["field"]}}` | `defaults.{{item["type"]}}` | {{item["description"]}}
+{% endfor %}
 
 ## Frame Types
 

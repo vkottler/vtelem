@@ -1,0 +1,8 @@
+entries:
+- field: "crc"
+  type: "crc"
+  description: >-
+    An optional checksum for the frame. In [Python](https://www.python.org/)
+    this is done with
+    [`zlib.crc32`](https://docs.python.org/3/library/zlib.html#zlib.crc32) on
+    the entire frame's contents minus the checksum field itself.
