@@ -1,10 +1,5 @@
 renders:
-- name: "primitive.md"
-  output_dir: "docs"
-  dependencies:
-  - "compiles-enums"
-  - "compiles-local"
-- name: "message.md"
+- name: "{doc}.md"
   output_dir: "docs"
   dependencies:
   - "compiles-enums"
@@ -15,3 +10,5 @@ groups:
   dependencies:
   - "renders-primitive.md"
   - "renders-message.md"
+  - "renders-message_type.md"
+  - "renders-channel_identifier.md"

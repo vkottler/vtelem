@@ -1,0 +1,31 @@
+{% macro sentence_case(text) %}{{text[0]|upper}}{{text[1:]}}{% endmacro %}
+# {{docs["message_type"]}}
+
+([back](../README.md#documentation))
+
+*See [{{docs["message"]}}](message.md#message) for the message frame's
+definition.*
+
+This document describes protocol-defined message types so that certain
+messages can be used to bootstrap practical decoding of other frames.
+
+## Message Types
+
+Extending this list of protocol-defined message types may become warranted as
+canon use of the protocol identifies a gap where introduction of a new message
+type could simplify implementations.
+
+Appication-specific messaging proxied through this protocol can use the
+[`agnostic`](#agnostic) message type.
+
+Name | Value | Description
+-----|-------|------------
+{% for item in message_types["entries"] %}
+[`{{item["name"]}}`](#{{item["name"]}}) | {{item["value"]}} | {{item["summary"]}}
+{% endfor %}
+{% for item in message_types["entries"] %}
+
+### {{sentence_case(item["name"])}}
+
+{{item["description"]}}
+{% endfor %}

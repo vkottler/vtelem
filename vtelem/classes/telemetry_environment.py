@@ -9,6 +9,7 @@ from typing import List, Dict, Type, Tuple, Optional
 
 # internal
 from vtelem.enums.primitive import Primitive
+from vtelem.enums.frame import MESSAGE_TYPES
 from . import DEFAULTS
 from .channel import Channel
 from .channel_environment import ChannelEnvironment
@@ -48,6 +49,7 @@ class TelemetryEnvironment(ChannelEnvironment):
         self.registries["enum"] = self.enum_registry
         self.registries["type"] = self.type_registry
         assert self.enum_registry.add_enum(self.framer.get_types())[0]
+        assert self.enum_registry.add_enum(MESSAGE_TYPES)[0]
         self.enum_registry.export(self.type_registry)
         self.enum_channel_types: Dict[int, int] = defaultdict(lambda: -1)
         if self.metrics is not None:

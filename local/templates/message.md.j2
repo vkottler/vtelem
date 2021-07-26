@@ -16,7 +16,7 @@ covered.
 
 ## Frame Header
 
-These header fields appear in every message, regardless of the frame type.
+These header fields appear in every frame, regardless of the type.
 Given this header schema and the frame-specific interpretation of `size` it
 becomes possible to determine a frame's boundary.
 
@@ -44,6 +44,14 @@ Field | Type | Description
 {% for item in footer["entries"] %}
 `{{item["field"]}}` | `defaults.{{item["type"]}}` | {{item["description"]}}
 {% endfor %}
+
+## Frame Structure
+
+Frames contain a number of possible payloads based on the `type` field.
+A `header` and optional `footer` encapsulate this payload.
+
+[`header`](#frame-header) | frame contents | [`[footer]`](#frame-footer)
+--------------------------|----------------|----------------------------
 
 ## Frame Types
 

@@ -75,7 +75,7 @@ class ChannelFramer:
         # build primitives to hold the frame types and timestamps
         self.timestamps: Dict[str, TypePrimitive] = {}
         self.primitives: Dict[str, TypePrimitive] = {}
-        for name in FRAME_TYPES.enum.values():
+        for name in self.frame_types.enum.values():
             self.timestamps[name] = new_default("timestamp")
             self.primitives[name] = self.frame_types.get_primitive(name)
         self.primitives["app_id"] = create_app_id(app_id_basis)

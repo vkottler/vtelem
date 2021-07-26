@@ -1,2 +1,4 @@
 primitive: "Primitive Types"
-message: "Message Types"
+message: "Frame Types"
+message_type: "Message Types"
+channel_identifier: "Channel Identifiers"

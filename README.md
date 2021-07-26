@@ -2,7 +2,7 @@
     =====================================
     generator=datazen
     version=1.7.9
-    hash=6ad0ec99a4a6e3ad83c3e3bfe69b4390
+    hash=6f0ea066d7faa693a9724b0261bc688c
     =====================================
 -->
 
@@ -61,4 +61,6 @@ Project documentation can be found in
 directory.
 
 * [Primitive Types](docs/primitive.md)
-* [Message Types](docs/message.md)
+* [Frame Types](docs/message.md)
+* [Message Types](docs/message_type.md)
+* [Channel Identifiers](docs/channel_identifier.md)

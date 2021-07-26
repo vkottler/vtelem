@@ -28,3 +28,10 @@ FRAME_TYPE_MAP: Dict[int, str] = {
 {% endfor %}
 }
 FRAME_TYPES = UserEnum("frame_type", FRAME_TYPE_MAP)
+
+MESSAGE_TYPE_MAP: Dict[int, str] = {
+{% for item in message_types["entries"] %}
+    {{item["value"]}}: "{{item["name"]}}",
+{% endfor %}
+}
+MESSAGE_TYPES = UserEnum("message_type", MESSAGE_TYPE_MAP)

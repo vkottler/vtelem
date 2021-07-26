@@ -21,16 +21,16 @@ entries:
   description: |
     A data frame stores `size` channel-data elements where the frame body
     consists of two `size` length arrays:
-    1. The first array contains `defaults.id` elements that hold the channel
-    identifiers (TODO: reference for this).
+    1. The first array contains `defaults.id` elements that hold the
+    [channel identifiers](channel_identifier.md).
     1. The second array contains channel data in the order that the indices
     appeared where each element's size in bytes must be understood in advance
     by mapping the channel index to a specific [primitive](primitive.md) type.
 
-    #### Structure
+    #### Frame Contents Structure
 
-    [`header`](#frame-header) | `channel_id[0]` | . . . | `channel_id[size - 1]` | `channel_data[0]` | . . . | `channel_data[size - 1]`
-    --------------------------|-----------------|-------|------------------------|-------------------|-------|-------------------------
+    `channel_id[0]` | . . . | `channel_id[size - 1]` | `channel_data[0]` | . . . | `channel_data[size - 1]`
+    ----------------|-------|------------------------|-------------------|-------|-------------------------
 - name: "event"
   value: 2
   summary: >-
@@ -41,8 +41,8 @@ entries:
   description: |
     An event frame stores `size` channel-event elements where the frame body
     also (like the [data](#data) frame) consists of two `size` length arrays:
-    1. The first array contains `defaults.id` elements that hold the channel
-    identifiers (TODO: reference for this).
+    1. The first array contains `defaults.id` elements that hold the
+    [channel identifiers](channel_identifier.md).
     1. The second array contains event data in the order that the indices
     appeared where an event structure is as follows:
 
@@ -57,7 +57,58 @@ entries:
         last assigned a value, even if it was the same value. *This is true
         for all channels whether they emit events or not.*
 
-    #### Structure
+    #### Frame Contents Structure
 
-    [`header`](#frame-header) | `channel_id[0]` | . . . | `channel_id[size - 1]` | `channel_event[0]` | . . . | `channel_event[size - 1]`
-    --------------------------|-----------------|-------|------------------------|--------------------|-------|--------------------------
+    `channel_id[0]` | . . . | `channel_id[size - 1]` | `channel_event[0]` | . . . | `channel_event[size - 1]`
+    ----------------|-------|------------------------|--------------------|-------|--------------------------
+- name: "message"
+  value: 3
+  summary: >-
+    A frame containing bytes for one portion of a variable-length message.
+  description: |
+    A message frame is used to transfer runtime information that can help
+    telemetry emitters and clients correctly interpret any frame. In order for
+    frames to contain minimal data but remain coherent, some configuration
+    messages must be transferred asynchronously such as ones that describe
+    channels based on [channel identifiers](channel_identifier.md), enumeration
+    and types mapping, et cetera.
+
+    In order for a generic message transportation mechanism to be useful in
+    practice, the protocol defines a [message type](message_type.md) mapping
+    that supports both protocol-agnostic and protocol-specific messages. Fields
+    found within the message frame are described below:
+
+    Field | Type | Description
+    ------|------|------------
+    `message_type` | `defaults.enum` | An enumeration associated with this message so it can be interpreted based on protocol-defined [message types](message_type.md).
+    `message_number` | `defaults.id` | The instance of this message type being sent. This should increment only if the full message payload differs from that of the current message payload, otherwise a message can be sent again with the same number. **This instance number is specific to the message type and is not global for all message types.**
+    `fragment_index` | `defaults.id` | The current fragment of the message contained in this frame.
+    `total_fragments` | `defaults.id` | The total number of fragments required to assemble the full message payload.
+    `fragment_byte[n]` | `uint8` | A byte belonging to the message fragment. In total there are `size` bytes in the fragment.
+
+    #### Frame Contents Structure
+
+    `message_type` | `message_number` | `fragment_index` | `total_fragments` | `fragment_byte[0]` | . . . | `fragment_byte[size - 1]`
+    ---------------|------------------|------------------|-------------------|--------------------|-------|--------------------------
+- name: "stream"
+  value: 4
+  summary: >-
+    A frame containing bytes from a stream channel starting at a provided
+    index.
+  description: |
+    A stream frame contains data for a stream-oriented channel. Regardless of
+    the current state of the channel as understood by the emitter or any
+    current clients, the frame should contain `size` elements of its primitive
+    type and also carry the element index that the stream frame should start
+    at. Fields found within the frame are described below:
+
+    Field | Type | Description
+    ------|------|------------
+    `channel_id` | `defaults.id` | The [channel identifier](channel_identifier.md) used to determine channel attributes (like its primitive type).
+    `stream_index` | `defaults.count` | Location in the stream where these `size` elements start.
+    `channel_data[n]` | Channel's Primitive Type | An element in the stream at position `n`.
+
+    #### Frame Contents Structure
+
+    `channel_id` | `stream_index` | `channel_data[stream_index]` | . . . | `channel_data[stream_index - size - 1]`
+    -------------|----------------|------------------------------|-------|----------------------------------------

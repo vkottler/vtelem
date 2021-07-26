@@ -26,7 +26,7 @@ def parse_data_frame(
     obj: dict, buf: ByteBuffer, registry: ChannelRegistry
 ) -> None:
     """
-    From an object that contains frame-header data, parse the telemetry data.
+    Attempt to parse a data frame from the remaining byte-buffer.
     """
 
     # read channel IDs
@@ -45,7 +45,7 @@ def parse_event_frame(
     obj: dict, buf: ByteBuffer, registry: ChannelRegistry
 ) -> None:
     """
-    From an object that contains frame-header data, parse the event data.
+    Attempt to parse an event frame from the remaining byte-buffer.
     """
 
     # read channel IDs
@@ -61,3 +61,23 @@ def parse_event_frame(
         event["previous"]["time"] = buf.read(DEFAULTS["timestamp"])
         event["current"] = {"value": buf.read(event["channel"].type)}
         event["current"]["time"] = buf.read(DEFAULTS["timestamp"])
+
+
+def parse_message_frame(
+    obj: dict, buf: ByteBuffer, registry: ChannelRegistry
+) -> None:
+    """
+    Attempt to parse a message frame from the remaining byte-buffer.
+    """
+
+    return parse_invalid_frame(obj, buf, registry)
+
+
+def parse_stream_frame(
+    obj: dict, buf: ByteBuffer, registry: ChannelRegistry
+) -> None:
+    """
+    Attempt to parse a stream frame from the remaining byte-buffer.
+    """
+
+    return parse_invalid_frame(obj, buf, registry)
