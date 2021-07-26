@@ -27,6 +27,7 @@ class Channel(TypePrimitive):
         rate: float,
         event_queue: EventQueue = None,
         commandable: bool = True,
+        is_stream: bool = False,
     ) -> None:
         """
         Construct a new channel of a provided primitive type that should be
@@ -49,6 +50,7 @@ class Channel(TypePrimitive):
         self.name = name
         self.rate = rate
         self.commandable = commandable
+        self.is_stream = is_stream
         self.last_emitted: float = float()
 
     def command(

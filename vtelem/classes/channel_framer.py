@@ -6,50 +6,22 @@ vtelem - A module for building frames of channel data from emissions.
 import logging
 from queue import Queue
 from threading import RLock
-from typing import Dict, Tuple, List
+from typing import Tuple, List
 
 # internal
-from vtelem.enums.primitive import Primitive, random_integer
-from vtelem.enums.frame import FRAME_TYPES
-from . import DEFAULTS
+from vtelem.enums.primitive import Primitive
+from .frame import Frame
 from .channel import Channel
-from .channel_frame import ChannelFrame, time_to_int
+from .channel_frame import ChannelFrame
 from .channel_registry import ChannelRegistry
 from .event_queue import EventQueue
-from .type_primitive import TypePrimitive, new_default
-from .user_enum import UserEnum
+from .framer import Framer
+from .framer import build_dummy_frame as dummy_frame
 
 LOG = logging.getLogger(__name__)
 
 
-def basis_to_int(basis: float) -> int:
-    """
-    Convert some basis floating-point number into a valid integer for an
-    application identifier.
-    """
-
-    basis = abs(basis)
-    if basis > 1.0:
-        basis = 1.0 / basis
-    return int(float(DEFAULTS["id"].value["max"]) * basis)
-
-
-def create_app_id(basis: float = None) -> TypePrimitive:
-    """
-    Create a new application identifier, use a provided basis value if
-    provided.
-    """
-
-    result = new_default("id")
-    if basis is None:
-        new_id = random_integer(DEFAULTS["id"])
-    else:
-        new_id = basis_to_int(basis)
-    assert result.set(new_id)
-    return result
-
-
-class ChannelFramer:
+class ChannelFramer(Framer):
     """
     An extension of channel management that builds frames from emitted data.
     """
@@ -65,60 +37,28 @@ class ChannelFramer:
     ) -> None:
         """Construct a new channel framer."""
 
-        self.mtu = mtu
+        super().__init__(mtu, app_id_basis, use_crc)
         self.registry = registry
         self.channels = channels
         self.lock = channel_lock
-        self.timestamp = new_default("timestamp")
-        self.frame_types = FRAME_TYPES
-
-        # build primitives to hold the frame types and timestamps
-        self.timestamps: Dict[str, TypePrimitive] = {}
-        self.primitives: Dict[str, TypePrimitive] = {}
-        for name in self.frame_types.enum.values():
-            self.timestamps[name] = new_default("timestamp")
-            self.primitives[name] = self.frame_types.get_primitive(name)
-        self.primitives["app_id"] = create_app_id(app_id_basis)
-        self.use_crc = use_crc
-        LOG.info(
-            "using application identifier '%d'",
-            self.primitives["app_id"].get(),
-        )
-
-    def get_types(self) -> UserEnum:
-        """Get the frame-type enumeration."""
-
-        return self.frame_types
-
-    def new_frame(
-        self, frame_type: str, time: float, set_time: bool = True
-    ) -> ChannelFrame:
-        """Construct a new frame object."""
-
-        timestamp = self.timestamps[frame_type]
-        if set_time:
-            assert timestamp.set(time_to_int(time))
-        return ChannelFrame(
-            self.mtu,
-            self.primitives["app_id"],
-            self.primitives[frame_type],
-            timestamp,
-            self.use_crc,
-        )
 
     def new_event_frame(
         self, time: float, set_time: bool = True
     ) -> ChannelFrame:
         """Construct a new event-frame object."""
 
-        return self.new_frame("event", time, set_time)
+        frame = self.new_frame("event", time, set_time)
+        assert isinstance(frame, ChannelFrame)
+        return frame
 
     def new_data_frame(
         self, time: float, set_time: bool = True
     ) -> ChannelFrame:
         """Construct a new data-frame object."""
 
-        return self.new_frame("data", time, set_time)
+        frame = self.new_frame("data", time, set_time)
+        assert isinstance(frame, ChannelFrame)
+        return frame
 
     def add_channel(self, channel: Channel) -> None:
         """Add another managed channel."""
@@ -181,13 +121,11 @@ class ChannelFramer:
         curr_frame = self.new_data_frame(time)
         with self.lock:
             for channel in self.channels:
-
                 result = channel.emit(time)
 
                 # if the channel emitted, add it to the current frame
                 if result is not None:
                     emit_count += 1
-
                     chan_id = self.registry.get_id(channel.name)
                     assert chan_id is not None
 
@@ -211,20 +149,16 @@ class ChannelFramer:
 
 def build_dummy_frame(
     overall_size: int, app_id_basis: float = None, bad_crc: bool = False
-) -> ChannelFrame:
+) -> Frame:
     """Build an empty frame of a specified size."""
 
-    frame = ChannelFrame(
-        overall_size,
-        create_app_id(app_id_basis),
-        FRAME_TYPES.get_primitive("invalid"),
-        new_default("timestamp"),
+    def frame_builder(frame: Frame) -> None:
+        """Stub function for building a frame."""
+
+        chan = Channel("fake", Primitive.BOOLEAN, 1.0)
+        while frame.space:
+            frame.write(chan)
+
+    return dummy_frame(
+        overall_size, "invalid", frame_builder, app_id_basis, bad_crc
     )
-
-    while frame.add(0, Primitive.BOOLEAN, False):
-        pass
-
-    frame.finalize(not bad_crc)
-    frame.pad_to_mtu()
-    assert frame.finalize() == overall_size
-    return frame

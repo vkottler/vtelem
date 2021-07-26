@@ -9,10 +9,9 @@ from typing import Optional
 # internal
 from vtelem.classes import DEFAULTS
 from vtelem.classes.byte_buffer import ByteBuffer
-from vtelem.classes.channel_framer import FRAME_TYPES
 from vtelem.classes.channel_registry import ChannelRegistry
 from vtelem.classes.type_primitive import TypePrimitive
-from vtelem.enums.frame import PARSERS
+from vtelem.enums.frame import PARSERS, FRAME_TYPES
 from vtelem.enums.primitive import get_size
 
 LOG = logging.getLogger(__name__)

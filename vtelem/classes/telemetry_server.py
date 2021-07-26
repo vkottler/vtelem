@@ -164,9 +164,9 @@ class TelemetryServer(HttpDaemon):
     def scale_speed(self, scalar: float) -> None:
         """Change the time scaling for the time keeper."""
 
-        self.daemons.perform_all(DaemonOperation.PAUSE)
+        assert self.daemons.perform_all(DaemonOperation.PAUSE)
         self.time_keeper.scale(scalar)
-        self.daemons.perform_all(DaemonOperation.UNPAUSE)
+        assert self.daemons.perform_all(DaemonOperation.UNPAUSE)
 
     def start_all(self) -> None:
         """Start everything."""
@@ -175,8 +175,8 @@ class TelemetryServer(HttpDaemon):
         assert isinstance(telem, TelemetryDaemon)
         kwargs: dict = {"service_registry": telem.registries["services"]}
         kwargs["first_start"] = self.first_start
-        self.daemons.perform_all(DaemonOperation.START, **kwargs)
-        self.start(**kwargs)
+        assert self.daemons.perform_all(DaemonOperation.START, **kwargs)
+        assert self.perform(DaemonOperation.START, **kwargs)
         self.first_start = False
 
         with self.lock:
@@ -185,8 +185,8 @@ class TelemetryServer(HttpDaemon):
     def stop_all(self) -> None:
         """Stop everything."""
 
-        self.daemons.perform_all(DaemonOperation.STOP)
-        self.stop()
+        assert self.daemons.perform_all(DaemonOperation.STOP)
+        assert self.perform(DaemonOperation.STOP)
         self.close()
         self.udp_clients.remove_all()
         with self.lock:
@@ -201,9 +201,11 @@ class TelemetryServer(HttpDaemon):
 
         try:
             self.start_all()
+            self.state_sem.acquire()
             yield
         finally:
             self.stop_all()
+            self.state_sem.acquire()
 
     def await_shutdown(self, timeout: float = None) -> None:
         """

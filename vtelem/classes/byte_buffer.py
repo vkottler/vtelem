@@ -100,11 +100,18 @@ class ByteBuffer:
         """Read a primitive out of a buffer, at its current position."""
 
         assert self.can_read(inst)
-        elem_size = get_size(inst)
-        end_pos = self.get_pos() + elem_size
-        buffer_slice = self.data[self.get_pos() : end_pos]
-        result = struct.unpack(self.fstring(inst), buffer_slice)[0]
-        self.advance(elem_size)
+        result = struct.unpack(
+            self.fstring(inst), self.read_bytes(get_size(inst))
+        )[0]
+        return result
+
+    def read_bytes(self, count: int) -> bytearray:
+        """Read some number of bytes from a buffer."""
+
+        assert self.remaining >= count
+        pos = self.get_pos()
+        result = self.data[pos : pos + count]
+        self.advance(count)
         return result
 
     def append(self, other: bytearray, data_len: int) -> None:

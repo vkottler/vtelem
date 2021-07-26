@@ -48,8 +48,9 @@ class TelemetryEnvironment(ChannelEnvironment):
         self.type_registry = get_default()
         self.registries["enum"] = self.enum_registry
         self.registries["type"] = self.type_registry
-        assert self.enum_registry.add_enum(self.framer.get_types())[0]
-        assert self.enum_registry.add_enum(MESSAGE_TYPES)[0]
+        enums = [self.framer.frame_types, MESSAGE_TYPES]
+        for to_register in enums:
+            assert self.enum_registry.add_enum(to_register)[0]
         self.enum_registry.export(self.type_registry)
         self.enum_channel_types: Dict[int, int] = defaultdict(lambda: -1)
         if self.metrics is not None:

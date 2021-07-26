@@ -3,7 +3,7 @@ vtelem - Test the telemetry proxy's correctness.
 """
 
 # module under test
-from vtelem.classes.channel_framer import create_app_id, build_dummy_frame
+from vtelem.classes.channel_framer import Framer, build_dummy_frame
 from vtelem.classes.stream_writer import default_writer
 from vtelem.classes.telemetry_environment import TelemetryEnvironment
 from vtelem.classes.telemetry_proxy import TelemetryProxy
@@ -28,7 +28,7 @@ def setup_environment() -> dict:
     proxy = TelemetryProxy(
         ("localhost", 0),
         writer.get_queue("proxy"),
-        create_app_id(app_basis),
+        Framer.create_app_id(app_basis),
         env,
         DEFAULT_MTU,
     )

@@ -117,28 +117,36 @@ class DaemonBase(TimeEntity):
         self.daemon_ops[DaemonOperation.START] = {
             "action": self.start,
             "takes_args": True,
+            "skip_if_state": [DaemonState.STARTING, DaemonState.RUNNING],
         }
         self.daemon_ops[DaemonOperation.STOP] = {
             "action": self.stop,
             "takes_args": False,
+            "skip_if_state": [DaemonState.STOPPING, DaemonState.IDLE],
         }
         self.daemon_ops[DaemonOperation.PAUSE] = {
             "action": self.pause,
             "takes_args": False,
+            "skip_if_state": [DaemonState.PAUSED],
         }
         self.daemon_ops[DaemonOperation.UNPAUSE] = {
             "action": self.unpause,
             "takes_args": False,
+            "skip_if_state": [DaemonState.IDLE, DaemonState.RUNNING],
         }
         self.daemon_ops[DaemonOperation.RESTART] = {
             "action": self.restart,
             "takes_args": True,
+            "skip_if_state": [],
         }
 
     def perform(self, action: DaemonOperation, *args, **kwargs) -> bool:
         """Perform an action by enum."""
 
         operation = self.daemon_ops[action]
+        curr = self.get_state()
+        if curr in operation["skip_if_state"]:
+            return True
         if not operation["takes_args"]:
             return operation["action"]()
         return operation["action"](*args, **kwargs)
@@ -156,12 +164,12 @@ class DaemonBase(TimeEntity):
 
         return "{}.{}".format(self.name, channel_name)
 
-    def set_state(self, state: DaemonState) -> None:
+    def set_state(self, state: DaemonState) -> bool:
         """Assigns a new run-state to this daemon."""
 
         with self.lock:
             if self.state == state:
-                return
+                return False
             self.function["state_change"](self.state, state, self.get_time())
             self.state = state
 
@@ -172,6 +180,8 @@ class DaemonBase(TimeEntity):
                     self.get_state_str(),
                     self.get_time(),
                 )
+
+        return True
 
     def set_env_metric(
         self, name: str, value: Any, prim: Primitive = DEFAULTS["metric"]
@@ -224,13 +234,13 @@ class DaemonBase(TimeEntity):
         """
 
         try:
-            self.set_state(DaemonState.RUNNING)
-            self.run(*args, **kwargs)
+            if self.set_state(DaemonState.RUNNING):
+                self.run(*args, **kwargs)
         except KeyboardInterrupt:
             LOG.warning("%s: interrupted", self.name)
         finally:
             self.increment_metric("count")
-            self.set_state(DaemonState.IDLE)
+            assert self.set_state(DaemonState.IDLE)
 
     def run(self, *_, **__) -> None:
         """To be implemented by parent."""
@@ -277,7 +287,7 @@ class DaemonBase(TimeEntity):
             )
             self.reset_metric("count")
             self.increment_metric("starts")
-            self.set_state(DaemonState.STARTING)
+            assert self.set_state(DaemonState.STARTING)
 
         self.thread.start()
         return True
@@ -297,9 +307,9 @@ class DaemonBase(TimeEntity):
 
         with self.lock:
             if self.state == DaemonState.RUNNING:
-                self.set_state(DaemonState.PAUSED)
-                self.increment_metric("pauses")
-                return True
+                if self.set_state(DaemonState.PAUSED):
+                    self.increment_metric("pauses")
+                    return True
         return False
 
     def unpause(self) -> bool:
@@ -307,9 +317,9 @@ class DaemonBase(TimeEntity):
 
         with self.lock:
             if self.state == DaemonState.PAUSED:
-                self.set_state(DaemonState.RUNNING)
-                self.increment_metric("unpauses")
-                return True
+                if self.set_state(DaemonState.RUNNING):
+                    self.increment_metric("unpauses")
+                    return True
         return False
 
     def begin_stop(self) -> bool:
@@ -321,8 +331,8 @@ class DaemonBase(TimeEntity):
         should_stop = False
         with self.lock:
             if self.state == DaemonState.RUNNING:
-                self.set_state(DaemonState.STOPPING)
-                should_stop = True
+                if self.set_state(DaemonState.STOPPING):
+                    should_stop = True
 
         if should_stop:
             try:

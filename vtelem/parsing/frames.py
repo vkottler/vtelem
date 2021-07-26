@@ -34,6 +34,7 @@ def parse_data_frame(
     for _ in range(obj["size"]):
         chan = {"id": buf.read(DEFAULTS["id"])}
         chan["channel"] = registry.get_item(chan["id"])
+        assert not chan["channel"].is_stream
         obj["channels"].append(chan)
 
     # read values
@@ -53,6 +54,7 @@ def parse_event_frame(
     for _ in range(obj["size"]):
         event = {"id": buf.read(DEFAULTS["id"])}
         event["channel"] = registry.get_item(event["id"])
+        assert not event["channel"].is_stream
         obj["events"].append(event)
 
     # read events
@@ -64,13 +66,17 @@ def parse_event_frame(
 
 
 def parse_message_frame(
-    obj: dict, buf: ByteBuffer, registry: ChannelRegistry
+    obj: dict, buf: ByteBuffer, _: ChannelRegistry
 ) -> None:
     """
     Attempt to parse a message frame from the remaining byte-buffer.
     """
 
-    return parse_invalid_frame(obj, buf, registry)
+    obj["message_type"] = buf.read(DEFAULTS["enum"])
+    obj["message_number"] = buf.read(DEFAULTS["id"])
+    obj["fragment_index"] = buf.read(DEFAULTS["id"])
+    obj["total_fragments"] = buf.read(DEFAULTS["id"])
+    obj["fragment_bytes"] = buf.read_bytes(obj["size"])
 
 
 def parse_stream_frame(
@@ -80,4 +86,8 @@ def parse_stream_frame(
     Attempt to parse a stream frame from the remaining byte-buffer.
     """
 
-    return parse_invalid_frame(obj, buf, registry)
+    obj["id"] = buf.read(DEFAULTS["id"])
+    obj["channel"] = registry.get_item(obj["id"])
+    assert obj["channel"].is_stream
+    obj["index"] = buf.read(DEFAULTS["count"])
+    obj["data"] = buf.read_bytes(obj["size"] * obj["channel"].size())
