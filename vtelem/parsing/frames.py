@@ -8,7 +8,7 @@ import logging
 # internal
 from vtelem.classes import DEFAULTS
 from vtelem.classes.byte_buffer import ByteBuffer
-from vtelem.classes.channel_registry import ChannelRegistry
+from vtelem.channel.registry import ChannelRegistry
 
 LOG = logging.getLogger(__name__)
 

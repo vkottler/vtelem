@@ -3,7 +3,7 @@ vtelem - Test the UDP-client manager module's correctness.
 """
 
 # module under test
-from vtelem.classes.channel_framer import build_dummy_frame
+from vtelem.channel.framer import build_dummy_frame
 from vtelem.classes.udp_client_manager import UdpClientManager
 from vtelem.classes.stream_writer import default_writer
 from vtelem.mtu import DEFAULT_MTU

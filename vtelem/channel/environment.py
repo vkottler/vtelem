@@ -10,16 +10,16 @@ from typing import Any, List, Tuple, Dict, Optional
 # internal
 from vtelem.enums.primitive import Primitive
 from vtelem.parsing.encapsulation import decode_frame
-from . import LOG_PERIOD
-from .channel import Channel
-from .channel_registry import ChannelRegistry
-from .channel_frame import ChannelFrame
-from .channel_framer import ChannelFramer
-from .event_queue import EventQueue
-from .metered_queue import MeteredQueue
-from .time_entity import TimeEntity
-from .registry import Registry
-from .type_primitive import TypePrimitive
+from vtelem.channel import Channel
+from vtelem.channel.registry import ChannelRegistry
+from vtelem.channel.frame import ChannelFrame
+from vtelem.channel.framer import ChannelFramer
+from vtelem.classes import LOG_PERIOD
+from vtelem.classes.event_queue import EventQueue
+from vtelem.classes.metered_queue import MeteredQueue
+from vtelem.classes.time_entity import TimeEntity
+from vtelem.classes.registry import Registry
+from vtelem.classes.type_primitive import TypePrimitive
 
 LOG = logging.getLogger(__name__)
 

@@ -6,8 +6,8 @@ vtelem - Test the telemetry environment's correctness.
 import time
 
 # module under test
-from vtelem.classes.channel import Channel
-from vtelem.classes.channel_framer import Framer
+from vtelem.channel import Channel
+from vtelem.channel.framer import Framer
 from vtelem.classes.telemetry_environment import TelemetryEnvironment
 from vtelem.classes.user_enum import UserEnum
 from vtelem.enums.primitive import Primitive

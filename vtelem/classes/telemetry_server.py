@@ -17,7 +17,7 @@ from vtelem.factories.telemetry_server import register_http_handlers
 from vtelem.factories.udp_client_manager import create_udp_client_commander
 from vtelem.factories.websocket_daemon import commandable_websocket_daemon
 from vtelem.types.telemetry_server import AppSetup, AppLoop
-from .channel_group_registry import ChannelGroupRegistry
+from vtelem.channel.group_registry import ChannelGroupRegistry
 from .command_queue_daemon import CommandQueueDaemon
 from .daemon import Daemon
 from .daemon_base import DaemonOperation

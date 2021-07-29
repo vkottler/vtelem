@@ -10,13 +10,13 @@ from typing import Tuple, List
 
 # internal
 from vtelem.enums.primitive import Primitive
-from .frame import Frame
-from .channel import Channel
-from .channel_frame import ChannelFrame
-from .channel_registry import ChannelRegistry
-from .event_queue import EventQueue
-from .framer import Framer
-from .framer import build_dummy_frame as dummy_frame
+from vtelem.channel import Channel
+from vtelem.channel.frame import ChannelFrame
+from vtelem.channel.registry import ChannelRegistry
+from vtelem.classes.frame import Frame
+from vtelem.classes.event_queue import EventQueue
+from vtelem.classes.framer import Framer
+from vtelem.classes.framer import build_dummy_frame as dummy_frame
 
 LOG = logging.getLogger(__name__)
 

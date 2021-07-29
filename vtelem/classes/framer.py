@@ -8,11 +8,11 @@ import logging
 from typing import Callable, Dict, Type
 
 # internal
+from vtelem.channel.frame import ChannelFrame
 from vtelem.enums.primitive import random_integer
 from vtelem.enums.frame import FRAME_TYPES
 from . import DEFAULTS
 from .frame import Frame, time_to_int
-from .channel_frame import ChannelFrame
 from .type_primitive import TypePrimitive, new_default
 
 LOG = logging.getLogger(__name__)

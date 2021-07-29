@@ -3,7 +3,7 @@ vtelem - Test the telemetry proxy's correctness.
 """
 
 # module under test
-from vtelem.classes.channel_framer import Framer, build_dummy_frame
+from vtelem.channel.framer import Framer, build_dummy_frame
 from vtelem.classes.stream_writer import default_writer
 from vtelem.classes.telemetry_environment import TelemetryEnvironment
 from vtelem.classes.telemetry_proxy import TelemetryProxy

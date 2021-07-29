@@ -8,9 +8,9 @@ from typing import Any, Optional
 
 # internal
 from vtelem.enums.primitive import Primitive
-from . import EventType
-from .type_primitive import TypePrimitive
-from .event_queue import EventQueue
+from vtelem.classes import EventType
+from vtelem.classes.type_primitive import TypePrimitive
+from vtelem.classes.event_queue import EventQueue
 
 
 class Channel(TypePrimitive):

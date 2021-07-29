@@ -10,7 +10,7 @@ import sys
 from typing import Tuple
 
 # internal
-from .classes.channel_framer import build_dummy_frame
+from .channel.framer import build_dummy_frame
 
 LOG = logging.getLogger(__name__)
 DEFAULT_MTU = 1500 - (60 + 8)

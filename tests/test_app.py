@@ -7,8 +7,8 @@ import time
 from typing import Any, Dict
 
 # module under test
+from vtelem.channel.group_registry import ChannelGroupRegistry
 from vtelem.classes.telemetry_server import TelemetryServer
-from vtelem.classes.channel_group_registry import ChannelGroupRegistry
 from vtelem.enums.primitive import Primitive
 
 

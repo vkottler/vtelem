@@ -4,7 +4,7 @@ vtelem - Test the channel-group registry's correctness.
 
 # module under test
 from vtelem.enums.primitive import Primitive
-from vtelem.classes.channel_group_registry import ChannelGroupRegistry
+from vtelem.channel.group_registry import ChannelGroupRegistry
 from vtelem.classes.telemetry_environment import TelemetryEnvironment
 
 # internal

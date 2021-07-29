@@ -8,9 +8,9 @@ from typing import Dict, Iterator, Any
 
 # internal
 from vtelem.enums.primitive import Primitive
-from .channel_group import ChannelGroup
-from .registry import Registry
-from .telemetry_environment import TelemetryEnvironment
+from vtelem.channel.group import ChannelGroup
+from vtelem.classes.registry import Registry
+from vtelem.classes.telemetry_environment import TelemetryEnvironment
 
 
 class ChannelGroupRegistry(Registry[ChannelGroup]):

@@ -3,7 +3,7 @@ vtelem - Test the channel class's correctness.
 """
 
 # module under test
-from vtelem.classes.channel import Channel
+from vtelem.channel import Channel
 from vtelem.classes.event_queue import EventQueue
 from vtelem.enums.primitive import Primitive
 

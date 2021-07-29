@@ -6,7 +6,7 @@ vtelem - Common type definitions for the telemetry server.
 from typing import Any, Callable, Dict
 
 # internal
-from vtelem.classes.channel_group_registry import ChannelGroupRegistry
+from vtelem.channel.group_registry import ChannelGroupRegistry
 
 AppSetup = Callable[[ChannelGroupRegistry, Dict[str, Any]], None]
 AppLoop = Callable[[ChannelGroupRegistry, Dict[str, Any]], None]

@@ -11,7 +11,7 @@ from threading import Semaphore
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
 # internal
-from .channel_frame import ChannelFrame
+from vtelem.channel.frame import ChannelFrame
 from .telemetry_environment import TelemetryEnvironment
 from .metered_queue import create, MAX_SIZE
 from .queue_daemon import QueueDaemon

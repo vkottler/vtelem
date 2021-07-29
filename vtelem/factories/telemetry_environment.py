@@ -7,7 +7,7 @@ vtelem - A module for creating functions based on telemetry environment
 from typing import Tuple
 
 # internal
-from vtelem.classes.channel import Channel
+from vtelem.channel import Channel
 from vtelem.classes.telemetry_environment import TelemetryEnvironment
 from vtelem.classes.command_queue_daemon import CommandQueueDaemon
 from vtelem.types.command_queue_daemon import ResultCbType

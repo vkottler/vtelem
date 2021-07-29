@@ -8,11 +8,11 @@ from enum import Enum
 from typing import List, Dict, Type, Tuple, Optional
 
 # internal
+from vtelem.channel import Channel
+from vtelem.channel.environment import ChannelEnvironment
 from vtelem.enums.primitive import Primitive
 from vtelem.enums.frame import MESSAGE_TYPES
 from . import DEFAULTS
-from .channel import Channel
-from .channel_environment import ChannelEnvironment
 from .enum_registry import EnumRegistry
 from .user_enum import UserEnum, from_enum
 from .type_registry import get_default

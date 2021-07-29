@@ -6,7 +6,7 @@ vtelem - Exposes daemonic capabilities for telemetry.
 from typing import List
 
 # internal
-from .channel import Channel
+from vtelem.channel import Channel
 from .telemetry_environment import TelemetryEnvironment
 from .time_keeper import TimeKeeper
 from .daemon import Daemon

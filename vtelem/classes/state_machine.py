@@ -9,8 +9,8 @@ import logging
 from typing import Dict, List, Iterator, Tuple, Optional
 
 # internal
+from vtelem.channel.group import ChannelGroup
 from . import DEFAULTS
-from .channel_group import ChannelGroup
 from .state import State
 from .telemetry_environment import TelemetryEnvironment
 from .time_entity import LockEntity

@@ -6,8 +6,8 @@ vtelem - A module for encapsulating software states.
 from typing import Callable, Optional
 
 # internal
+from vtelem.channel.group import ChannelGroup
 from . import DEFAULTS
-from .channel_group import ChannelGroup
 from .telemetry_environment import TelemetryEnvironment
 
 

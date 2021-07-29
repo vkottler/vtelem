@@ -7,8 +7,8 @@ from typing import List, Tuple
 
 # internal
 from vtelem.enums.primitive import Primitive
-from .channel import Channel, ChannelEncoder
-from .registry import Registry
+from vtelem.channel import Channel, ChannelEncoder
+from vtelem.classes.registry import Registry
 
 
 class ChannelRegistry(Registry[Channel]):
