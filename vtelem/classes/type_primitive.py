@@ -53,11 +53,11 @@ class TypePrimitive:
         if time is None:
             time = float()
 
-        expected_type = self.type.value["type"]
+        expected_type = self.type.value.type
         if isinstance(data, expected_type):
 
             # validate the desired value
-            if not self.type.value["validate"](self.type, data):
+            if not self.type.value.validate(self.type.value, data):
                 LOG.warning(
                     "value '%s' not valid for type '%s'", data, self.type
                 )

@@ -30,7 +30,7 @@ def basis_to_int(basis: float) -> int:
     basis = abs(basis)
     if basis > 1.0:
         basis = 1.0 / basis
-    return int(float(DEFAULTS["id"].value["max"]) * basis)
+    return int(float(DEFAULTS["id"].value.max) * basis)
 
 
 class Framer:

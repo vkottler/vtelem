@@ -89,9 +89,9 @@ class ChannelEncoder(JSONEncoder):
 
         assert isinstance(o, Channel)
         type_dict = {
-            "name": o.type.value["name"],
-            "signed": o.type.value["name"],
-            "size": o.type.value["size"],
+            "name": o.type.value.name,
+            "signed": o.type.value.signed,
+            "size": o.type.value.size,
         }
         result = {
             "name": o.name,
