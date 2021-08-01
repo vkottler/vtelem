@@ -6,7 +6,7 @@ vtelem - Test the correctness of the daemon manager.
 import json
 
 # module under test
-from vtelem.classes.daemon_base import DaemonOperation, DaemonState
+from vtelem.daemon import DaemonOperation, DaemonState
 from vtelem.classes.daemon_manager import DaemonManager
 from vtelem.classes.command_queue_daemon import CommandQueueDaemon
 from vtelem.classes.time_keeper import TimeKeeper

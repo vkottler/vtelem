@@ -8,7 +8,7 @@ from threading import Semaphore
 from typing import Any
 
 # internal
-from .daemon_base import DaemonBase
+from vtelem.daemon import DaemonBase
 from .telemetry_environment import TelemetryEnvironment
 
 

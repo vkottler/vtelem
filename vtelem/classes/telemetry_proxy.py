@@ -10,7 +10,7 @@ from typing import Tuple
 
 # internal
 from vtelem.mtu import create_udp_socket, DEFAULT_MTU
-from .daemon_base import DaemonBase, DaemonState
+from vtelem.daemon import DaemonBase, DaemonState
 from .telemetry_environment import TelemetryEnvironment
 from .type_primitive import TypePrimitive
 

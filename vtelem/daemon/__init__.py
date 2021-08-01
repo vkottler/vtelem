@@ -14,10 +14,10 @@ from typing import Any, Callable, Dict, Optional, Iterator
 from vtelem.enums.daemon import DaemonState, DaemonOperation, str_to_operation
 from vtelem.enums.primitive import Primitive
 from vtelem.names import class_to_snake
-from . import DEFAULTS
-from .telemetry_environment import TelemetryEnvironment
-from .time_entity import TimeEntity
-from .user_enum import from_enum
+from vtelem.classes import DEFAULTS
+from vtelem.classes.telemetry_environment import TelemetryEnvironment
+from vtelem.classes.time_entity import TimeEntity
+from vtelem.classes.user_enum import from_enum
 
 LOG = logging.getLogger(__name__)
 MainThread = Callable[..., int]

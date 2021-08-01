@@ -10,7 +10,7 @@ from threading import Semaphore
 from typing import Any, Dict, Tuple
 
 # internal
-from .daemon_base import DaemonBase
+from vtelem.daemon import DaemonBase
 from .stream_writer import StreamWriter, QueueClientManager
 from .telemetry_environment import TelemetryEnvironment
 

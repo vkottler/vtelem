@@ -14,7 +14,7 @@ import ssl
 from typing import Type, Tuple, Optional
 
 # internal
-from .daemon_base import DaemonBase, DaemonState, MainThread
+from vtelem.daemon import DaemonBase, DaemonState, MainThread
 from .http_request_mapper import HttpRequestMapper, RequestHandle
 from .service_registry import ServiceRegistry
 from .telemetry_environment import TelemetryEnvironment

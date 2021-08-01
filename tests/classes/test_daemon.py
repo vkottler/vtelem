@@ -7,8 +7,8 @@ import time
 
 # module under test
 from vtelem.classes.daemon import DaemonState, Daemon
-from vtelem.classes.daemon_base import DaemonOperation
 from vtelem.classes.time_keeper import TimeKeeper
+from vtelem.daemon import DaemonOperation
 
 
 def test_daemon_callbacks():

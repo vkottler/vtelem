@@ -8,12 +8,12 @@ import logging
 from typing import Dict, Optional, List
 
 # internal
+from vtelem.daemon import DaemonBase
 from vtelem.enums.daemon import (
     DaemonOperation,
     str_to_operation,
     operation_str,
 )
-from .daemon_base import DaemonBase
 from .time_entity import LockEntity
 
 LOG = logging.getLogger(__name__)

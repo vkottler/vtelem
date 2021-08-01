@@ -9,9 +9,9 @@ import signal
 import time
 
 # module under test
-from vtelem.classes.daemon_base import DaemonState
 from vtelem.classes.time_keeper import TimeKeeper
 from vtelem.classes.time_entity import TimeEntity
+from vtelem.daemon import DaemonState
 
 
 def test_time_keeper_interrupted():

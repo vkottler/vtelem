@@ -7,7 +7,7 @@ from queue import Queue
 from typing import Any, Callable
 
 # internal
-from .daemon_base import DaemonBase
+from vtelem.daemon import DaemonBase
 from .telemetry_environment import TelemetryEnvironment
 
 
