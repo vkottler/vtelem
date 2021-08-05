@@ -2,7 +2,7 @@
     =====================================
     generator=datazen
     version=1.7.9
-    hash=61c097616d44c828b1030997ea9d2544
+    hash=1a0c168df03c548d8d0729cc0181d0cc
     =====================================
 -->
 
@@ -144,14 +144,15 @@ Field | Type | Description
 ------|------|------------
 `message_type` | `defaults.enum` | An enumeration associated with this message so it can be interpreted based on protocol-defined [message types](message_type.md).
 `message_number` | `defaults.id` | The instance of this message type being sent. This should increment only if the full message payload differs from that of the current message payload, otherwise a message can be sent again with the same number. **This instance number is specific to the message type and is not global for all message types.**
+`message_crc` | `defaults.crc` | A checksum of this message's contents (all fragment bytes). It can be assumed that a new message of a given type with an equivalent checksum to a previously-seen message of the same type has identical contents. Messages can be stored in a cache with checksums as keys, but receivers should compare new message contents and caches evict stale entries on an interval regular enough to ensure correctness.
 `fragment_index` | `defaults.id` | The current fragment of the message contained in this frame.
 `total_fragments` | `defaults.id` | The total number of fragments required to assemble the full message payload.
 `fragment_byte[n]` | `uint8` | A byte belonging to the message fragment. In total there are `size` bytes in the fragment.
 
 #### Frame Contents Structure
 
-`message_type` | `message_number` | `fragment_index` | `total_fragments` | `fragment_byte[0]` | . . . | `fragment_byte[size - 1]`
----------------|------------------|------------------|-------------------|--------------------|-------|--------------------------
+`message_type` | `message_number` | `message_crc` | `fragment_index` | `total_fragments` | `fragment_byte[0]` | . . . | `fragment_byte[size - 1]`
+---------------|------------------|---------------|------------------|-------------------|--------------------|-------|--------------------------
 
 
 ### Stream

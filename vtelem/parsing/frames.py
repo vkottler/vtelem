@@ -74,6 +74,7 @@ def parse_message_frame(
 
     obj["message_type"] = buf.read(DEFAULTS["enum"])
     obj["message_number"] = buf.read(DEFAULTS["id"])
+    obj["message_crc"] = buf.read(DEFAULTS["crc"])
     obj["fragment_index"] = buf.read(DEFAULTS["id"])
     obj["total_fragments"] = buf.read(DEFAULTS["id"])
     obj["fragment_bytes"] = buf.read_bytes(obj["size"])
