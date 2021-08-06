@@ -12,13 +12,13 @@ from vtelem.enums.primitive import Primitive
 from vtelem.parsing.encapsulation import decode_frame
 from vtelem.channel import Channel
 from vtelem.channel.registry import ChannelRegistry
-from vtelem.channel.frame import ChannelFrame
 from vtelem.channel.framer import ChannelFramer
 from vtelem.classes import LOG_PERIOD
 from vtelem.classes.event_queue import EventQueue
 from vtelem.classes.metered_queue import MeteredQueue
 from vtelem.classes.time_entity import TimeEntity
 from vtelem.classes.type_primitive import TypePrimitive
+from vtelem.frame.channel import ChannelFrame
 from vtelem.registry import Registry
 
 LOG = logging.getLogger(__name__)

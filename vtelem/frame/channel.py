@@ -10,8 +10,8 @@ from typing import Any
 from vtelem.enums.primitive import Primitive, get_size
 from vtelem.classes import DEFAULTS, EventType
 from vtelem.classes.byte_buffer import ByteBuffer
-from vtelem.classes.frame import Frame, time_to_int
 from vtelem.classes.type_primitive import TypePrimitive, new_default
+from vtelem.frame import Frame, time_to_int
 
 
 class ChannelFrame(Frame):

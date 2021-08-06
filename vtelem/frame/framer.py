@@ -8,12 +8,12 @@ import logging
 from typing import Callable, Dict, Type
 
 # internal
-from vtelem.channel.frame import ChannelFrame
+from vtelem.classes import DEFAULTS
+from vtelem.classes.type_primitive import TypePrimitive, new_default
 from vtelem.enums.primitive import random_integer
 from vtelem.enums.frame import FRAME_TYPES
-from . import DEFAULTS
-from .frame import Frame, time_to_int
-from .type_primitive import TypePrimitive, new_default
+from vtelem.frame import Frame, time_to_int
+from vtelem.frame.channel import ChannelFrame
 
 LOG = logging.getLogger(__name__)
 FRAME_CLASS_MAP: Dict[str, Type] = defaultdict(lambda: Frame)

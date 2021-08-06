@@ -7,9 +7,9 @@ import math
 from typing import Any, Dict, Tuple
 
 # internal
+from vtelem.classes.byte_buffer import ByteBuffer
+from vtelem.classes.type_primitive import TypePrimitive, new_default
 from vtelem.enums.primitive import random_integer
-from .byte_buffer import ByteBuffer
-from .type_primitive import TypePrimitive, new_default
 
 
 def time_to_int(time: float, precision: int = 1000) -> int:

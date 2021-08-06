@@ -11,9 +11,9 @@ from typing import Any, Tuple, Set, Optional
 from websockets.exceptions import WebSocketException
 
 # internal
-from vtelem.channel.frame import ChannelFrame
 from vtelem.classes.stream_writer import StreamWriter, QueueClientManager
 from vtelem.daemon.websocket import WebsocketDaemon
+from vtelem.frame.channel import ChannelFrame
 from vtelem.telemetry.environment import TelemetryEnvironment
 
 

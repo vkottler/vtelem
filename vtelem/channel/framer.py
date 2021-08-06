@@ -11,12 +11,12 @@ from typing import Tuple, List
 # internal
 from vtelem.enums.primitive import Primitive
 from vtelem.channel import Channel
-from vtelem.channel.frame import ChannelFrame
 from vtelem.channel.registry import ChannelRegistry
-from vtelem.classes.frame import Frame
 from vtelem.classes.event_queue import EventQueue
-from vtelem.classes.framer import Framer
-from vtelem.classes.framer import build_dummy_frame as dummy_frame
+from vtelem.frame import Frame
+from vtelem.frame.channel import ChannelFrame
+from vtelem.frame.framer import Framer
+from vtelem.frame.framer import build_dummy_frame as dummy_frame
 
 LOG = logging.getLogger(__name__)
 
