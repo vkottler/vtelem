@@ -9,8 +9,8 @@ import time
 # module under test
 from vtelem.channel.framer import build_dummy_frame
 from vtelem.classes.stream_writer import default_writer
-from vtelem.classes.telemetry_environment import TelemetryEnvironment
 from vtelem.daemon.tcp_telemetry import TcpTelemetryDaemon
+from vtelem.telemetry.environment import TelemetryEnvironment
 
 
 def test_tcp_telemetry_daemon_boot():

@@ -5,7 +5,7 @@ vtelem - Test the channel group class's correctness.
 # module under test
 from vtelem.enums.primitive import Primitive
 from vtelem.channel.group import ChannelGroup
-from vtelem.classes.telemetry_environment import TelemetryEnvironment
+from vtelem.telemetry.environment import TelemetryEnvironment
 
 # internal
 from . import EnumA

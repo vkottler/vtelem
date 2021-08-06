@@ -17,8 +17,8 @@ from vtelem.types.command_queue_daemon import (
     HandlersType,
 )
 from vtelem.classes.metered_queue import create
-from vtelem.classes.telemetry_environment import TelemetryEnvironment
 from vtelem.daemon.queue import QueueDaemon
+from vtelem.telemetry.environment import TelemetryEnvironment
 
 LOG = logging.getLogger(__name__)
 

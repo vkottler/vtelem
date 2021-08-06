@@ -6,10 +6,10 @@ vtelem - Test the telemetry-environment factory functions.
 from queue import Queue
 
 # module under test
-from vtelem.classes.telemetry_environment import TelemetryEnvironment
 from vtelem.daemon.command_queue import CommandQueueDaemon
 from vtelem.enums.primitive import Primitive, get_name
 from vtelem.factories.telemetry_environment import create_channel_commander
+from vtelem.telemetry.environment import TelemetryEnvironment
 
 # internal
 from tests import command_result, make_queue_cb

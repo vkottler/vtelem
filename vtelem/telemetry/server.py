@@ -18,6 +18,10 @@ from vtelem.factories.udp_client_manager import create_udp_client_commander
 from vtelem.factories.websocket_daemon import commandable_websocket_daemon
 from vtelem.types.telemetry_server import AppSetup, AppLoop
 from vtelem.channel.group_registry import ChannelGroupRegistry
+from vtelem.classes.http_request_mapper import MapperAwareRequestHandler
+from vtelem.classes.stream_writer import StreamWriter
+from vtelem.classes.time_keeper import TimeKeeper
+from vtelem.classes.udp_client_manager import UdpClientManager
 from vtelem.daemon import DaemonOperation
 from vtelem.daemon.command_queue import CommandQueueDaemon
 from vtelem.daemon.http import HttpDaemon
@@ -26,10 +30,6 @@ from vtelem.daemon.telemetry import TelemetryDaemon
 from vtelem.daemon.synchronous import Daemon
 from vtelem.daemon.websocket_telemetry import WebsocketTelemetryDaemon
 from vtelem.registry.service import ServiceRegistry
-from .http_request_mapper import MapperAwareRequestHandler
-from .stream_writer import StreamWriter
-from .time_keeper import TimeKeeper
-from .udp_client_manager import UdpClientManager
 
 
 class TelemetryServer(HttpDaemon):

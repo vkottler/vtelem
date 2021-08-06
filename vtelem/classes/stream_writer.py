@@ -13,7 +13,7 @@ from typing import Any, Callable, Dict, List, Optional, Tuple
 # internal
 from vtelem.channel.frame import ChannelFrame
 from vtelem.daemon.queue import QueueDaemon
-from .telemetry_environment import TelemetryEnvironment
+from vtelem.telemetry.environment import TelemetryEnvironment
 from .metered_queue import create, MAX_SIZE
 from .time_entity import LockEntity
 

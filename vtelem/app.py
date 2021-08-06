@@ -10,7 +10,7 @@ import socket
 import netifaces  # type: ignore
 
 # internal
-from .classes.telemetry_server import TelemetryServer
+from vtelem.telemetry.server import TelemetryServer
 
 
 def entry(args: argparse.Namespace) -> int:

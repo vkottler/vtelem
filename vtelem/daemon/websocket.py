@@ -11,9 +11,9 @@ from typing import Any, Callable, Tuple, Optional
 import websockets
 
 # internal
-from vtelem.classes.telemetry_environment import TelemetryEnvironment
 from vtelem.daemon.event_loop import EventLoopDaemon
 from vtelem.registry.service import ServiceRegistry
+from vtelem.telemetry.environment import TelemetryEnvironment
 
 LOG = logging.getLogger(__name__)
 

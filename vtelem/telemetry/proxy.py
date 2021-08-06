@@ -10,9 +10,9 @@ from typing import Tuple
 
 # internal
 from vtelem.mtu import create_udp_socket, DEFAULT_MTU
+from vtelem.classes.type_primitive import TypePrimitive
 from vtelem.daemon import DaemonBase, DaemonState
-from .telemetry_environment import TelemetryEnvironment
-from .type_primitive import TypePrimitive
+from vtelem.telemetry.environment import TelemetryEnvironment
 
 LOG = logging.getLogger(__name__)
 

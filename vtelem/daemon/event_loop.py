@@ -8,8 +8,8 @@ from threading import Semaphore
 from typing import Any
 
 # internal
-from vtelem.classes.telemetry_environment import TelemetryEnvironment
 from vtelem.daemon import DaemonBase
+from vtelem.telemetry.environment import TelemetryEnvironment
 
 
 class EventLoopDaemon(DaemonBase):

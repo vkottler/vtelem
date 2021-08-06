@@ -5,8 +5,8 @@ vtelem - Test the state machine module's correctness.
 # module under test
 from vtelem.classes.state import State
 from vtelem.classes.state_machine import StateMachine
-from vtelem.classes.telemetry_environment import TelemetryEnvironment
 from vtelem.mtu import DEFAULT_MTU
+from vtelem.telemetry.environment import TelemetryEnvironment
 
 
 def test_state_machine_basic():

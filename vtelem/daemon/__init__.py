@@ -15,9 +15,9 @@ from vtelem.enums.daemon import DaemonState, DaemonOperation, str_to_operation
 from vtelem.enums.primitive import Primitive
 from vtelem.names import class_to_snake
 from vtelem.classes import DEFAULTS
-from vtelem.classes.telemetry_environment import TelemetryEnvironment
 from vtelem.classes.time_entity import TimeEntity
 from vtelem.classes.user_enum import from_enum
+from vtelem.telemetry.environment import TelemetryEnvironment
 
 LOG = logging.getLogger(__name__)
 MainThread = Callable[..., int]

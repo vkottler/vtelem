@@ -13,8 +13,8 @@ import requests
 import websockets
 
 # module under test
-from vtelem.classes.telemetry_server import TelemetryServer
 from vtelem.mtu import get_free_tcp_port
+from vtelem.telemetry.server import TelemetryServer
 
 
 def test_telemetry_server_basic():

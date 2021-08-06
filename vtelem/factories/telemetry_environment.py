@@ -8,8 +8,8 @@ from typing import Tuple
 
 # internal
 from vtelem.channel import Channel
-from vtelem.classes.telemetry_environment import TelemetryEnvironment
 from vtelem.daemon.command_queue import CommandQueueDaemon
+from vtelem.telemetry.environment import TelemetryEnvironment
 from vtelem.types.command_queue_daemon import ResultCbType
 
 

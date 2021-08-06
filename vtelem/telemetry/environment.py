@@ -10,12 +10,12 @@ from typing import List, Dict, Type, Tuple, Optional
 # internal
 from vtelem.channel import Channel
 from vtelem.channel.environment import ChannelEnvironment
+from vtelem.classes import DEFAULTS
+from vtelem.classes.user_enum import UserEnum, from_enum
 from vtelem.enums.primitive import Primitive
 from vtelem.enums.frame import MESSAGE_TYPES
 from vtelem.registry.enum import EnumRegistry
 from vtelem.registry.type import get_default
-from . import DEFAULTS
-from .user_enum import UserEnum, from_enum
 
 
 class TelemetryEnvironment(ChannelEnvironment):

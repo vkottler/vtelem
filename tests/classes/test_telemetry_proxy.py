@@ -5,10 +5,10 @@ vtelem - Test the telemetry proxy's correctness.
 # module under test
 from vtelem.channel.framer import Framer, build_dummy_frame
 from vtelem.classes.stream_writer import default_writer
-from vtelem.classes.telemetry_environment import TelemetryEnvironment
-from vtelem.classes.telemetry_proxy import TelemetryProxy
 from vtelem.classes.udp_client_manager import UdpClientManager
 from vtelem.mtu import DEFAULT_MTU
+from vtelem.telemetry.environment import TelemetryEnvironment
+from vtelem.telemetry.proxy import TelemetryProxy
 
 
 def setup_environment() -> dict:

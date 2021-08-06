@@ -9,7 +9,7 @@ from typing import Any, Dict, Iterator
 
 # internal
 from vtelem.enums.primitive import Primitive, default_val
-from vtelem.classes.telemetry_environment import TelemetryEnvironment
+from vtelem.telemetry.environment import TelemetryEnvironment
 
 
 class ChannelGroup:

@@ -11,8 +11,8 @@ from typing import Any, Dict, Tuple
 
 # internal
 from vtelem.classes.stream_writer import StreamWriter, QueueClientManager
-from vtelem.classes.telemetry_environment import TelemetryEnvironment
 from vtelem.daemon import DaemonBase
+from vtelem.telemetry.environment import TelemetryEnvironment
 
 LOG = logging.getLogger(__name__)
 

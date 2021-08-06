@@ -8,9 +8,9 @@ import time
 # module under test
 from vtelem.channel import Channel
 from vtelem.channel.framer import Framer
-from vtelem.classes.telemetry_environment import TelemetryEnvironment
 from vtelem.classes.user_enum import UserEnum
 from vtelem.enums.primitive import Primitive
+from vtelem.telemetry.environment import TelemetryEnvironment
 
 # internal
 from . import EnumA
