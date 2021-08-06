@@ -7,8 +7,8 @@ import json
 from typing import List, Tuple
 
 # internal
-from vtelem.classes.command_queue_daemon import CommandQueueDaemon
-from vtelem.classes.daemon_manager import DaemonManager
+from vtelem.daemon.command_queue import CommandQueueDaemon
+from vtelem.daemon.manager import DaemonManager
 from vtelem.enums.daemon import is_operation, DaemonOperation, operation_str
 from vtelem.types.command_queue_daemon import ResultCbType
 

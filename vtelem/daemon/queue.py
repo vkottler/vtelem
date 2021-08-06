@@ -7,8 +7,8 @@ from queue import Queue
 from typing import Any, Callable
 
 # internal
+from vtelem.classes.telemetry_environment import TelemetryEnvironment
 from vtelem.daemon import DaemonBase
-from .telemetry_environment import TelemetryEnvironment
 
 
 class QueueDaemon(DaemonBase):

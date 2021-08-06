@@ -3,7 +3,7 @@ vtelem - Test the correctness of the telemetry daemon.
 """
 
 # module under test
-from vtelem.classes.telemetry_daemon import TelemetryDaemon
+from vtelem.daemon.telemetry import TelemetryDaemon
 from vtelem.classes.time_keeper import TimeKeeper
 
 

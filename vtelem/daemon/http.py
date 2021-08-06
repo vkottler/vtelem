@@ -14,11 +14,11 @@ import ssl
 from typing import Type, Tuple, Optional
 
 # internal
+from vtelem.classes.http_request_mapper import HttpRequestMapper, RequestHandle
+from vtelem.classes.service_registry import ServiceRegistry
+from vtelem.classes.telemetry_environment import TelemetryEnvironment
+from vtelem.classes.time_keeper import TimeKeeper
 from vtelem.daemon import DaemonBase, DaemonState, MainThread
-from .http_request_mapper import HttpRequestMapper, RequestHandle
-from .service_registry import ServiceRegistry
-from .telemetry_environment import TelemetryEnvironment
-from .time_keeper import TimeKeeper
 
 LOG = logging.getLogger(__name__)
 

@@ -6,7 +6,7 @@ vtelem - Test the correctness of the command-queue daemon.
 from typing import Tuple
 
 # module under test
-from vtelem.classes.command_queue_daemon import CommandQueueDaemon
+from vtelem.daemon.command_queue import CommandQueueDaemon
 
 
 def test_command_queue_daemon_basic():

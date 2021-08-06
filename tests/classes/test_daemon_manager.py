@@ -7,8 +7,8 @@ import json
 
 # module under test
 from vtelem.daemon import DaemonOperation, DaemonState
-from vtelem.classes.daemon_manager import DaemonManager
-from vtelem.classes.command_queue_daemon import CommandQueueDaemon
+from vtelem.daemon.manager import DaemonManager
+from vtelem.daemon.command_queue import CommandQueueDaemon
 from vtelem.classes.time_keeper import TimeKeeper
 from vtelem.factories.daemon_manager import create_daemon_manager_commander
 

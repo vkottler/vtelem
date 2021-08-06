@@ -9,7 +9,7 @@ from typing import Tuple
 # internal
 from vtelem.channel import Channel
 from vtelem.classes.telemetry_environment import TelemetryEnvironment
-from vtelem.classes.command_queue_daemon import CommandQueueDaemon
+from vtelem.daemon.command_queue import CommandQueueDaemon
 from vtelem.types.command_queue_daemon import ResultCbType
 
 

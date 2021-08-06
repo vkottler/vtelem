@@ -6,7 +6,7 @@ vtelem - Test the event-loop daemon's correctness.
 import time
 
 # module under test
-from vtelem.classes.event_loop_daemon import EventLoopDaemon
+from vtelem.daemon.event_loop import EventLoopDaemon
 
 
 def test_event_loop_daemon_basic():

@@ -7,7 +7,7 @@ import time
 from typing import Callable, List, Any
 
 # internal
-from .daemon import Daemon
+from vtelem.daemon.synchronous import Daemon
 
 
 class TimeKeeper(Daemon):

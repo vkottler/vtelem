@@ -7,7 +7,7 @@ from queue import Queue
 
 # module under test
 from vtelem.classes.telemetry_environment import TelemetryEnvironment
-from vtelem.classes.command_queue_daemon import CommandQueueDaemon
+from vtelem.daemon.command_queue import CommandQueueDaemon
 from vtelem.enums.primitive import Primitive, get_name
 from vtelem.factories.telemetry_environment import create_channel_commander
 

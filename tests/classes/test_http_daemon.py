@@ -15,7 +15,7 @@ import requests
 from tests.resources import get_resource
 
 # module under test
-from vtelem.classes.http_daemon import HttpDaemon
+from vtelem.daemon.http import HttpDaemon
 
 
 def test_http_daemon_serve():

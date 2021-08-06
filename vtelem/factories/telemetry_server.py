@@ -8,8 +8,8 @@ import json
 from typing import Any, Tuple
 
 # internal
-from vtelem.classes.command_queue_daemon import CommandQueueDaemon
-from vtelem.classes.telemetry_daemon import TelemetryDaemon
+from vtelem.daemon.command_queue import CommandQueueDaemon
+from vtelem.daemon.telemetry import TelemetryDaemon
 
 
 def register_http_handlers(

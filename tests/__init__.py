@@ -7,7 +7,7 @@ from queue import Queue
 from typing import Tuple
 
 # internal
-from vtelem.classes.command_queue_daemon import CommandQueueDaemon
+from vtelem.daemon.command_queue import CommandQueueDaemon
 from vtelem.types.command_queue_daemon import ResultCbType
 
 

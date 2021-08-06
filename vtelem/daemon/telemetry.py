@@ -7,10 +7,10 @@ from typing import List
 
 # internal
 from vtelem.channel import Channel
-from .telemetry_environment import TelemetryEnvironment
-from .time_keeper import TimeKeeper
-from .daemon import Daemon
-from .user_enum import UserEnum
+from vtelem.classes.telemetry_environment import TelemetryEnvironment
+from vtelem.classes.time_keeper import TimeKeeper
+from vtelem.classes.user_enum import UserEnum
+from vtelem.daemon.synchronous import Daemon
 
 
 class TelemetryDaemon(TelemetryEnvironment, Daemon):

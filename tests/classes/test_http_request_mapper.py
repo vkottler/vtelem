@@ -10,7 +10,7 @@ from typing import Tuple
 import requests
 
 # module under test
-from vtelem.classes.http_daemon import HttpDaemon
+from vtelem.daemon.http import HttpDaemon
 from vtelem.classes.http_request_mapper import (
     MapperAwareRequestHandler,
     parse_content_type,

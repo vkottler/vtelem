@@ -7,10 +7,10 @@ import json
 from typing import Tuple
 
 # internal
-from vtelem.classes.command_queue_daemon import CommandQueueDaemon
-from vtelem.classes.websocket_daemon import WebsocketDaemon
 from vtelem.classes.telemetry_environment import TelemetryEnvironment
 from vtelem.classes.time_keeper import TimeKeeper
+from vtelem.daemon.command_queue import CommandQueueDaemon
+from vtelem.daemon.websocket import WebsocketDaemon
 
 
 def commandable_websocket_daemon(

@@ -14,7 +14,7 @@ from vtelem.enums.daemon import (
     str_to_operation,
     operation_str,
 )
-from .time_entity import LockEntity
+from vtelem.classes.time_entity import LockEntity
 
 LOG = logging.getLogger(__name__)
 NAME_DENYLIST = ["all"]

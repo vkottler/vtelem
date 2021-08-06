@@ -10,7 +10,7 @@ import time
 import websockets
 
 # module under test
-from vtelem.classes.websocket_daemon import WebsocketDaemon
+from vtelem.daemon.websocket import WebsocketDaemon
 from vtelem.mtu import get_free_tcp_port
 
 

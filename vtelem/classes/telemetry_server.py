@@ -19,17 +19,17 @@ from vtelem.factories.websocket_daemon import commandable_websocket_daemon
 from vtelem.types.telemetry_server import AppSetup, AppLoop
 from vtelem.channel.group_registry import ChannelGroupRegistry
 from vtelem.daemon import DaemonOperation
-from .command_queue_daemon import CommandQueueDaemon
-from .daemon import Daemon
-from .daemon_manager import DaemonManager
-from .http_daemon import HttpDaemon
+from vtelem.daemon.command_queue import CommandQueueDaemon
+from vtelem.daemon.http import HttpDaemon
+from vtelem.daemon.manager import DaemonManager
+from vtelem.daemon.telemetry import TelemetryDaemon
+from vtelem.daemon.synchronous import Daemon
+from vtelem.daemon.websocket_telemetry import WebsocketTelemetryDaemon
 from .http_request_mapper import MapperAwareRequestHandler
 from .service_registry import ServiceRegistry
 from .stream_writer import StreamWriter
-from .telemetry_daemon import TelemetryDaemon
 from .time_keeper import TimeKeeper
 from .udp_client_manager import UdpClientManager
-from .websocket_telemetry_daemon import WebsocketTelemetryDaemon
 
 
 class TelemetryServer(HttpDaemon):

@@ -10,8 +10,8 @@ from typing import Callable, Any
 # internal
 from vtelem.daemon import DaemonBase, DaemonState
 from vtelem.enums.primitive import Primitive
-from . import LOG_PERIOD
-from .telemetry_environment import TelemetryEnvironment
+from vtelem.classes import LOG_PERIOD
+from vtelem.classes.telemetry_environment import TelemetryEnvironment
 
 LOG = logging.getLogger(__name__)
 

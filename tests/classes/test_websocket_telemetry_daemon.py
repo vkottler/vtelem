@@ -12,7 +12,7 @@ import websockets
 # module under test
 from vtelem.channel.framer import build_dummy_frame
 from vtelem.classes.stream_writer import default_writer
-from vtelem.classes.websocket_telemetry_daemon import (
+from vtelem.daemon.websocket_telemetry import (
     WebsocketTelemetryDaemon,
     queue_get,
 )

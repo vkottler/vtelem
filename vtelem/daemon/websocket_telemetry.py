@@ -12,9 +12,9 @@ from websockets.exceptions import WebSocketException
 
 # internal
 from vtelem.channel.frame import ChannelFrame
-from .stream_writer import StreamWriter, QueueClientManager
-from .telemetry_environment import TelemetryEnvironment
-from .websocket_daemon import WebsocketDaemon
+from vtelem.classes.stream_writer import StreamWriter, QueueClientManager
+from vtelem.classes.telemetry_environment import TelemetryEnvironment
+from vtelem.daemon.websocket import WebsocketDaemon
 
 
 def queue_get(queue: Queue, timeout: int = 2) -> Optional[Any]:
