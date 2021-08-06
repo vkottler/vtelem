@@ -6,7 +6,7 @@ vtelem - Contains a class for managing known services.
 from typing import Tuple, List
 
 # internal
-from .registry import Registry
+from vtelem.registry import Registry
 
 Service = List[Tuple[str, int]]
 

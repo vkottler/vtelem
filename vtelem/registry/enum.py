@@ -9,10 +9,10 @@ import logging
 from typing import Tuple, List, Type
 
 # internal
-from . import DEFAULTS
-from .registry import Registry
-from .type_registry import TypeRegistry
-from .user_enum import UserEnum, from_enum, UserEnumEncoder
+from vtelem.classes import DEFAULTS
+from vtelem.classes.user_enum import UserEnum, from_enum, UserEnumEncoder
+from vtelem.registry import Registry
+from vtelem.registry.type import TypeRegistry
 
 LOG = logging.getLogger(__name__)
 

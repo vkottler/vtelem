@@ -18,8 +18,8 @@ from vtelem.classes import LOG_PERIOD
 from vtelem.classes.event_queue import EventQueue
 from vtelem.classes.metered_queue import MeteredQueue
 from vtelem.classes.time_entity import TimeEntity
-from vtelem.classes.registry import Registry
 from vtelem.classes.type_primitive import TypePrimitive
+from vtelem.registry import Registry
 
 LOG = logging.getLogger(__name__)
 

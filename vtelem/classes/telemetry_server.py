@@ -25,8 +25,8 @@ from vtelem.daemon.manager import DaemonManager
 from vtelem.daemon.telemetry import TelemetryDaemon
 from vtelem.daemon.synchronous import Daemon
 from vtelem.daemon.websocket_telemetry import WebsocketTelemetryDaemon
+from vtelem.registry.service import ServiceRegistry
 from .http_request_mapper import MapperAwareRequestHandler
-from .service_registry import ServiceRegistry
 from .stream_writer import StreamWriter
 from .time_keeper import TimeKeeper
 from .udp_client_manager import UdpClientManager

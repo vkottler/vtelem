@@ -6,9 +6,9 @@ vtelem - Test the enum-registry class's correctness.
 from enum import Enum
 
 # module under test
-from vtelem.classes.type_registry import get_default
-from vtelem.classes.enum_registry import EnumRegistry
 from vtelem.classes.user_enum import UserEnum, from_enum
+from vtelem.registry.type import get_default
+from vtelem.registry.enum import EnumRegistry
 
 
 def test_from_enum():

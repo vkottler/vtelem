@@ -7,7 +7,7 @@ from typing import Tuple, Optional, List
 
 # internal
 from vtelem.enums.primitive import Primitive, PrimitiveEncoder, get_name
-from .registry import Registry
+from vtelem.registry import Registry
 
 
 class TypeRegistry(Registry[Primitive]):

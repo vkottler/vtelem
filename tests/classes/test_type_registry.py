@@ -3,7 +3,7 @@ vtelem - Test the type-registry class's correctness.
 """
 
 # module under test
-from vtelem.classes.type_registry import get_default
+from vtelem.registry.type import get_default
 from vtelem.enums.primitive import Primitive, get_name
 
 

@@ -12,10 +12,10 @@ from vtelem.channel import Channel
 from vtelem.channel.environment import ChannelEnvironment
 from vtelem.enums.primitive import Primitive
 from vtelem.enums.frame import MESSAGE_TYPES
+from vtelem.registry.enum import EnumRegistry
+from vtelem.registry.type import get_default
 from . import DEFAULTS
-from .enum_registry import EnumRegistry
 from .user_enum import UserEnum, from_enum
-from .type_registry import get_default
 
 
 class TelemetryEnvironment(ChannelEnvironment):
