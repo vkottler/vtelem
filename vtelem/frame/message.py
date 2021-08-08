@@ -3,6 +3,7 @@ vtelem - A module implementing message frames.
 """
 
 # built-in
+from math import ceil
 from typing import Any, Dict
 
 # internal
@@ -11,6 +12,10 @@ from vtelem.classes.type_primitive import TypePrimitive
 from vtelem.enums.frame import MESSAGE_TYPES
 from vtelem.frame import Frame
 from vtelem.frame.fields import MESSAGE_FIELDS
+
+HEADER_SIZE: int = 0
+for _field in MESSAGE_FIELDS:
+    HEADER_SIZE += _field.type.value.size
 
 
 class MessageFrame(Frame):
@@ -34,6 +39,19 @@ class MessageFrame(Frame):
         self.used += msg_len
         self.increment_count(msg_len)
         self.initialized = True
+
+    @property
+    def frame_overhead(self) -> int:
+        """
+        Compute the overhead required to serialize a message for this frame.
+        """
+
+        return HEADER_SIZE + self.overhead
+
+    def frame_size(self, message: str) -> int:
+        """Compute the size of a potential frame."""
+
+        return self.frame_overhead + len(message.encode())
 
     @staticmethod
     def messag_crc(message: str) -> int:
@@ -62,3 +80,13 @@ class MessageFrame(Frame):
                 prim.set(values[field.name])
             result[field.name] = prim
         return result
+
+
+def frames_required(prototype: MessageFrame, message_len: int) -> int:
+    """
+    Compute the number of frames required to completely transfer a message
+    via message frames.
+    """
+
+    len_per_mtu = prototype.mtu - prototype.frame_overhead
+    return ceil(message_len / len_per_mtu)

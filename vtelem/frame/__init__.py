@@ -56,6 +56,7 @@ class Frame:
         if use_crc:
             self.crc = new_default("crc")
             self.used += self.crc.size()
+        self.overhead = self.used
 
         assert self.space > 0
 
