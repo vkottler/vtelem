@@ -253,7 +253,7 @@ class ChannelEnvironment(TimeEntity):
 
     def decode_frame(
         self,
-        data: bytearray,
+        data: bytes,
         size: int,
         expected_id: Optional[TypePrimitive] = None,
     ) -> dict:

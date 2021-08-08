@@ -4,7 +4,7 @@ vtelem - Parsing frames into runtime data.
 
 # built-in
 import logging
-from typing import Optional
+from typing import cast, Optional
 
 # internal
 from vtelem.channel.registry import ChannelRegistry
@@ -47,14 +47,14 @@ def parse_frame_footer(result: dict, buf: ByteBuffer) -> bool:
 
 def decode_frame(
     channel_registry: ChannelRegistry,
-    data: bytearray,
+    data: bytes,
     size: int,
     expected_id: Optional[TypePrimitive] = None,
 ) -> dict:
     """Unpack a frame from an array of bytes."""
 
     result: dict = {"valid": False, "crc": None}
-    buf = ByteBuffer(data, False, size)
+    buf = ByteBuffer(cast(bytearray, data), False, size)
 
     if parse_frame_header(result, buf, expected_id):
         result["valid"] = True

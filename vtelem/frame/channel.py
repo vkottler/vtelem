@@ -34,6 +34,7 @@ class ChannelFrame(Frame):
         """Append the element buffer to the actual frame buffer."""
 
         self.buffer.append(self.elem_buffer.data, self.elem_buffer.size)
+        self.initialized = True
 
     def add_event(
         self,

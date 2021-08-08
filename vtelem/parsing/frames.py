@@ -9,6 +9,7 @@ import logging
 from vtelem.classes import DEFAULTS
 from vtelem.classes.byte_buffer import ByteBuffer
 from vtelem.channel.registry import ChannelRegistry
+from vtelem.frame.fields import MESSAGE_FIELDS
 
 LOG = logging.getLogger(__name__)
 
@@ -72,11 +73,8 @@ def parse_message_frame(
     Attempt to parse a message frame from the remaining byte-buffer.
     """
 
-    obj["message_type"] = buf.read(DEFAULTS["enum"])
-    obj["message_number"] = buf.read(DEFAULTS["id"])
-    obj["message_crc"] = buf.read(DEFAULTS["crc"])
-    obj["fragment_index"] = buf.read(DEFAULTS["id"])
-    obj["total_fragments"] = buf.read(DEFAULTS["id"])
+    for field in MESSAGE_FIELDS:
+        obj[field.name] = buf.read(field.type)
     obj["fragment_bytes"] = buf.read_bytes(obj["size"])
 
 

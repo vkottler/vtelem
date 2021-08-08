@@ -14,11 +14,13 @@ from vtelem.enums.primitive import random_integer
 from vtelem.enums.frame import FRAME_TYPES
 from vtelem.frame import Frame, time_to_int
 from vtelem.frame.channel import ChannelFrame
+from vtelem.frame.message import MessageFrame
 
 LOG = logging.getLogger(__name__)
 FRAME_CLASS_MAP: Dict[str, Type] = defaultdict(lambda: Frame)
 FRAME_CLASS_MAP["data"] = ChannelFrame
 FRAME_CLASS_MAP["event"] = ChannelFrame
+FRAME_CLASS_MAP["message"] = MessageFrame
 
 
 def basis_to_int(basis: float) -> int:

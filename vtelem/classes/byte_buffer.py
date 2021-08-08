@@ -12,6 +12,14 @@ import zlib
 from vtelem.enums.primitive import Primitive, get_size, get_fstring
 
 
+def crc(data: bytes, size: int = None, initial_val: int = 0) -> int:
+    """Compute a generic 32-bit CRC."""
+
+    if size is None:
+        size = len(data)
+    return zlib.crc32(data[0:size], initial_val)
+
+
 class ByteBuffer:
     """
     A storage object useful for building network-transportable frames
@@ -105,7 +113,7 @@ class ByteBuffer:
         )[0]
         return result
 
-    def read_bytes(self, count: int) -> bytearray:
+    def read_bytes(self, count: int) -> bytes:
         """Read some number of bytes from a buffer."""
 
         assert self.remaining >= count
@@ -114,16 +122,19 @@ class ByteBuffer:
         self.advance(count)
         return result
 
-    def append(self, other: bytearray, data_len: int) -> None:
+    def append(self, other: bytes, data_len: int = None) -> int:
         """Add raw data to the end of this set."""
 
+        if data_len is None:
+            data_len = len(other)
         self.data = self.data[0 : self.size] + other[0:data_len]
         self.advance(data_len, True)
+        return data_len
 
     def crc32(self, initial_val: int = 0) -> int:
         """Compute this buffer's crc32."""
 
-        return zlib.crc32(self.data[0 : self.size], initial_val)
+        return crc(self.data, self.size, initial_val)
 
     def write(self, inst: Primitive, data: Any) -> int:
         """

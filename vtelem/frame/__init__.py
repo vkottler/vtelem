@@ -4,12 +4,12 @@ vtelem - A module for basic frame interfaces.
 
 # built-in
 import math
-from typing import Any, Dict, Tuple
+from typing import Any, Dict, NamedTuple, Tuple
 
 # internal
 from vtelem.classes.byte_buffer import ByteBuffer
 from vtelem.classes.type_primitive import TypePrimitive, new_default
-from vtelem.enums.primitive import random_integer
+from vtelem.enums.primitive import Primitive, random_integer
 
 
 def time_to_int(time: float, precision: int = 1000) -> int:
@@ -37,6 +37,7 @@ class Frame:
         self.buffer = ByteBuffer(bytearray(self.mtu))
         self.id_primitive = new_default("id")
         self.finalized = False
+        self.initialized = False
 
         # write frame header: (application) id, type, timestamp
         self.write(frame_id)
@@ -118,6 +119,7 @@ class Frame:
 
         # run frame-specific finalization
         self.finalize_hook()
+        assert self.initialized
 
         # compute and write the crc
         if self.crc is not None:
@@ -130,3 +132,10 @@ class Frame:
         self.finalized = True
         assert self.buffer.size == self.used
         return self.used
+
+
+class FieldType(NamedTuple):
+    """A pairing of a field name and its type."""
+
+    name: str
+    type: Primitive
