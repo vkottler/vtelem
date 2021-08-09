@@ -63,13 +63,11 @@ class Framer:
             self.primitives["app_id"].get(),
         )
 
-    def new_frame(
-        self, frame_type: str, time: float, set_time: bool = True
-    ) -> Frame:
+    def new_frame(self, frame_type: str, time: float = None) -> Frame:
         """Construct a new frame object."""
 
         timestamp = self.timestamps[frame_type]
-        if set_time:
+        if time is not None:
             assert timestamp.set(time_to_int(time))
         return FRAME_CLASS_MAP[frame_type](
             self.mtu,

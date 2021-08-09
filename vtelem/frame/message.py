@@ -4,7 +4,7 @@ vtelem - A module implementing message frames.
 
 # built-in
 from math import ceil
-from typing import Any, Dict
+from typing import Any, Dict, Tuple
 
 # internal
 from vtelem.classes.byte_buffer import crc
@@ -22,7 +22,7 @@ class MessageFrame(Frame):
     """An implementation of a message frame."""
 
     def initialize(
-        self, field_data: Dict[str, TypePrimitive], fragment: str
+        self, field_data: Dict[str, TypePrimitive], fragment: bytes
     ) -> None:
         """Perform one-time initialization of a message frame."""
 
@@ -35,10 +35,17 @@ class MessageFrame(Frame):
             self.write(field_data[field.name])
 
         # write fragment
-        msg_len = self.buffer.append(fragment.encode())
+        msg_len = self.buffer.append(fragment)
         self.used += msg_len
         self.increment_count(msg_len)
         self.initialized = True
+
+    def initialize_str(
+        self, field_data: Dict[str, TypePrimitive], fragment: str
+    ) -> None:
+        """Initialize a message with a String fragment."""
+
+        return self.initialize(field_data, fragment.encode())
 
     @property
     def frame_overhead(self) -> int:
@@ -48,16 +55,27 @@ class MessageFrame(Frame):
 
         return HEADER_SIZE + self.overhead
 
-    def frame_size(self, message: str) -> int:
+    def frame_size(self, message: bytes) -> int:
         """Compute the size of a potential frame."""
 
-        return self.frame_overhead + len(message.encode())
+        return self.frame_overhead + len(message)
+
+    def frame_size_str(self, message: str) -> int:
+        """Compute the size of a potential frame with a String payload."""
+
+        return self.frame_size(message.encode())
 
     @staticmethod
-    def messag_crc(message: str) -> int:
+    def messag_crc(message: bytes) -> int:
         """Compute a message checksum."""
 
-        return crc(message.encode())
+        return crc(message)
+
+    @staticmethod
+    def messag_crc_str(message: str) -> int:
+        """Compute a message checksum for a String message."""
+
+        return MessageFrame.messag_crc(message.encode())
 
     @staticmethod
     def message_type(intended: str) -> int:
@@ -82,11 +100,13 @@ class MessageFrame(Frame):
         return result
 
 
-def frames_required(prototype: MessageFrame, message_len: int) -> int:
+def frames_required(
+    prototype: MessageFrame, message_len: int
+) -> Tuple[int, int]:
     """
     Compute the number of frames required to completely transfer a message
     via message frames.
     """
 
     len_per_mtu = prototype.mtu - prototype.frame_overhead
-    return ceil(message_len / len_per_mtu)
+    return ceil(message_len / len_per_mtu), len_per_mtu

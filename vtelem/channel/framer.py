@@ -42,21 +42,17 @@ class ChannelFramer(Framer):
         self.channels = channels
         self.lock = channel_lock
 
-    def new_event_frame(
-        self, time: float, set_time: bool = True
-    ) -> ChannelFrame:
+    def new_event_frame(self, time: float = None) -> ChannelFrame:
         """Construct a new event-frame object."""
 
-        frame = self.new_frame("event", time, set_time)
+        frame = self.new_frame("event", time)
         assert isinstance(frame, ChannelFrame)
         return frame
 
-    def new_data_frame(
-        self, time: float, set_time: bool = True
-    ) -> ChannelFrame:
+    def new_data_frame(self, time: float = None) -> ChannelFrame:
         """Construct a new data-frame object."""
 
-        frame = self.new_frame("data", time, set_time)
+        frame = self.new_frame("data", time)
         assert isinstance(frame, ChannelFrame)
         return frame
 
@@ -94,7 +90,7 @@ class ChannelFramer(Framer):
                 curr_frame.finalize(write_crc and self.use_crc)
                 queue.put(curr_frame)
                 frame_count += 1
-                curr_frame = self.new_event_frame(time, False)
+                curr_frame = self.new_event_frame()
                 assert curr_frame.add_event(
                     chan_id, chan_type, event[1], event[2]
                 )
@@ -135,7 +131,7 @@ class ChannelFramer(Framer):
                         curr_frame.finalize(write_crc and self.use_crc)
                         queue.put(curr_frame)
                         frame_count += 1
-                        curr_frame = self.new_data_frame(time, False)
+                        curr_frame = self.new_data_frame()
                         assert curr_frame.add(chan_id, channel.type, result)
 
         # finalize the last frame if necessary
