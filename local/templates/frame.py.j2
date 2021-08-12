@@ -3,7 +3,6 @@ vtelem - A definition of the supported frame types for this library.
 """
 
 # built-in
-from enum import IntEnum
 from typing import Callable, Dict
 
 # internal
@@ -18,14 +17,6 @@ from vtelem.parsing.frames import (
 from vtelem.types.frame import FrameType, FrameHeader
 
 
-class MessageType(IntEnum):
-    """An enumeration for possible frame types."""
-
-{% for item in message_types["entries"] %}
-    {{item["name"]|upper}} = {{item["value"]}}
-{% endfor %}
-
-
 FrameParser = Callable[[FrameHeader, ByteBuffer, ChannelRegistry], dict]
 PARSERS: Dict[FrameType, FrameParser] = {
 {% for item in frames["entries"] %}
@@ -33,4 +24,3 @@ PARSERS: Dict[FrameType, FrameParser] = {
 {% endfor %}
 }
 FRAME_TYPES = from_enum(FrameType)
-MESSAGE_TYPES = from_enum(MessageType)

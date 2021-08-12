@@ -3,6 +3,7 @@ vtelem - Test message framer correctness.
 """
 
 # module under test
+from vtelem.frame.fields import to_parsed
 from vtelem.message.framer import MessageFramer
 from vtelem.telemetry.environment import TelemetryEnvironment
 
@@ -37,6 +38,7 @@ def test_message_framer_basic():  # pylint: disable=too-many-locals
 
     # validate parsed results
     initial = total_parsed[0]
+    assert to_parsed(initial.body) is not None
     curr_idx = initial.body["fragment_index"]
     message_bytes = initial.body["fragment_bytes"]
     should_match = [
@@ -46,6 +48,7 @@ def test_message_framer_basic():  # pylint: disable=too-many-locals
         "total_fragments",
     ]
     for parsed in total_parsed[1:]:
+        assert to_parsed(parsed.body) is not None
         for check in should_match:
             assert parsed.body[check] == initial.body[check]
         assert parsed.body["fragment_index"] == curr_idx + 1

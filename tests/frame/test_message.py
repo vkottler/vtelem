@@ -3,10 +3,10 @@ vtelem - Test message frame correctness.
 """
 
 # module under test
-from vtelem.enums.frame import MessageType
 from vtelem.frame.message import MessageFrame, frames_required
 from vtelem.frame.framer import Framer
 from vtelem.telemetry.environment import TelemetryEnvironment
+from vtelem.types.frame import MessageType
 
 
 def test_message_frame_basic():

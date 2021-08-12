@@ -1,14 +1,13 @@
 # =====================================
 # generator=datazen
 # version=1.7.9
-# hash=d2192197ca211c3b77e43f85bdc41ee7
+# hash=0c18bf173ef7489425f320bdb0f2de3e
 # =====================================
 """
 vtelem - A definition of the supported frame types for this library.
 """
 
 # built-in
-from enum import IntEnum
 from typing import Callable, Dict
 
 # internal
@@ -25,14 +24,6 @@ from vtelem.parsing.frames import (
 from vtelem.types.frame import FrameType, FrameHeader
 
 
-class MessageType(IntEnum):
-    """An enumeration for possible frame types."""
-
-    AGNOSTIC = 0
-    TEXT = 1
-    JSON = 2
-
-
 FrameParser = Callable[[FrameHeader, ByteBuffer, ChannelRegistry], dict]
 PARSERS: Dict[FrameType, FrameParser] = {
     FrameType.INVALID: parse_invalid_frame,
@@ -42,4 +33,3 @@ PARSERS: Dict[FrameType, FrameParser] = {
     FrameType.STREAM: parse_stream_frame,
 }
 FRAME_TYPES = from_enum(FrameType)
-MESSAGE_TYPES = from_enum(MessageType)

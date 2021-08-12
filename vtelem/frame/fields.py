@@ -3,11 +3,11 @@ vtelem - Data structures for organizing frame-field information.
 """
 
 # built-in
-from typing import List
+from typing import List, NamedTuple
 
 # internal
 from vtelem.classes import DEFAULTS
-from vtelem.frame import FieldType
+from vtelem.types.frame import FieldType, MessageType
 
 
 MESSAGE_FIELDS: List[FieldType] = [
@@ -17,3 +17,28 @@ MESSAGE_FIELDS: List[FieldType] = [
     FieldType("fragment_index", DEFAULTS["id"]),
     FieldType("total_fragments", DEFAULTS["id"]),
 ]
+
+
+class ParsedMessage(NamedTuple):
+    """An encapsulation of fields present in a parsed message."""
+
+    type: MessageType
+    number: int
+    crc: int
+    fragment_index: int
+    total_fragments: int
+
+
+def to_parsed(data: dict) -> ParsedMessage:
+    """From raw parsed data, construct a named tuple."""
+
+    for field in MESSAGE_FIELDS:
+        assert field.name in data
+
+    return ParsedMessage(
+        MessageType(data["message_type"]),
+        data["message_number"],
+        data["message_crc"],
+        data["fragment_index"],
+        data["total_fragments"],
+    )

@@ -1,7 +1,7 @@
 # =====================================
 # generator=datazen
 # version=1.7.9
-# hash=132b6c30deef9606da5463c457ebe601
+# hash=37f3d7ceb6d9b08d24e6ac9579761eb6
 # =====================================
 """
 vtelem - Useful type definitions for working with frames.
@@ -10,6 +10,10 @@ vtelem - Useful type definitions for working with frames.
 # built-in
 from enum import IntEnum
 from typing import NamedTuple, Optional
+
+# internal
+from vtelem.classes.user_enum import from_enum
+from vtelem.enums.primitive import Primitive
 
 
 class FrameType(IntEnum):
@@ -43,3 +47,21 @@ class ParsedFrame(NamedTuple):
     header: FrameHeader
     body: dict
     footer: FrameFooter
+
+
+class FieldType(NamedTuple):
+    """A pairing of a field name and its type."""
+
+    name: str
+    type: Primitive
+
+
+class MessageType(IntEnum):
+    """An enumeration for possible frame types."""
+
+    AGNOSTIC = 0
+    TEXT = 1
+    JSON = 2
+
+
+MESSAGE_TYPES = from_enum(MessageType)

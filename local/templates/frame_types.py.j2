@@ -6,6 +6,10 @@ vtelem - Useful type definitions for working with frames.
 from enum import IntEnum
 from typing import NamedTuple, Optional
 
+# internal
+from vtelem.classes.user_enum import from_enum
+from vtelem.enums.primitive import Primitive
+
 
 class FrameType(IntEnum):
     """An enumeration for possible frame types."""
@@ -37,3 +41,21 @@ class ParsedFrame(NamedTuple):
     header: FrameHeader
     body: dict
     footer: FrameFooter
+
+
+class FieldType(NamedTuple):
+    """A pairing of a field name and its type."""
+
+    name: str
+    type: Primitive
+
+
+class MessageType(IntEnum):
+    """An enumeration for possible frame types."""
+
+{% for item in message_types["entries"] %}
+    {{item["name"]|upper}} = {{item["value"]}}
+{% endfor %}
+
+
+MESSAGE_TYPES = from_enum(MessageType)

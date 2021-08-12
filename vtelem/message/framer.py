@@ -6,9 +6,9 @@ vtelem - A module exposing message serialization methods.
 from typing import Dict, Tuple, Sequence
 
 # internal
-from vtelem.enums.frame import MessageType
 from vtelem.frame.framer import Framer
 from vtelem.frame.message import MessageFrame, frames_required
+from vtelem.types.frame import MessageType
 
 
 class MessageFramer(Framer):
