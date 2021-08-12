@@ -4,7 +4,7 @@ vtelem - An environment that supports management of telemetry.
 
 # built-in
 from collections import defaultdict
-from enum import Enum
+from enum import IntEnum
 from typing import List, Dict, Type, Tuple, Optional
 
 # internal
@@ -168,7 +168,7 @@ class TelemetryEnvironment(ChannelEnvironment):
         assert enum_def is not None
         return self.set_now(channel_id, enum_def.get_value(data))
 
-    def add_from_enum(self, enum_class: Type[Enum]) -> int:
+    def add_from_enum(self, enum_class: Type[IntEnum]) -> int:
         """Add an enumeration from an enum class."""
 
         return self.add_enum(from_enum(enum_class))

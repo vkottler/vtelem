@@ -1,0 +1,39 @@
+"""
+vtelem - Useful type definitions for working with frames.
+"""
+
+# built-in
+from enum import IntEnum
+from typing import NamedTuple, Optional
+
+
+class FrameType(IntEnum):
+    """An enumeration for possible frame types."""
+
+{% for item in frames["entries"] %}
+    {{item["name"]|upper}} = {{item["value"]}}
+{% endfor %}
+
+
+class FrameHeader(NamedTuple):
+    """Elements contained in a frame header."""
+
+{% for item in header["entries"] %}
+    {{item["field"]}}: {{item["py_type"]}}
+{% endfor %}
+
+
+class FrameFooter(NamedTuple):
+    """Elements contained in a frame footer."""
+
+{% for item in footer["entries"] %}
+    {{item["field"]}}: {{item["py_type"]}}
+{% endfor %}
+
+
+class ParsedFrame(NamedTuple):
+    """A type defining fields in a parsed frame."""
+
+    header: FrameHeader
+    body: dict
+    footer: FrameFooter

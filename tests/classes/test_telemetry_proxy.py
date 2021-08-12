@@ -18,7 +18,7 @@ def setup_environment() -> dict:
 
     result: dict = {}
     # set up an environment
-    env = TelemetryEnvironment(DEFAULT_MTU, metrics_rate=1.0)
+    env = TelemetryEnvironment(DEFAULT_MTU, metrics_rate=1.0, use_crc=False)
 
     # set up a stream-writer
     writer, frame_queue = default_writer("test_writer", env=env)
@@ -66,7 +66,7 @@ def test_telemetry_proxy_read_error():
         # read expected number of frames
         for _ in range(frame_count):
             frame = testenv["proxy"].frames.get()
-            assert not frame["valid"]
+            assert frame is not None
 
         # close the server unexpectedly
         testenv["proxy"].function["inject_stop"]()
@@ -101,6 +101,6 @@ def test_telemetry_proxy_basic():
     # read frames from proxy
     for _ in range(frame_count):
         frame = testenv["proxy"].frames.get()
-        assert not frame["valid"]
+        assert frame is not None
 
     assert testenv["proxy"].stop()

@@ -12,6 +12,11 @@ renders:
   output_dir: "{{project}}/enums"
   dependencies:
   - "compiles-enums"
+- name: "frame_types.py"
+  output_dir: "{{project}}/types"
+  output_path: "frame.py"
+  dependencies:
+  - "compiles-enums"
 
 groups:
 - name: "local-python"
@@ -19,4 +24,5 @@ groups:
   - "renders-defaults.py"
   - "renders-primitive.py"
   - "renders-frame.py"
+  - "renders-frame_types.py"
   - "groups-python"

@@ -3,35 +3,34 @@ vtelem - A definition of the supported frame types for this library.
 """
 
 # built-in
+from enum import IntEnum
 from typing import Callable, Dict
 
 # internal
 from vtelem.classes.byte_buffer import ByteBuffer
 from vtelem.channel.registry import ChannelRegistry
-from vtelem.classes.user_enum import UserEnum
+from vtelem.classes.user_enum import from_enum
 from vtelem.parsing.frames import (
 {% for item in frames["entries"] %}
     parse_{{item["name"]}}_frame,
 {% endfor %}
 )
+from vtelem.types.frame import FrameType, FrameHeader
 
-FrameParser = Callable[[dict, ByteBuffer, ChannelRegistry], None]
-PARSERS: Dict[str, FrameParser] = {
-{% for item in frames["entries"] %}
-    "{{item["name"]}}": parse_{{item["name"]}}_frame,
-{% endfor %}
-}
 
-FRAME_TYPE_MAP: Dict[int, str] = {
-{% for item in frames["entries"] %}
-    {{item["value"]}}: "{{item["name"]}}",
-{% endfor %}
-}
-FRAME_TYPES = UserEnum("frame_type", FRAME_TYPE_MAP)
+class MessageType(IntEnum):
+    """An enumeration for possible frame types."""
 
-MESSAGE_TYPE_MAP: Dict[int, str] = {
 {% for item in message_types["entries"] %}
-    {{item["value"]}}: "{{item["name"]}}",
+    {{item["name"]|upper}} = {{item["value"]}}
+{% endfor %}
+
+
+FrameParser = Callable[[FrameHeader, ByteBuffer, ChannelRegistry], dict]
+PARSERS: Dict[FrameType, FrameParser] = {
+{% for item in frames["entries"] %}
+    FrameType.{{item["name"]|upper}}: parse_{{item["name"]}}_frame,
 {% endfor %}
 }
-MESSAGE_TYPES = UserEnum("message_type", MESSAGE_TYPE_MAP)
+FRAME_TYPES = from_enum(FrameType)
+MESSAGE_TYPES = from_enum(MessageType)

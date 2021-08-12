@@ -32,13 +32,13 @@ def test_message_framer_basic():  # pylint: disable=too-many-locals
     total_parsed = []
     for frame in frames:
         result = env.decode_frame(*frame.raw())
-        assert result["valid"]
+        assert result is not None
         total_parsed.append(result)
 
     # validate parsed results
     initial = total_parsed[0]
-    curr_idx = initial["fragment_index"]
-    message_bytes = initial["fragment_bytes"]
+    curr_idx = initial.body["fragment_index"]
+    message_bytes = initial.body["fragment_bytes"]
     should_match = [
         "message_type",
         "message_number",
@@ -47,11 +47,11 @@ def test_message_framer_basic():  # pylint: disable=too-many-locals
     ]
     for parsed in total_parsed[1:]:
         for check in should_match:
-            assert parsed[check] == initial[check]
-        assert parsed["fragment_index"] == curr_idx + 1
-        curr_idx = parsed["fragment_index"]
+            assert parsed.body[check] == initial.body[check]
+        assert parsed.body["fragment_index"] == curr_idx + 1
+        curr_idx = parsed.body["fragment_index"]
 
-        message_bytes += parsed["fragment_bytes"]
+        message_bytes += parsed.body["fragment_bytes"]
 
     # verify overall correctness
     assert message_bytes == long_message_bytes

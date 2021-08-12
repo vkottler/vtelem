@@ -1,19 +1,20 @@
 # =====================================
 # generator=datazen
 # version=1.7.9
-# hash=407dd0a3a3e83bd5324a7b29a6f899f5
+# hash=d2192197ca211c3b77e43f85bdc41ee7
 # =====================================
 """
 vtelem - A definition of the supported frame types for this library.
 """
 
 # built-in
+from enum import IntEnum
 from typing import Callable, Dict
 
 # internal
 from vtelem.classes.byte_buffer import ByteBuffer
 from vtelem.channel.registry import ChannelRegistry
-from vtelem.classes.user_enum import UserEnum
+from vtelem.classes.user_enum import from_enum
 from vtelem.parsing.frames import (
     parse_invalid_frame,
     parse_data_frame,
@@ -21,28 +22,24 @@ from vtelem.parsing.frames import (
     parse_message_frame,
     parse_stream_frame,
 )
+from vtelem.types.frame import FrameType, FrameHeader
 
-FrameParser = Callable[[dict, ByteBuffer, ChannelRegistry], None]
-PARSERS: Dict[str, FrameParser] = {
-    "invalid": parse_invalid_frame,
-    "data": parse_data_frame,
-    "event": parse_event_frame,
-    "message": parse_message_frame,
-    "stream": parse_stream_frame,
-}
 
-FRAME_TYPE_MAP: Dict[int, str] = {
-    0: "invalid",
-    1: "data",
-    2: "event",
-    3: "message",
-    4: "stream",
-}
-FRAME_TYPES = UserEnum("frame_type", FRAME_TYPE_MAP)
+class MessageType(IntEnum):
+    """An enumeration for possible frame types."""
 
-MESSAGE_TYPE_MAP: Dict[int, str] = {
-    0: "agnostic",
-    1: "text",
-    2: "json",
+    AGNOSTIC = 0
+    TEXT = 1
+    JSON = 2
+
+
+FrameParser = Callable[[FrameHeader, ByteBuffer, ChannelRegistry], dict]
+PARSERS: Dict[FrameType, FrameParser] = {
+    FrameType.INVALID: parse_invalid_frame,
+    FrameType.DATA: parse_data_frame,
+    FrameType.EVENT: parse_event_frame,
+    FrameType.MESSAGE: parse_message_frame,
+    FrameType.STREAM: parse_stream_frame,
 }
-MESSAGE_TYPES = UserEnum("message_type", MESSAGE_TYPE_MAP)
+FRAME_TYPES = from_enum(FrameType)
+MESSAGE_TYPES = from_enum(MessageType)

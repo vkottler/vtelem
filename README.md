@@ -2,11 +2,11 @@
     =====================================
     generator=datazen
     version=1.7.9
-    hash=49a05cf1c9381d6c9a794258af0d1ebb
+    hash=7f78f923c638e0818864b08343d9e115
     =====================================
 -->
 
-# vtelem ([0.2.7](https://pypi.org/project/vtelem/))
+# vtelem ([0.3.0](https://pypi.org/project/vtelem/))
 
 [![python](https://img.shields.io/pypi/pyversions/vtelem.svg)](https://pypi.org/project/vtelem/)
 ![Build Status](https://github.com/vkottler/vtelem/workflows/Python%20package/badge.svg)
@@ -19,9 +19,9 @@
 ```
 $ ./venv3.8/bin/vtelem -h
 
-usage: vtelem [-h] [--version] [-v] [-C DIR] [-i {lo,bond0,dummy0,eth0,sit0}]
-              [-p PORT] [--ws-cmd-port WS_CMD_PORT]
-              [--ws-tlm-port WS_TLM_PORT] [-t TICK] [--telem-rate TELEM_RATE]
+usage: vtelem [-h] [--version] [-v] [-C DIR] [-i {lo,enp0s25,wlo1}] [-p PORT]
+              [--ws-cmd-port WS_CMD_PORT] [--ws-tlm-port WS_TLM_PORT]
+              [-t TICK] [--telem-rate TELEM_RATE]
               [--metrics-rate METRICS_RATE] [--time-scale TIME_SCALE]
               [-a APP_ID] [-u UPTIME]
 
@@ -32,7 +32,7 @@ optional arguments:
   --version             show program's version number and exit
   -v, --verbose         set to increase logging verbosity
   -C DIR, --dir DIR     execute from a specific directory
-  -i {lo,bond0,dummy0,eth0,sit0}, --interface {lo,bond0,dummy0,eth0,sit0}
+  -i {lo,enp0s25,wlo1}, --interface {lo,enp0s25,wlo1}
                         interface to bind to
   -p PORT, --port PORT  http api port
   --ws-cmd-port WS_CMD_PORT

@@ -1,6 +1,7 @@
 entries:
 - field: "crc"
   type: "crc"
+  py_type: "Optional[int]"
   description: >-
     An optional checksum for the frame. In [Python](https://www.python.org/)
     this is done with

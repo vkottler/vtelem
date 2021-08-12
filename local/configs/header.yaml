@@ -1,6 +1,7 @@
 entries:
 - field: "app_id"
   type: "id"
+  py_type: "int"
   description: >-
     An application identifier used to allow unique identification of the
     sender (not a security feature). It is assumed that users control both
@@ -9,14 +10,17 @@ entries:
     field can be ignored.
 - field: "type"
   type: "enum"
+  py_type: "FrameType"
   description: >-
     The type of frame that should be parsed after this header. Information on
     parsing each frame is below.
 - field: "timestamp"
   type: "timestamp"
+  py_type: "int"
   description: >-
     An integer timestamp for the frame. Neither an exact epoch or unit is
     strictly defined.
 - field: "size"
   type: "count"
+  py_type: "int"
   description: "A size parameter to be interpreted based on the frame type."

@@ -7,6 +7,7 @@ import time
 
 # module under test
 from vtelem.enums.primitive import Primitive
+from vtelem.enums.frame import FrameType
 from vtelem.telemetry.environment import TelemetryEnvironment
 
 
@@ -41,5 +42,6 @@ def test_read_frame_basic():
 
     # check correctness of frames
     result = frames[0]
-    assert result["type"] == "data"
-    assert result["size"] == len(chan_ids)
+    assert result is not None
+    assert result.header.type == FrameType.DATA
+    assert result.header.size == len(chan_ids)

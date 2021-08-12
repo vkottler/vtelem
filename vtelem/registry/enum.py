@@ -4,7 +4,7 @@ vtelem - Contains a class for managing known enumeration sets.
 
 # built-in
 from collections import defaultdict
-from enum import Enum
+from enum import IntEnum
 import logging
 from typing import Tuple, List, Type
 
@@ -38,7 +38,7 @@ class EnumRegistry(Registry[UserEnum]):
             result = (True, id_candidate)
         return result
 
-    def add_from_enum(self, enum_class: Type[Enum]) -> Tuple[bool, int]:
+    def add_from_enum(self, enum_class: Type[IntEnum]) -> Tuple[bool, int]:
         """Attempt to register an enumeration from an enum class."""
 
         return self.add_enum(from_enum(enum_class))

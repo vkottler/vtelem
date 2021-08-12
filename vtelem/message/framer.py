@@ -6,7 +6,7 @@ vtelem - A module exposing message serialization methods.
 from typing import Dict, Tuple, Sequence
 
 # internal
-from vtelem.enums.frame import MESSAGE_TYPE_MAP
+from vtelem.enums.frame import MessageType
 from vtelem.frame.framer import Framer
 from vtelem.frame.message import MessageFrame, frames_required
 
@@ -25,8 +25,8 @@ class MessageFramer(Framer):
         super().__init__(mtu, app_id_basis, use_crc)
 
         # initialize message numbers
-        self.message_numbers: Dict[str, int] = {}
-        for message_type in MESSAGE_TYPE_MAP.values():
+        self.message_numbers: Dict[MessageType, int] = {}
+        for message_type in MessageType:
             self.message_numbers[message_type] = 0
 
     def message_frame(self, time: float = None) -> MessageFrame:
@@ -40,7 +40,7 @@ class MessageFramer(Framer):
         self,
         message: bytes,
         time: float = None,
-        message_type: str = "agnostic",
+        message_type: MessageType = MessageType.AGNOSTIC,
     ) -> Tuple[Sequence[MessageFrame], int]:
         """Serialize an arbitrary message into one or more frames."""
 
@@ -50,7 +50,7 @@ class MessageFramer(Framer):
 
         base_params = MessageFrame.create_fields(
             {
-                "message_type": MessageFrame.message_type(message_type),
+                "message_type": message_type.value,
                 "message_number": self.message_numbers[message_type],
                 "message_crc": MessageFrame.messag_crc(message),
                 "fragment_index": 0,
@@ -83,7 +83,7 @@ class MessageFramer(Framer):
         self,
         message: str,
         time: float = None,
-        message_type: str = "text",
+        message_type: MessageType = MessageType.TEXT,
     ) -> Tuple[Sequence[MessageFrame], int]:
         """Serialize an arbitrary String-based message."""
 

@@ -9,7 +9,6 @@ from typing import Any, Dict, Tuple
 # internal
 from vtelem.classes.byte_buffer import crc
 from vtelem.classes.type_primitive import TypePrimitive
-from vtelem.enums.frame import MESSAGE_TYPES
 from vtelem.frame import Frame
 from vtelem.frame.fields import MESSAGE_FIELDS
 
@@ -76,12 +75,6 @@ class MessageFrame(Frame):
         """Compute a message checksum for a String message."""
 
         return MessageFrame.messag_crc(message.encode())
-
-    @staticmethod
-    def message_type(intended: str) -> int:
-        """Convert a message type to an integer."""
-
-        return MESSAGE_TYPES.get_value(intended)
 
     @staticmethod
     def create_fields(

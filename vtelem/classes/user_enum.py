@@ -4,9 +4,9 @@ vtelem - Implements an object for storing a runtime enumeration.
 
 # built-in
 from collections import defaultdict
-from enum import Enum
+from enum import IntEnum
 import json
-from typing import Dict, Callable, Optional, Type
+from typing import Dict, Callable, Iterator, Optional, Type
 
 # internal
 from vtelem.enums.primitive import get_size
@@ -40,6 +40,12 @@ class UserEnum:
         val = default if default is not None else list(self.strings.keys())[0]
         assert val is not None
         self.default_val = val
+
+    def __iter__(self) -> Iterator[str]:
+        """Iterate over all valid String keys in this enum."""
+
+        options = [x for x in self.strings if x is not None]
+        return iter(options)
 
     def get_str(self, val: int) -> str:
         """Look up the String represented by the integer enum value."""
@@ -90,7 +96,7 @@ class UserEnumEncoder(json.JSONEncoder):
         return {"name": o.name, "mappings": o.enum}
 
 
-def from_enum(enum_class: Type[Enum]) -> UserEnum:
+def from_enum(enum_class: Type[IntEnum]) -> UserEnum:
     """From an enum class, create a user enum."""
 
     values = {}

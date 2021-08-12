@@ -9,30 +9,32 @@ import logging
 from vtelem.classes import DEFAULTS
 from vtelem.classes.byte_buffer import ByteBuffer
 from vtelem.channel.registry import ChannelRegistry
+from vtelem.types.frame import FrameHeader
 from vtelem.frame.fields import MESSAGE_FIELDS
 
 LOG = logging.getLogger(__name__)
 
 
 def parse_invalid_frame(
-    obj: dict, __: ByteBuffer, ___: ChannelRegistry
-) -> None:
+    header: FrameHeader, buf: ByteBuffer, ___: ChannelRegistry
+) -> dict:
     """A default parser for frames we can't interpret."""
 
-    LOG.warning("can't decode frame type '%s'", obj["type"])
-    obj["valid"] = False
+    LOG.warning("can't decode frame type '%s'", header.type)
+    buf.advance(buf.remaining)
+    return {"valid": False}
 
 
 def parse_data_frame(
-    obj: dict, buf: ByteBuffer, registry: ChannelRegistry
-) -> None:
+    header: FrameHeader, buf: ByteBuffer, registry: ChannelRegistry
+) -> dict:
     """
     Attempt to parse a data frame from the remaining byte-buffer.
     """
 
     # read channel IDs
-    obj["channels"] = []
-    for _ in range(obj["size"]):
+    obj: dict = {"channels": []}
+    for _ in range(header.size):
         chan = {"id": buf.read(DEFAULTS["id"])}
         chan["channel"] = registry.get_item(chan["id"])
         assert not chan["channel"].is_stream
@@ -42,17 +44,19 @@ def parse_data_frame(
     for chan in obj["channels"]:
         chan["value"] = buf.read(chan["channel"].type)
 
+    return obj
+
 
 def parse_event_frame(
-    obj: dict, buf: ByteBuffer, registry: ChannelRegistry
-) -> None:
+    header: FrameHeader, buf: ByteBuffer, registry: ChannelRegistry
+) -> dict:
     """
     Attempt to parse an event frame from the remaining byte-buffer.
     """
 
     # read channel IDs
-    obj["events"] = []
-    for _ in range(obj["size"]):
+    obj: dict = {"events": []}
+    for _ in range(header.size):
         event = {"id": buf.read(DEFAULTS["id"])}
         event["channel"] = registry.get_item(event["id"])
         assert not event["channel"].is_stream
@@ -65,28 +69,31 @@ def parse_event_frame(
         event["current"] = {"value": buf.read(event["channel"].type)}
         event["current"]["time"] = buf.read(DEFAULTS["timestamp"])
 
+    return obj
+
 
 def parse_message_frame(
-    obj: dict, buf: ByteBuffer, _: ChannelRegistry
-) -> None:
+    header: FrameHeader, buf: ByteBuffer, _: ChannelRegistry
+) -> dict:
     """
     Attempt to parse a message frame from the remaining byte-buffer.
     """
 
-    for field in MESSAGE_FIELDS:
-        obj[field.name] = buf.read(field.type)
-    obj["fragment_bytes"] = buf.read_bytes(obj["size"])
+    obj = {field.name: buf.read(field.type) for field in MESSAGE_FIELDS}
+    obj["fragment_bytes"] = buf.read_bytes(header.size)
+    return obj
 
 
 def parse_stream_frame(
-    obj: dict, buf: ByteBuffer, registry: ChannelRegistry
-) -> None:
+    header: FrameHeader, buf: ByteBuffer, registry: ChannelRegistry
+) -> dict:
     """
     Attempt to parse a stream frame from the remaining byte-buffer.
     """
 
-    obj["id"] = buf.read(DEFAULTS["id"])
+    obj = {"id": buf.read(DEFAULTS["id"])}
     obj["channel"] = registry.get_item(obj["id"])
     assert obj["channel"].is_stream
     obj["index"] = buf.read(DEFAULTS["count"])
-    obj["data"] = buf.read_bytes(obj["size"] * obj["channel"].size())
+    obj["data"] = buf.read_bytes(header.size * obj["channel"].size())
+    return obj

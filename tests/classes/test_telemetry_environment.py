@@ -9,6 +9,7 @@ import time
 from vtelem.channel import Channel
 from vtelem.channel.framer import Framer
 from vtelem.classes.user_enum import UserEnum
+from vtelem.enums.frame import FrameType
 from vtelem.enums.primitive import Primitive
 from vtelem.telemetry.environment import TelemetryEnvironment
 
@@ -52,7 +53,8 @@ def test_environment_with_metrics():
     env.dispatch_now()
     frame = env.get_next_frame().raw()
     frame_data = env.decode_frame(frame[0], frame[1])
-    assert frame_data["type"] == "data"
+    assert frame_data is not None
+    assert frame_data.header.type == FrameType.DATA
 
     # make sure all the metrics can be found in the frame
     expected_metrics = [
@@ -66,7 +68,7 @@ def test_environment_with_metrics():
     ]
     for metric in expected_metrics:
         found = False
-        for chan in frame_data["channels"]:
+        for chan in frame_data.body["channels"]:
             if metric == chan["channel"].name:
                 found = True
                 break

@@ -79,6 +79,6 @@ class TelemetryProxy(DaemonBase):
                 continue
 
             assert self.env is not None
-            self.frames.put(
-                self.env.decode_frame(data, len(data), self.expected_id)
-            )
+            frame = self.env.decode_frame(data, len(data), self.expected_id)
+            if frame is not None:
+                self.frames.put(frame)

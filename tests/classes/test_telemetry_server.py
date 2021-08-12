@@ -98,7 +98,7 @@ def test_telemetry_server_ws_telemetry():
                     result = telem.decode_frame(
                         frame, len(frame), telem.app_id
                     )
-                    assert result["valid"]
+                    assert result is not None
 
         for _ in range(5):
             asyncio.get_event_loop().run_until_complete(telemetry_test())

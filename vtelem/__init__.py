@@ -1,7 +1,7 @@
 # =====================================
 # generator=datazen
 # version=1.7.9
-# hash=7671d3f3cc82a5ac793f8cf2050d360e
+# hash=3da1fcabb3d5b1cf9e005820eaaefb3c
 # =====================================
 
 """
@@ -9,5 +9,5 @@ vtelem - Useful defaults and other package metadata.
 """
 
 PKG_NAME = "vtelem"
-VERSION = "0.2.7"
+VERSION = "0.3.0"
 DESCRIPTION = "A real-time telemetry library."

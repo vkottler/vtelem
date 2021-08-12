@@ -9,7 +9,7 @@ from typing import Any, List, Tuple, Dict, Optional
 
 # internal
 from vtelem.enums.primitive import Primitive
-from vtelem.parsing.encapsulation import decode_frame
+from vtelem.parsing.encapsulation import decode_frame, ParsedFrame
 from vtelem.channel import Channel
 from vtelem.channel.registry import ChannelRegistry
 from vtelem.channel.framer import ChannelFramer
@@ -256,7 +256,7 @@ class ChannelEnvironment(TimeEntity):
         data: bytes,
         size: int,
         expected_id: Optional[TypePrimitive] = None,
-    ) -> dict:
+    ) -> Optional[ParsedFrame]:
         """Unpack a frame from an array of bytes."""
 
         return decode_frame(self.channel_registry, data, size, expected_id)
