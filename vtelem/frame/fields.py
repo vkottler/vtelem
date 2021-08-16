@@ -27,6 +27,7 @@ class ParsedMessage(NamedTuple):
     crc: int
     fragment_index: int
     total_fragments: int
+    data: bytes
 
 
 def to_parsed(data: dict) -> ParsedMessage:
@@ -41,4 +42,5 @@ def to_parsed(data: dict) -> ParsedMessage:
         data["message_crc"],
         data["fragment_index"],
         data["total_fragments"],
+        data["fragment_bytes"],
     )

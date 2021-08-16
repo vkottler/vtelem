@@ -4,37 +4,23 @@ vtelem - Test message framer correctness.
 
 # module under test
 from vtelem.frame.fields import to_parsed
-from vtelem.message.framer import MessageFramer
-from vtelem.telemetry.environment import TelemetryEnvironment
+
+# internal
+from tests.message import LONG_MESSAGE, create_env, parse_frames
 
 
 def test_message_framer_basic():  # pylint: disable=too-many-locals
     """Test simple message serialization."""
 
-    basis = 0.5
-    framer = MessageFramer(64, basis, False)
-    long_message = """
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod
-    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
-    veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-    commodo consequat. Duis aute irure dolor in reprehenderit in voluptate
-    velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat
-    cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id
-    est laborum.
-    """
-    long_message_bytes = long_message.encode()
+    framer, env = create_env()
+    long_message_bytes = LONG_MESSAGE.encode()
 
-    frames, total_bytes = framer.serialize_message_str(long_message)
+    frames, total_bytes = framer.serialize_message_str(LONG_MESSAGE)
     assert len(frames) > 1
     assert total_bytes > len(long_message_bytes)
 
     # attempt to de-serialize the message
-    env = TelemetryEnvironment(2 ** 8, 0.0, app_id_basis=basis, use_crc=False)
-    total_parsed = []
-    for frame in frames:
-        result = env.decode_frame(*frame.raw())
-        assert result is not None
-        total_parsed.append(result)
+    total_parsed = parse_frames(env, frames)
 
     # validate parsed results
     initial = total_parsed[0]
@@ -58,4 +44,4 @@ def test_message_framer_basic():  # pylint: disable=too-many-locals
 
     # verify overall correctness
     assert message_bytes == long_message_bytes
-    assert message_bytes.decode() == long_message
+    assert message_bytes.decode() == LONG_MESSAGE
