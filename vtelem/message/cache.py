@@ -4,12 +4,15 @@ vtelem - A module implementing a message storage.
 
 # built-in
 import os
-from typing import List, Optional, Tuple
+from typing import Dict, Callable, List, Optional, Tuple
 
 # internal
 from vtelem.classes.data_cache import DataCache
 from vtelem.frame.fields import to_parsed
 from vtelem.types.frame import ParsedFrame, FrameType, MessageType
+
+MessageCallback = Callable[[MessageType, int, bytes], None]
+CallbackMap = Dict[MessageType, List[MessageCallback]]
 
 
 class MessageCache(DataCache):
@@ -18,12 +21,18 @@ class MessageCache(DataCache):
     coherent messages when completely received.
     """
 
-    def __init__(self, cache_dir: str) -> None:
+    def __init__(
+        self, cache_dir: str, initial_callbacks: CallbackMap = None
+    ) -> None:
         """Construct a new message cache."""
 
         super().__init__(cache_dir)
 
+        if initial_callbacks is None:
+            initial_callbacks = {}
+
         self.fragment_data: dict = {}
+        self.message_callbacks: CallbackMap = initial_callbacks
         self.fragment_dir = cache_dir + "_fragments"
 
         for mtype in MessageType:
@@ -31,8 +40,40 @@ class MessageCache(DataCache):
             if mtype_str not in self.data:
                 self.data[mtype_str] = {}
             self.fragment_data[mtype.value] = {}
+            if mtype not in self.message_callbacks:
+                self.message_callbacks[mtype] = []
 
         self.load_fragments(self.fragment_dir)
+        self.service_all_callbacks()
+
+    def add_callback(
+        self, mtype: MessageType, callback: MessageCallback
+    ) -> None:
+        """
+        Add a callback to consume a specific message type when complete
+        messages are received.
+        """
+
+        self.message_callbacks[mtype].append(callback)
+
+    def service_callbacks(
+        self, mtype: MessageType, number: int, data: bytes
+    ) -> None:
+        """Invoke callbacks for a message."""
+
+        for callback in self.message_callbacks[mtype]:
+            callback(mtype, number, data)
+
+    def service_all_callbacks(self) -> None:
+        """Invoke registered callbacks for all complete messages."""
+
+        for mtype in MessageType:
+            callbacks = self.message_callbacks[mtype]
+            for crc in self.complete(mtype):
+                message = self.content(mtype, crc)
+                assert message is not None
+                for callback in callbacks:
+                    callback(mtype, message[0], message[1])
 
     def load_fragments(self, fragment_dir: str) -> None:
         """Load fragment data from disk."""
@@ -152,3 +193,10 @@ class MessageCache(DataCache):
             if crc_data["fragments"] == message.total_fragments:
                 crc_data["complete"] = True
                 crc_data["number"] = message.number
+
+                # service message consumers
+                full_message = self.content(message.type, message.crc)
+                assert full_message is not None
+                self.service_callbacks(
+                    message.type, full_message[0], full_message[1]
+                )

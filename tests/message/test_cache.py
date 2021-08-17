@@ -20,8 +20,17 @@ def test_message_cache_basic():
     frames, _ = framer.serialize_message_str(LONG_MESSAGE)
     parsed = parse_frames(env, frames)
 
+    def sample_callback(mtype: MessageType, number: int, data: bytes) -> None:
+        """An example message consumer."""
+
+        assert mtype == MessageType.TEXT
+        assert number >= 0
+        assert data.decode() == LONG_MESSAGE
+
     with tempfile.TemporaryDirectory() as cache_dir:
         cache = MessageCache(cache_dir)
+        cache.add_callback(MessageType.TEXT, sample_callback)
+
         for message in parsed:
             cache.ingest(message)
 
@@ -40,7 +49,9 @@ def test_message_cache_basic():
 
         # confirm the cache can be loaded
         cache.write()
-        new_cache = MessageCache(cache_dir)
+        new_cache = MessageCache(
+            cache_dir, {MessageType.TEXT: [sample_callback]}
+        )
         print(new_cache.data)
         assert len(new_cache.complete(MessageType.TEXT)) == 1
         _, data = new_cache.content_str(MessageType.TEXT, completed[0])
