@@ -63,8 +63,7 @@ class SocketClient(DaemonBase):
         size.
         """
 
-        with self.lock:
-            self.mtu = new_mtu
+        self.mtu = new_mtu
         LOG.info("%s: mtu set to %d", self.name, new_mtu)
 
     def run(self, *_, **__) -> None:
@@ -72,10 +71,8 @@ class SocketClient(DaemonBase):
 
         errored = False
         while self.state != DaemonState.STOPPING and not errored:
-            with self.lock:
-                mtu = self.mtu
             try:
-                data = self.socket.recv(mtu)
+                data = self.socket.recv(self.mtu)
                 if not data:
                     continue
             except OSError as exc:
