@@ -9,6 +9,7 @@ from typing import Tuple
 # internal
 from vtelem.daemon.command_queue import CommandQueueDaemon
 from vtelem.classes.udp_client_manager import UdpClientManager
+from vtelem.mtu import Host
 from vtelem.types.command_queue_daemon import ResultCbType
 
 
@@ -18,7 +19,7 @@ def add_client(manager: UdpClientManager, data: dict) -> Tuple[bool, str]:
     if "host" not in data and "port" not in data:
         return False, "must provide 'host' and 'port'"
 
-    result = manager.add_client((data["host"], data["port"]))
+    result = manager.add_client(Host(data["host"], data["port"]))
     client_name = manager.client_name(result[0])
     client_str = "{}:{}".format(client_name[0], client_name[1])
     msg = "client '{}' ({}) added with mtu '{}'".format(

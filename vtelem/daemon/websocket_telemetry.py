@@ -5,7 +5,7 @@ vtelem - An interface for managing websocket servers that serve telemetry data.
 # built-in
 import asyncio
 from queue import Empty, Queue
-from typing import Any, Tuple, Set, Optional
+from typing import Any, Set, Optional
 
 # third-party
 from websockets.exceptions import WebSocketException
@@ -14,6 +14,7 @@ from websockets.exceptions import WebSocketException
 from vtelem.classes.stream_writer import StreamWriter, QueueClientManager
 from vtelem.daemon.websocket import WebsocketDaemon
 from vtelem.frame.channel import ChannelFrame
+from vtelem.mtu import Host
 from vtelem.telemetry.environment import TelemetryEnvironment
 
 
@@ -36,7 +37,7 @@ class WebsocketTelemetryDaemon(QueueClientManager, WebsocketDaemon):
         self,
         name: str,
         writer: StreamWriter,
-        address: Tuple[str, int] = None,
+        address: Host = None,
         env: TelemetryEnvironment = None,
         time_keeper: Any = None,
     ) -> None:

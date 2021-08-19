@@ -12,6 +12,7 @@ from typing import Any, Dict, Tuple
 # internal
 from vtelem.classes.stream_writer import StreamWriter, QueueClientManager
 from vtelem.daemon import DaemonBase
+from vtelem.mtu import Host
 from vtelem.telemetry.environment import TelemetryEnvironment
 
 LOG = logging.getLogger(__name__)
@@ -66,10 +67,13 @@ class TcpTelemetryDaemon(QueueClientManager, DaemonBase):
         name: str,
         writer: StreamWriter,
         env: TelemetryEnvironment,
-        address: Tuple[str, int] = ("0.0.0.0", 0),
+        address: Host = None,
         time_keeper: Any = None,
     ) -> None:
         """Construct a new tcp telemetry daemon."""
+
+        if address is None:
+            address = Host()
 
         QueueClientManager.__init__(self, name, writer)
         DaemonBase.__init__(self, name, env, time_keeper)

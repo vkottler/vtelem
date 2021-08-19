@@ -40,7 +40,7 @@ def test_telemetry_server_app_basic():
 
         assert data["a"] == "a"
 
-    server = TelemetryServer(0.01, 0.10, ("0.0.0.0", 0), 0.25)
+    server = TelemetryServer(0.01, 0.10, 0.25)
     server.register_application("test1", 0.10, app_setup, app_loop)
     with server.booted():
         server.register_application("test2", 0.10, app_setup, app_loop)

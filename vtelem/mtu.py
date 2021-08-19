@@ -7,13 +7,20 @@ from enum import IntEnum
 import logging
 import socket
 import sys
-from typing import Tuple
+from typing import NamedTuple
 
 # internal
 from .channel.framer import build_dummy_frame
 
 LOG = logging.getLogger(__name__)
 DEFAULT_MTU = 1500 - (60 + 8)
+
+
+class Host(NamedTuple):
+    """A generic representation of a network host."""
+
+    address: str = "0.0.0.0"
+    port: int = 0
 
 
 class SocketConstants(IntEnum):
@@ -24,9 +31,7 @@ class SocketConstants(IntEnum):
     IP_PMTUDISC_DO = 2
 
 
-def create_udp_socket(
-    host: Tuple[str, int], is_client: bool = True
-) -> socket.SocketType:
+def create_udp_socket(host: Host, is_client: bool = True) -> socket.SocketType:
     """Create a UDP socket, set to a requested peer address."""
 
     assert sys.platform == "linux"
@@ -80,23 +85,25 @@ def discover_mtu(
     return sock.getsockopt(socket.IPPROTO_IP, SocketConstants.IP_MTU)
 
 
-def get_free_tcp_port(interface_ip: str = "0.0.0.0") -> int:
+def get_free_tcp_port(
+    interface_ip: str = "0.0.0.0", test_port: int = 0
+) -> int:
     """
     Create a socket to determine an arbitrary port number that's available.
     There is an inherent race condition using this strategy.
     """
 
+    host = Host(interface_ip, test_port)
+
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.bind((interface_ip, 0))
+    sock.bind((host.address, host.port))
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     _, port = sock.getsockname()
     sock.close()
     return port
 
 
-def discover_ipv4_mtu(
-    host: Tuple[str, int], probe_size: int = DEFAULT_MTU
-) -> int:
+def discover_ipv4_mtu(host: Host, probe_size: int = DEFAULT_MTU) -> int:
     """
     Determine the maximum transmission unit for an IPv4 payload to a provided
     host.

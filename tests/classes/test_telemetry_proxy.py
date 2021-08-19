@@ -6,7 +6,7 @@ vtelem - Test the telemetry proxy's correctness.
 from vtelem.channel.framer import Framer, build_dummy_frame
 from vtelem.classes.stream_writer import default_writer
 from vtelem.classes.udp_client_manager import UdpClientManager
-from vtelem.mtu import DEFAULT_MTU
+from vtelem.mtu import DEFAULT_MTU, Host
 from vtelem.telemetry.environment import TelemetryEnvironment
 from vtelem.telemetry.proxy import TelemetryProxy
 
@@ -26,7 +26,7 @@ def setup_environment() -> dict:
     # set up the proxy
     app_basis = 0.5
     proxy = TelemetryProxy(
-        ("localhost", 0),
+        Host("localhost", 0),
         writer.get_queue("proxy"),
         Framer.create_app_id(app_basis),
         env,
@@ -34,7 +34,9 @@ def setup_environment() -> dict:
     )
 
     manager = UdpClientManager(writer)
-    client = manager.add_client(("localhost", proxy.socket.getsockname()[1]))
+    client = manager.add_client(
+        Host("localhost", proxy.socket.getsockname()[1])
+    )
     proxy.update_mtu(client[1])
     env.handle_new_mtu(client[1])
 

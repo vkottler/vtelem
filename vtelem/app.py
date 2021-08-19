@@ -10,27 +10,33 @@ import socket
 import netifaces  # type: ignore
 
 # internal
+from vtelem.mtu import Host
 from vtelem.telemetry.server import TelemetryServer
+from vtelem.types.telemetry_server import TelemetryServices
 
 
 def entry(args: argparse.Namespace) -> int:
     """Execute the requested task."""
 
     # determine appropriate ip address
-    ip_address = "0.0.0.0"
+    ip_address = Host().address
     if args.interface is not None:
         iface = netifaces.ifaddresses(args.interface)[socket.AF_INET]
         ip_address = iface[0]["addr"]
+
+    services = TelemetryServices(
+        Host(ip_address, args.port),
+        Host(ip_address, args.ws_cmd_port),
+        Host(ip_address, args.ws_tlm_port),
+    )
 
     # instantiate the server
     server = TelemetryServer(
         args.tick,
         args.telem_rate,
-        (ip_address, args.port),
         args.metrics_rate,
         args.app_id,
-        (ip_address, args.ws_cmd_port),
-        (ip_address, args.ws_tlm_port),
+        services,
     )
 
     # run until the server shuts down because of timeout, external command, or

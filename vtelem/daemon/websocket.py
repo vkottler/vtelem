@@ -5,13 +5,14 @@ vtelem - An interface for managing websocket servers.
 # built-in
 import asyncio
 import logging
-from typing import Any, Callable, Tuple, Optional
+from typing import Any, Callable, Optional
 
 # third-party
 import websockets
 
 # internal
 from vtelem.daemon.event_loop import EventLoopDaemon
+from vtelem.mtu import Host
 from vtelem.registry.service import ServiceRegistry
 from vtelem.telemetry.environment import TelemetryEnvironment
 
@@ -39,7 +40,7 @@ class WebsocketDaemon(EventLoopDaemon):
         self,
         name: str,
         message_consumer: Optional[Callable],
-        address: Tuple[str, int] = None,
+        address: Host = None,
         env: TelemetryEnvironment = None,
         time_keeper: Any = None,
         ws_handler: Callable = None,
@@ -50,7 +51,7 @@ class WebsocketDaemon(EventLoopDaemon):
 
         # listen on all interfaces, on an arbitrary port by default
         if address is None:
-            address = ("0.0.0.0", 0)
+            address = Host()
         self.address = address
         self.server = None
         self.serving = False

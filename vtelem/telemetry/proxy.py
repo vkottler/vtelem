@@ -6,10 +6,9 @@ vtelem - A daemon that provides decoded telemetry frames into a queue, from a
 # built-in
 import logging
 from queue import Queue
-from typing import Tuple
 
 # internal
-from vtelem.mtu import create_udp_socket, DEFAULT_MTU
+from vtelem.mtu import create_udp_socket, DEFAULT_MTU, Host
 from vtelem.classes.type_primitive import TypePrimitive
 from vtelem.daemon import DaemonBase, DaemonState
 from vtelem.telemetry.environment import TelemetryEnvironment
@@ -24,7 +23,7 @@ class TelemetryProxy(DaemonBase):
 
     def __init__(
         self,
-        host: Tuple[str, int],
+        host: Host,
         output_stream: Queue,
         app_id: TypePrimitive,
         env: TelemetryEnvironment,

@@ -13,14 +13,15 @@ import requests
 import websockets
 
 # module under test
-from vtelem.mtu import get_free_tcp_port
+from vtelem.mtu import get_free_tcp_port, Host
 from vtelem.telemetry.server import TelemetryServer
+from vtelem.types.telemetry_server import TelemetryServices
 
 
 def test_telemetry_server_basic():
     """Test that the telemetry server can boot."""
 
-    server = TelemetryServer(0.01, 0.10, ("0.0.0.0", 0), 0.25)
+    server = TelemetryServer(0.01, 0.10, 0.25)
     assert server.daemons.get("stream").get_queue("test")
     with server.booted():
         time.sleep(2.0)
@@ -31,10 +32,10 @@ def test_telemetry_server_basic():
 def test_telemetry_server_get_types():
     """Test that the type manifest can be successfully requested."""
 
-    server = TelemetryServer(0.01, 0.10, ("0.0.0.0", 0), 0.25)
+    server = TelemetryServer(0.01, 0.10, 0.25)
     with server.booted():
         # add  a client
-        server.udp_clients.add_client(("0.0.0.0", 0))
+        server.udp_clients.add_client(Host())
 
         # get app id
         cmd_str = "types?indent=4"
@@ -81,7 +82,10 @@ def test_telemetry_server_ws_telemetry():
 
     port = get_free_tcp_port()
     server = TelemetryServer(
-        0.01, 0.10, None, 0.25, websocket_tlm_address=("0.0.0.0", port)
+        0.01,
+        0.10,
+        0.25,
+        services=TelemetryServices(None, None, Host("0.0.0.0", port)),
     )
     with server.booted():
         time.sleep(0.1)
@@ -109,7 +113,10 @@ def test_telemetry_server_ws_commands():
 
     port = get_free_tcp_port()
     server = TelemetryServer(
-        0.01, 0.10, None, 0.25, websocket_cmd_address=("0.0.0.0", port)
+        0.01,
+        0.10,
+        0.25,
+        services=TelemetryServices(None, Host("0.0.0.0", port)),
     )
     with server.booted():
         time.sleep(0.1)
@@ -190,7 +197,11 @@ def test_telemetry_server_stop_http():
 
     port = get_free_tcp_port()
     server = TelemetryServer(
-        0.01, 0.10, ("0.0.0.0", port), 0.25, app_id_basis=0.5
+        0.01,
+        0.10,
+        0.25,
+        app_id_basis=0.5,
+        services=TelemetryServices(Host("0.0.0.0", port)),
     )
     with server.booted():
         # get app id

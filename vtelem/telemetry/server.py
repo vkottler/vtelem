@@ -7,16 +7,16 @@ from collections import defaultdict
 from contextlib import contextmanager
 import socket
 import threading
-from typing import Any, Dict, Tuple, Iterator
+from typing import Any, Dict, Iterator
 
 # internal
-from vtelem.mtu import discover_ipv4_mtu, DEFAULT_MTU
+from vtelem.mtu import discover_ipv4_mtu, DEFAULT_MTU, Host
 from vtelem.factories.daemon_manager import create_daemon_manager_commander
 from vtelem.factories.telemetry_environment import create_channel_commander
 from vtelem.factories.telemetry_server import register_http_handlers
 from vtelem.factories.udp_client_manager import create_udp_client_commander
 from vtelem.factories.websocket_daemon import commandable_websocket_daemon
-from vtelem.types.telemetry_server import AppSetup, AppLoop
+from vtelem.types.telemetry_server import AppSetup, AppLoop, TelemetryServices
 from vtelem.channel.group_registry import ChannelGroupRegistry
 from vtelem.classes.http_request_mapper import MapperAwareRequestHandler
 from vtelem.classes.stream_writer import StreamWriter
@@ -39,15 +39,16 @@ class TelemetryServer(HttpDaemon):
         self,
         tick_length: float,
         telem_rate: float,
-        http_address: Tuple[str, int] = None,
         metrics_rate: float = None,
         app_id_basis: float = None,
-        websocket_cmd_address: Tuple[str, int] = None,
-        websocket_tlm_address: Tuple[str, int] = None,
+        services: TelemetryServices = None,
     ) -> None:
         """
         Construct a new telemetry server that can be commanded over http.
         """
+
+        if services is None:
+            services = TelemetryServices()
 
         self.daemons = DaemonManager()
         self.state_sem = threading.Semaphore(0)
@@ -60,7 +61,7 @@ class TelemetryServer(HttpDaemon):
         # dynamically build mtu, take the minimum of the system's loopback
         # interface, or a practical mtu based on a 1500-byte Ethernet II frame
         # (we will re-evalute mtu when we connect new clients)
-        mtu = discover_ipv4_mtu((socket.getfqdn(), 0)) - (60 + 8)
+        mtu = discover_ipv4_mtu(Host(socket.getfqdn(), 0)) - (60 + 8)
         telem = TelemetryDaemon(
             "telemetry",
             mtu,
@@ -92,7 +93,7 @@ class TelemetryServer(HttpDaemon):
             WebsocketTelemetryDaemon(
                 "websocket_telemetry",
                 writer,
-                websocket_tlm_address,
+                services.websocket_tlm,
                 telem,
                 self.time_keeper,
             )
@@ -101,7 +102,7 @@ class TelemetryServer(HttpDaemon):
         # add the http daemon
         super().__init__(
             "http",
-            http_address,
+            services.http,
             MapperAwareRequestHandler,
             telem,
             self.time_keeper,
@@ -117,7 +118,7 @@ class TelemetryServer(HttpDaemon):
         ws_cmd = commandable_websocket_daemon(
             "websocket_command",
             queue_daemon,
-            websocket_cmd_address,
+            services.websocket_cmd,
             telem,
             self.time_keeper,
         )
@@ -128,6 +129,11 @@ class TelemetryServer(HttpDaemon):
 
         # make the udp-client-manager commandable
         create_udp_client_commander(self.udp_clients, queue_daemon)
+
+        # add initial udp clients
+        self.udp_clients.add_clients(
+            services.udp if services.udp is not None else []
+        )
 
     def register_application(
         self, name: str, rate: float, setup: AppSetup, loop: AppLoop

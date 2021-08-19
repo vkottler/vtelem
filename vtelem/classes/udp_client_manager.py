@@ -5,10 +5,10 @@ vtelem - An interface for setting up and tearing down outgoing udp streams.
 # built-in
 import logging
 import socket
-from typing import Dict, Tuple, Any
+from typing import Dict, List, Tuple, Any
 
 # internal
-from vtelem.mtu import create_udp_socket, discover_mtu
+from vtelem.mtu import create_udp_socket, discover_mtu, Host
 from .stream_writer import StreamWriter
 from .time_entity import LockEntity
 
@@ -53,13 +53,18 @@ class UdpClientManager(LockEntity):
         self.closer = closer
         self.writer.error_handle = self.closer
 
-    def client_name(self, sock_id: int) -> Tuple[str, int]:
+    def client_name(self, sock_id: int) -> Host:
         """Get the host and port of a client."""
 
         assert sock_id in self.clients
-        return self.clients[sock_id][0].getsockname()
+        return Host(*self.clients[sock_id][0].getsockname())
 
-    def add_client(self, host: Tuple[str, int]) -> Tuple[int, int]:
+    def add_clients(self, hosts: List[Host]) -> Dict[Host, Tuple[int, int]]:
+        """Add multiple clients at once."""
+
+        return {host: self.add_client(host) for host in hosts}
+
+    def add_client(self, host: Host) -> Tuple[int, int]:
         """Add a new client connection by hostname and port."""
 
         sock = create_udp_socket(host)
@@ -67,10 +72,12 @@ class UdpClientManager(LockEntity):
         mtu -= 60 + 8  # subtract ip and udp header space
         sock_file = sock.makefile("wb")
         sock_file.flush()
+
         with self.lock:
             sock_id = self.writer.add_stream(sock_file)
             self.clients[sock_id] = (sock, sock_file)
-            name = sock.getsockname()
+
+        name = sock.getsockname()
         LOG.info(
             "adding stream client '%s:%d' -> '%s:%d'",
             name[0],

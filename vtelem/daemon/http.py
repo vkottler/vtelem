@@ -11,12 +11,13 @@ from http.server import (
 )
 import logging
 import ssl
-from typing import Type, Tuple, Optional
+from typing import Type, Optional
 
 # internal
 from vtelem.classes.http_request_mapper import HttpRequestMapper, RequestHandle
 from vtelem.classes.time_keeper import TimeKeeper
 from vtelem.daemon import DaemonBase, DaemonState, MainThread
+from vtelem.mtu import Host
 from vtelem.registry.service import ServiceRegistry
 from vtelem.telemetry.environment import TelemetryEnvironment
 
@@ -29,7 +30,7 @@ class HttpDaemon(DaemonBase):
     def __init__(
         self,
         name: str,
-        address: Tuple[str, int] = None,
+        address: Host = None,
         handler_class: Type[BaseHTTPRequestHandler] = None,
         env: TelemetryEnvironment = None,
         time_keeper: TimeKeeper = None,
@@ -41,7 +42,7 @@ class HttpDaemon(DaemonBase):
 
         # listen on all interfaces, on an arbitrary port by default
         if address is None:
-            address = ("0.0.0.0", 0)
+            address = Host()
 
         if handler_class is None:
             handler_class = SimpleHTTPRequestHandler

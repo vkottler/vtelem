@@ -4,19 +4,19 @@ vtelem - A module for creating different types of websocket daemons.
 
 # built-in
 import json
-from typing import Tuple
 
 # internal
 from vtelem.classes.time_keeper import TimeKeeper
 from vtelem.daemon.command_queue import CommandQueueDaemon
 from vtelem.daemon.websocket import WebsocketDaemon
+from vtelem.mtu import Host
 from vtelem.telemetry.environment import TelemetryEnvironment
 
 
 def commandable_websocket_daemon(
     name: str,
     daemon: CommandQueueDaemon,
-    address: Tuple[str, int] = None,
+    address: Host = None,
     env: TelemetryEnvironment = None,
     keeper: TimeKeeper = None,
 ) -> WebsocketDaemon:
