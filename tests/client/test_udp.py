@@ -8,7 +8,7 @@ from vtelem.classes.stream_writer import default_writer
 from vtelem.classes.udp_client_manager import UdpClientManager
 from vtelem.mtu import DEFAULT_MTU, Host
 from vtelem.telemetry.environment import TelemetryEnvironment
-from vtelem.telemetry.proxy import TelemetryProxy
+from vtelem.client.udp import UdpClient
 
 
 def setup_environment() -> dict:
@@ -25,9 +25,10 @@ def setup_environment() -> dict:
 
     # set up the proxy
     app_basis = 0.5
-    proxy = TelemetryProxy(
+    proxy = UdpClient(
         Host("localhost", 0),
         writer.get_queue("proxy"),
+        env.channel_registry,
         Framer.create_app_id(app_basis),
         env,
         DEFAULT_MTU,

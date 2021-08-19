@@ -1,53 +1,59 @@
 """
 vtelem - A daemon that provides decoded telemetry frames into a queue, from a
-         udp listener.
+         socket.
 """
 
 # built-in
 import logging
 from queue import Queue
+from socket import SocketType
+from typing import Callable
 
 # internal
-from vtelem.mtu import create_udp_socket, DEFAULT_MTU, Host
+from vtelem.mtu import DEFAULT_MTU
+from vtelem.channel.registry import ChannelRegistry
 from vtelem.classes.type_primitive import TypePrimitive
 from vtelem.daemon import DaemonBase, DaemonState
+from vtelem.parsing.encapsulation import decode_frame
 from vtelem.telemetry.environment import TelemetryEnvironment
 
 LOG = logging.getLogger(__name__)
 
 
-class TelemetryProxy(DaemonBase):
+class SocketClient(DaemonBase):
     """
     A class for publishing decoded telemetry frames into a queue as a daemon.
     """
 
     def __init__(
         self,
-        host: Host,
+        socket: SocketType,
+        stopper: Callable,
         output_stream: Queue,
-        app_id: TypePrimitive,
-        env: TelemetryEnvironment,
+        channel_registry: ChannelRegistry,
+        app_id: TypePrimitive = None,
+        env: TelemetryEnvironment = None,
         mtu: int = DEFAULT_MTU,
     ) -> None:
-        """Construct a new telemetry proxy."""
+        """Construct a new socket client."""
 
-        self.socket = create_udp_socket(host, False)
+        self.socket = socket
         self.mtu = mtu
+        self.channel_registry = channel_registry
         name = self.socket.getsockname()
         super().__init__("{}:{}".format(name[0], name[1]), env)
         self.frames = output_stream
         self.expected_id = app_id
-        self.curr_id = TypePrimitive(self.expected_id.type)
 
         def stop_server() -> None:
             """
-            Close this listener by sending a final, zero-length payload to
-            un-block recv, then closing the socket.
+            Call provided stopper, then close the socket and signal frame
+            queue that frames are over.
             """
-            LOG.info("%s: closing udp listener", self.name)
-            self.socket.sendto(bytearray(), self.socket.getsockname())
-            self.socket.close()
-            self.frames.put(None)
+            LOG.info("%s: closing listener", self.name)
+            stopper()
+            socket.close()
+            output_stream.put(None)
 
         self.function["inject_stop"] = stop_server
 
@@ -78,6 +84,8 @@ class TelemetryProxy(DaemonBase):
                 continue
 
             assert self.env is not None
-            frame = self.env.decode_frame(data, len(data), self.expected_id)
+            frame = decode_frame(
+                self.channel_registry, data, len(data), self.expected_id
+            )
             if frame is not None:
                 self.frames.put(frame)
