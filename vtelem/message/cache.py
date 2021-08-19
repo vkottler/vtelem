@@ -15,36 +15,21 @@ MessageCallback = Callable[[MessageType, int, bytes], None]
 CallbackMap = Dict[MessageType, List[MessageCallback]]
 
 
-class MessageCache(DataCache):
+class MessageDispatcher:
     """
-    A class for ingesting message frames so they can be accessed as fully
-    coherent messages when completely received.
+    A class managing callback routines associated with given message types.
     """
 
-    def __init__(
-        self, cache_dir: str, initial_callbacks: CallbackMap = None
-    ) -> None:
-        """Construct a new message cache."""
-
-        super().__init__(cache_dir)
+    def __init__(self, initial_callbacks: CallbackMap = None) -> None:
+        """Construct a new message dispatcher."""
 
         if initial_callbacks is None:
             initial_callbacks = {}
-
-        self.fragment_data: dict = {}
         self.message_callbacks: CallbackMap = initial_callbacks
-        self.fragment_dir = cache_dir + "_fragments"
 
         for mtype in MessageType:
-            mtype_str = str(mtype.value)
-            if mtype_str not in self.data:
-                self.data[mtype_str] = {}
-            self.fragment_data[mtype.value] = {}
             if mtype not in self.message_callbacks:
                 self.message_callbacks[mtype] = []
-
-        self.load_fragments(self.fragment_dir)
-        self.service_all_callbacks()
 
     def add_callback(
         self, mtype: MessageType, callback: MessageCallback
@@ -63,6 +48,33 @@ class MessageCache(DataCache):
 
         for callback in self.message_callbacks[mtype]:
             callback(mtype, number, data)
+
+
+class MessageCache(DataCache, MessageDispatcher):
+    """
+    A class for ingesting message frames so they can be accessed as fully
+    coherent messages when completely received.
+    """
+
+    def __init__(
+        self, cache_dir: str, initial_callbacks: CallbackMap = None
+    ) -> None:
+        """Construct a new message cache."""
+
+        DataCache.__init__(self, cache_dir)
+        MessageDispatcher.__init__(self, initial_callbacks)
+
+        self.fragment_data: dict = {}
+        self.fragment_dir = cache_dir + "_fragments"
+
+        for mtype in MessageType:
+            mtype_str = str(mtype.value)
+            if mtype_str not in self.data:
+                self.data[mtype_str] = {}
+            self.fragment_data[mtype.value] = {}
+
+        self.load_fragments(self.fragment_dir)
+        self.service_all_callbacks()
 
     def service_all_callbacks(self) -> None:
         """Invoke registered callbacks for all complete messages."""

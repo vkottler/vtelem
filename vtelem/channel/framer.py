@@ -5,7 +5,6 @@ vtelem - A module for building frames of channel data from emissions.
 # built-in
 import logging
 from queue import Queue
-from threading import RLock
 from typing import Tuple, List
 
 # internal
@@ -13,6 +12,7 @@ from vtelem.enums.primitive import Primitive
 from vtelem.channel import Channel
 from vtelem.channel.registry import ChannelRegistry
 from vtelem.classes.event_queue import EventQueue
+from vtelem.classes.time_entity import OptionalRLock
 from vtelem.frame import Frame
 from vtelem.frame.channel import ChannelFrame
 from vtelem.frame.framer import Framer
@@ -31,7 +31,7 @@ class ChannelFramer(Framer):
         mtu: int,
         registry: ChannelRegistry,
         channels: List[Channel],
-        channel_lock: RLock,
+        channel_lock: OptionalRLock,
         app_id_basis: float = None,
         use_crc: bool = True,
     ) -> None:
