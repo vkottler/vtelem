@@ -2,7 +2,7 @@
     =====================================
     generator=datazen
     version=1.7.9
-    hash=7f78f923c638e0818864b08343d9e115
+    hash=8f2282df1a18737d14c65a6bd14860b3
     =====================================
 -->
 
@@ -21,9 +21,9 @@ $ ./venv3.8/bin/vtelem -h
 
 usage: vtelem [-h] [--version] [-v] [-C DIR] [-i {lo,enp0s25,wlo1}] [-p PORT]
               [--ws-cmd-port WS_CMD_PORT] [--ws-tlm-port WS_TLM_PORT]
-              [-t TICK] [--telem-rate TELEM_RATE]
-              [--metrics-rate METRICS_RATE] [--time-scale TIME_SCALE]
-              [-a APP_ID] [-u UPTIME]
+              [--tcp-tlm-port TCP_TLM_PORT] [-t TICK]
+              [--telem-rate TELEM_RATE] [--metrics-rate METRICS_RATE]
+              [--time-scale TIME_SCALE] [-a APP_ID] [-u UPTIME]
 
 A real-time telemetry library.
 
@@ -39,6 +39,8 @@ optional arguments:
                         websocket command-interface port
   --ws-tlm-port WS_TLM_PORT
                         websocket telemetry-interface port
+  --tcp-tlm-port TCP_TLM_PORT
+                        tcp telemetry-interface port
   -t TICK, --tick TICK  lenth of a time tick
   --telem-rate TELEM_RATE
                         rate of the telemetry-servicing loop
