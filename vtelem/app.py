@@ -12,7 +12,11 @@ import netifaces  # type: ignore
 # internal
 from vtelem.mtu import Host
 from vtelem.telemetry.server import TelemetryServer
-from vtelem.types.telemetry_server import TelemetryServices
+from vtelem.types.telemetry_server import (
+    TelemetryServices,
+    Service,
+    default_services,
+)
 
 
 def entry(args: argparse.Namespace) -> int:
@@ -24,10 +28,16 @@ def entry(args: argparse.Namespace) -> int:
         iface = netifaces.ifaddresses(args.interface)[socket.AF_INET]
         ip_address = iface[0]["addr"]
 
+    defaults = default_services()
     services = TelemetryServices(
-        Host(ip_address, args.port),
-        Host(ip_address, args.ws_cmd_port),
-        Host(ip_address, args.ws_tlm_port),
+        Service(defaults.http.name, Host(ip_address, args.port)),
+        Service(
+            defaults.websocket_cmd.name, Host(ip_address, args.ws_cmd_port)
+        ),
+        Service(
+            defaults.websocket_tlm.name, Host(ip_address, args.ws_tlm_port)
+        ),
+        Service(defaults.tcp_tlm.name, Host(ip_address, args.tcp_tlm_port)),
     )
 
     # instantiate the server
@@ -76,6 +86,12 @@ def add_app_args(parser: argparse.ArgumentParser) -> None:
         default=0,
         type=int,
         help="websocket telemetry-interface port",
+    )
+    parser.add_argument(
+        "--tcp-tlm-port",
+        default=0,
+        type=int,
+        help="tcp telemetry-interface port",
     )
     parser.add_argument(
         "-t",

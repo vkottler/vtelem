@@ -15,7 +15,7 @@ import websockets
 # module under test
 from vtelem.mtu import get_free_tcp_port, Host
 from vtelem.telemetry.server import TelemetryServer
-from vtelem.types.telemetry_server import TelemetryServices
+from vtelem.types.telemetry_server import Service, default_services
 
 
 def test_telemetry_server_basic():
@@ -85,7 +85,11 @@ def test_telemetry_server_ws_telemetry():
         0.01,
         0.10,
         0.25,
-        services=TelemetryServices(None, None, Host("0.0.0.0", port)),
+        services=default_services(
+            websocket_telemetry=Service(
+                "websocket_telemetry", Host("0.0.0.0", port)
+            )
+        ),
     )
     with server.booted():
         time.sleep(0.1)
@@ -116,7 +120,11 @@ def test_telemetry_server_ws_commands():
         0.01,
         0.10,
         0.25,
-        services=TelemetryServices(None, Host("0.0.0.0", port)),
+        services=default_services(
+            websocket_command=Service(
+                "websocket_command", Host("0.0.0.0", port)
+            )
+        ),
     )
     with server.booted():
         time.sleep(0.1)
@@ -201,7 +209,7 @@ def test_telemetry_server_stop_http():
         0.10,
         0.25,
         app_id_basis=0.5,
-        services=TelemetryServices(Host("0.0.0.0", port)),
+        services=default_services(http=Service("http", Host("0.0.0.0", port))),
     )
     with server.booted():
         # get app id

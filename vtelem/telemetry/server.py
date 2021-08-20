@@ -16,7 +16,12 @@ from vtelem.factories.telemetry_environment import create_channel_commander
 from vtelem.factories.telemetry_server import register_http_handlers
 from vtelem.factories.udp_client_manager import create_udp_client_commander
 from vtelem.factories.websocket_daemon import commandable_websocket_daemon
-from vtelem.types.telemetry_server import AppSetup, AppLoop, TelemetryServices
+from vtelem.types.telemetry_server import (
+    AppSetup,
+    AppLoop,
+    TelemetryServices,
+    default_services,
+)
 from vtelem.channel.group_registry import ChannelGroupRegistry
 from vtelem.classes.http_request_mapper import MapperAwareRequestHandler
 from vtelem.classes.stream_writer import StreamWriter
@@ -29,6 +34,7 @@ from vtelem.daemon.manager import DaemonManager
 from vtelem.daemon.telemetry import TelemetryDaemon
 from vtelem.daemon.synchronous import Daemon
 from vtelem.daemon.websocket_telemetry import WebsocketTelemetryDaemon
+from vtelem.daemon.tcp_telemetry import TcpTelemetryDaemon
 from vtelem.registry.service import ServiceRegistry
 
 
@@ -48,7 +54,7 @@ class TelemetryServer(HttpDaemon):
         """
 
         if services is None:
-            services = TelemetryServices()
+            services = default_services()
 
         self.daemons = DaemonManager()
         self.state_sem = threading.Semaphore(0)
@@ -89,24 +95,38 @@ class TelemetryServer(HttpDaemon):
         assert self.daemons.add_daemon(writer)
 
         # add the websocket-telemetry daemon
-        assert self.daemons.add_daemon(
-            WebsocketTelemetryDaemon(
-                "websocket_telemetry",
-                writer,
-                services.websocket_tlm,
-                telem,
-                self.time_keeper,
+        if services.websocket_tlm.enabled:
+            assert self.daemons.add_daemon(
+                WebsocketTelemetryDaemon(
+                    services.websocket_tlm.name,
+                    writer,
+                    services.websocket_tlm.host,
+                    telem,
+                    self.time_keeper,
+                )
             )
-        )
+
+        # add the tcp-telemetry daemon
+        if services.tcp_tlm.enabled:
+            assert self.daemons.add_daemon(
+                TcpTelemetryDaemon(
+                    services.tcp_tlm.name,
+                    writer,
+                    telem,
+                    services.tcp_tlm.host,
+                    self.time_keeper,
+                )
+            )
 
         # add the http daemon
         super().__init__(
-            "http",
-            services.http,
+            services.http.name,
+            services.http.host,
             MapperAwareRequestHandler,
             telem,
             self.time_keeper,
         )
+        self.http_enabled = services.http.enabled
 
         # add the command-queue daemon
         queue_daemon = CommandQueueDaemon("command", telem, self.time_keeper)
@@ -115,13 +135,14 @@ class TelemetryServer(HttpDaemon):
         register_http_handlers(self, telem, queue_daemon)
 
         # add the websocket-command daemon
-        ws_cmd = commandable_websocket_daemon(
-            "websocket_command",
-            queue_daemon,
-            services.websocket_cmd,
-            telem,
-            self.time_keeper,
-        )
+        if services.websocket_cmd.enabled:
+            ws_cmd = commandable_websocket_daemon(
+                services.websocket_cmd.name,
+                queue_daemon,
+                services.websocket_cmd.host,
+                telem,
+                self.time_keeper,
+            )
         assert self.daemons.add_daemon(ws_cmd, ["stream"])
 
         # make the daemon-manager commandable
@@ -182,7 +203,9 @@ class TelemetryServer(HttpDaemon):
         kwargs: dict = {"service_registry": telem.registries["services"]}
         kwargs["first_start"] = self.first_start
         assert self.daemons.perform_all(DaemonOperation.START, **kwargs)
-        assert self.perform(DaemonOperation.START, **kwargs)
+
+        if self.http_enabled:
+            assert self.perform(DaemonOperation.START, **kwargs)
         self.first_start = False
 
         with self.lock:
@@ -192,8 +215,11 @@ class TelemetryServer(HttpDaemon):
         """Stop everything."""
 
         assert self.daemons.perform_all(DaemonOperation.STOP)
-        assert self.perform(DaemonOperation.STOP)
+
+        if self.http_enabled:
+            assert self.perform(DaemonOperation.STOP)
         self.close()
+
         self.udp_clients.remove_all()
         with self.lock:
             self.state_sem.release()
