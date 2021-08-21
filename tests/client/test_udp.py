@@ -58,12 +58,12 @@ def test_telemetry_proxy_read_error():
     testenv = setup_environment()
     assert testenv["proxy"].start()
 
-    frame_count = 2
+    frame_count = 5
     with testenv["writer"].booted():
         # write some frames
         for _ in range(frame_count):
             testenv["frame_queue"].put(
-                build_dummy_frame(testenv["client"][1], testenv["app_basis"])
+                build_dummy_frame(testenv["proxy"].mtu, testenv["app_basis"])
             )
 
         # read expected number of frames

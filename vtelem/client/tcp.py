@@ -1,23 +1,24 @@
 """
 vtelem - A daemon that provides decoded telemetry frames into a queue, from a
-         udp listener.
+         tcp listener.
 """
 
 # built-in
+import socket
 from queue import Queue
 
 # internal
 from vtelem.channel.registry import ChannelRegistry
 from vtelem.classes.type_primitive import TypePrimitive
 from vtelem.client.socket import SocketClient
-from vtelem.mtu import create_udp_socket, DEFAULT_MTU, Host
+from vtelem.mtu import DEFAULT_MTU, Host
 from vtelem.telemetry.environment import TelemetryEnvironment
 
 
-class UdpClient(SocketClient):
+class TcpClient(SocketClient):
     """
     A class for publishing decoded telemetry frames into a queue as a daemon,
-    from a udp socket.
+    from a tcp socket.
     """
 
     def __init__(
@@ -29,19 +30,18 @@ class UdpClient(SocketClient):
         env: TelemetryEnvironment = None,
         mtu: int = DEFAULT_MTU,
     ) -> None:
-        """Construct a new udp client."""
+        """Construct a new tcp client."""
 
-        socket = create_udp_socket(host, False)
+        sock = socket.create_connection(host)
+        sock.settimeout(0.1)
 
         def stop_server() -> None:
-            """
-            Close this listener by sending a final, zero-length payload to
-            un-block recv, then closing the socket.
-            """
-            socket.sendto(bytearray(), socket.getsockname())
+            """Nothing special needed to close this connection."""
+
+            sock.shutdown(socket.SHUT_RD)
 
         super().__init__(
-            socket,
+            sock,
             stop_server,
             output_stream,
             channel_registry,

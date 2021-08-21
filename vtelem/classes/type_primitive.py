@@ -4,6 +4,7 @@ vtelem - A generic element that can be read from and written to buffers.
 
 # built-in
 import logging
+import struct
 from typing import Any, Callable
 
 # internal
@@ -103,16 +104,23 @@ class TypePrimitive:
             result = buf.write(self.type, self.data)
         return result
 
-    def read(self, buf: ByteBuffer, pos: int = None) -> Any:
+    def read(
+        self, buf: ByteBuffer, pos: int = None, chomp: bool = False
+    ) -> Any:
         """
         Read this primitive out of a buffer, assign its data and return the
         result.
         """
 
         with buf.with_pos(pos):
-            result = buf.read(self.type)
+            result = buf.read(self.type, chomp)
         self.data = result
         return result
+
+    def buffer(self, order: str = "!") -> bytes:
+        """Get this primitive as a buffer of bytes."""
+
+        return struct.pack(order + self.type.value.fmt, self.data)
 
 
 def new_default(default: str, changed_cb: Callable = None) -> TypePrimitive:

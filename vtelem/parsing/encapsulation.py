@@ -31,6 +31,7 @@ def parse_frame_header(
             return app_id, None
 
     return app_id, FrameHeader(
+        buf.size,
         app_id,
         FrameType(buf.read(DEFAULTS["enum"])),
         buf.read(DEFAULTS["timestamp"]),

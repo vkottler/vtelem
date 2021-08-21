@@ -2,7 +2,7 @@
     =====================================
     generator=datazen
     version=1.7.9
-    hash=1a0c168df03c548d8d0729cc0181d0cc
+    hash=044a5de2bb1072b3a080b0c1274589a3
     =====================================
 -->
 
@@ -37,6 +37,7 @@ this document.
 
 Field | Type | Description
 ------|------|------------
+`length` | `defaults.count` | The length of this frame (less this field) in bytes. This is an essential first field as it allows stream-based reading interfaces to stay synchronized with the flow of data.
 `app_id` | `defaults.id` | An application identifier used to allow unique identification of the sender (not a security feature). It is assumed that users control both client and server, so an application identifier can be used to perform arbitration on multiple data sources. If this feature isn't needed, this field can be ignored.
 `type` | `defaults.enum` | The type of frame that should be parsed after this header. Information on parsing each frame is below.
 `timestamp` | `defaults.timestamp` | An integer timestamp for the frame. Neither an exact epoch or unit is strictly defined.

@@ -1,7 +1,7 @@
 # =====================================
 # generator=datazen
 # version=1.7.9
-# hash=37f3d7ceb6d9b08d24e6ac9579761eb6
+# hash=0ef86a1ac5fd67f67061169fe9bf45be
 # =====================================
 """
 vtelem - Useful type definitions for working with frames.
@@ -29,6 +29,7 @@ class FrameType(IntEnum):
 class FrameHeader(NamedTuple):
     """Elements contained in a frame header."""
 
+    length: int
     app_id: int
     type: FrameType
     timestamp: int

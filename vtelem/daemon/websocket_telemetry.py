@@ -51,7 +51,7 @@ class WebsocketTelemetryDaemon(QueueClientManager, WebsocketDaemon):
             """
 
             queue_id, frame_queue = self.add_client_queue(
-                websocket.remote_address
+                Host(*websocket.remote_address)
             )
             should_continue = True
             complete: Set[asyncio.Future] = set()

@@ -1,4 +1,11 @@
 entries:
+- field: "length"
+  type: "count"
+  py_type: "int"
+  description: >-
+    The length of this frame (less this field) in bytes. This is an essential
+    first field as it allows stream-based reading interfaces to stay
+    synchronized with the flow of data.
 - field: "app_id"
   type: "id"
   py_type: "int"

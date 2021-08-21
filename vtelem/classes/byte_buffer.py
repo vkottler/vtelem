@@ -33,7 +33,7 @@ class ByteBuffer:
         size: int = 0,
         order: str = "!",
     ) -> None:
-        """Construct a new, managed buffer"""
+        """Construct a new, managed buffer."""
 
         if data is None:
             data = bytearray()
@@ -104,22 +104,31 @@ class ByteBuffer:
 
         return self.remaining >= get_size(inst)
 
-    def read(self, inst: Primitive) -> Any:
+    def read(self, inst: Primitive, chomp: bool = False) -> Any:
         """Read a primitive out of a buffer, at its current position."""
 
         assert self.can_read(inst)
         result = struct.unpack(
-            self.fstring(inst), self.read_bytes(get_size(inst))
+            self.fstring(inst), self.read_bytes(get_size(inst), chomp)
         )[0]
         return result
 
-    def read_bytes(self, count: int) -> bytes:
+    def read_bytes(self, count: int, chomp: bool = False) -> bytes:
         """Read some number of bytes from a buffer."""
 
         assert self.remaining >= count
         pos = self.get_pos()
         result = self.data[pos : pos + count]
         self.advance(count)
+
+        # actually consume the bytes, can only be done from the front of the
+        # buffer
+        if chomp:
+            assert pos == 0
+            self.data = self.data[pos + count :]
+            self.size = self.remaining
+            self.set_pos(0)
+
         return result
 
     def append(self, other: bytes, data_len: int = None) -> int:
@@ -128,7 +137,12 @@ class ByteBuffer:
         if data_len is None:
             data_len = len(other)
         self.data = self.data[0 : self.size] + other[0:data_len]
-        self.advance(data_len, True)
+
+        if not self.remaining and self.size != 0:
+            self.advance(data_len, True)
+        else:
+            self.size += data_len
+
         return data_len
 
     def crc32(self, initial_val: int = 0) -> int:

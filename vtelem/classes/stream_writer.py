@@ -13,7 +13,10 @@ from typing import Any, Callable, Dict, List, Optional, Tuple
 # internal
 from vtelem.daemon.queue import QueueDaemon
 from vtelem.frame.channel import ChannelFrame
+from vtelem.mtu import Host
 from vtelem.telemetry.environment import TelemetryEnvironment
+from vtelem.classes import DEFAULTS
+from vtelem.classes.type_primitive import new_default
 from .metered_queue import create, MAX_SIZE
 from .time_entity import LockEntity
 
@@ -43,16 +46,26 @@ class StreamWriter(QueueDaemon):
         self.queues: Dict[int, Queue] = {}
         self.error_handle = error_handle
 
+        frame_size = new_default("count")
+
         def frame_handle(frame: Optional[ChannelFrame]) -> None:
             """Write this frame to all registered streams."""
 
             if frame is not None:
                 array, size = frame.raw()
+
+                # account for the frame-size header entry
+                assert frame_size.set(size)
+                size += frame_size.type.value.size
+
                 with self.lock:
                     to_remove = []
                     for stream_id, stream in self.streams.items():
                         try:
-                            assert stream.write(array) == size
+                            assert (
+                                stream.write(frame_size.buffer() + array)
+                                == size
+                            )
                             self.increment_metric("stream_writes")
                             self.increment_metric("bytes_written", size)
                         except OSError as exc:
@@ -98,6 +111,12 @@ class StreamWriter(QueueDaemon):
         self.reset_metric("stream_count")
         self.reset_metric("queue_writes")
         self.reset_metric("queue_count")
+
+    @property
+    def overhead(self) -> int:
+        """Get the amount of overhead bytes introduced by the framer."""
+
+        return DEFAULTS["count"].value.size
 
     def get_queue(self, name: str = None, maxsize: int = MAX_SIZE) -> Queue:
         """Get a default queue."""
@@ -191,14 +210,12 @@ class QueueClientManager(LockEntity):
         self.writer = writer
         self.active_client_queues: List[int] = []
 
-    def add_client_queue(
-        self, addr: Tuple[str, int] = None
-    ) -> Tuple[int, Queue]:
+    def add_client_queue(self, addr: Host = None) -> Tuple[int, Queue]:
         """Register a new frame queue for a connected client."""
 
         name = None
         if addr is not None:
-            name = "{}.{}:{}".format(self.name, addr[0], [1])
+            name = "{}.{}:{}".format(self.name, addr.address, addr.port)
         queue_id, frame_queue = self.writer.registered_queue(name)
         with self.lock:
             self.active_client_queues.append(queue_id)
@@ -225,8 +242,10 @@ def default_writer(
     env: TelemetryEnvironment = None,
     time_keeper: Any = None,
     maxsize: int = MAX_SIZE,
+    queue: Queue = None,
 ) -> Tuple[StreamWriter, Queue]:
     """Construct a queue and a stream writer, return both."""
 
-    queue = create(name + ".queue", env, maxsize)
+    if queue is None:
+        queue = create(name + ".queue", env, maxsize)
     return StreamWriter(name, queue, error_handle, env, time_keeper), queue

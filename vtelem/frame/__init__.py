@@ -91,10 +91,10 @@ class Frame:
         self.used += pad_amt
         return pad_amt
 
-    def pad_to_mtu(self) -> None:
+    def pad_to_mtu(self, overhead: int = 0) -> None:
         """Attempt to pad this frame to the full mtu size."""
 
-        self.pad(self.mtu - self.used)
+        self.pad(self.mtu - overhead - self.used)
 
     def raw(self) -> Tuple[bytearray, int]:
         """Obtain the raw buffer, and its size, from this frame."""
