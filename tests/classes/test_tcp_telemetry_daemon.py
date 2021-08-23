@@ -12,6 +12,7 @@ from vtelem.classes.metered_queue import MeteredQueue
 from vtelem.classes.stream_writer import default_writer
 from vtelem.client.tcp import TcpClient
 from vtelem.daemon.tcp_telemetry import TcpTelemetryDaemon
+from vtelem.frame.framer import Framer
 from vtelem.mtu import Host
 from vtelem.telemetry.environment import TelemetryEnvironment
 
@@ -75,8 +76,44 @@ def test_tcp_telemetry_real_client():
                 env.advance_time(10)
                 frame_count = env.dispatch_now()
                 for _ in range(frame_count):
-                    frame = out_queue.get()
-                    assert frame is not None
+                    assert out_queue.get() is not None
+
+
+def test_tcp_telemetry_bad_app_id():
+    """Test cient behavior when the application identifier doesn't match."""
+
+    # create the environment and register its frame queue
+    basis = 0.5
+    env = TelemetryEnvironment(64, metrics_rate=1.0, app_id_basis=basis)
+    writer, _ = default_writer("frames", env=env, queue=env.frame_queue)
+
+    # create a tcp-daemon for this environment
+    daemon = TcpTelemetryDaemon("test", writer, env)
+
+    with writer.booted(), daemon.booted():
+        time.sleep(0.1)
+
+        # create client
+        out_queue = MeteredQueue("out", env)
+        client_addr = Host(*daemon.address)
+        client = TcpClient(
+            client_addr,
+            out_queue,
+            env.channel_registry,
+            Framer.create_app_id(basis + 0.1),  # use an incorrect app-id
+            env,
+        )
+        with client.booted():
+            time.sleep(0.5)
+            for _ in range(10):
+                # advance time, dispatch to generate out-going frames
+                env.advance_time(10)
+                frame_count = env.dispatch_now()
+                for _ in range(frame_count):
+                    time.sleep(0.05)
+
+                    # we shouldn't get a frame if we had an app-id mis-match
+                    assert out_queue.empty()
 
 
 def test_tcp_telemetry_simple_client():

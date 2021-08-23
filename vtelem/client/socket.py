@@ -7,15 +7,15 @@ vtelem - A daemon that provides decoded telemetry frames into a queue, from a
 import logging
 from queue import Queue
 from socket import timeout, SocketType
-from typing import Callable
+from typing import Callable, Optional
 
 # internal
 from vtelem.mtu import DEFAULT_MTU
 from vtelem.channel.registry import ChannelRegistry
-from vtelem.classes.byte_buffer import ByteBuffer
 from vtelem.classes.type_primitive import TypePrimitive, new_default
 from vtelem.daemon import DaemonBase, DaemonState
-from vtelem.parsing.encapsulation import decode_frame
+from vtelem.frame.processor import FrameProcessor
+from vtelem.parsing.encapsulation import decode_frame, ParsedFrame
 from vtelem.telemetry.environment import TelemetryEnvironment
 
 LOG = logging.getLogger(__name__)
@@ -45,6 +45,7 @@ class SocketClient(DaemonBase):
         super().__init__("{}:{}".format(name[0], name[1]), env)
         self.frames = output_stream
         self.expected_id = app_id
+        self.processor = FrameProcessor()
 
         def stop_server() -> None:
             """
@@ -70,10 +71,10 @@ class SocketClient(DaemonBase):
     def run(self, *_, **__) -> None:
         """Read from the listener and enqueue decoded frames."""
 
-        buf = ByteBuffer()
         frame_size = new_default("count")
-        size_stale = True
-        size = 0
+        new_frame: Optional[ParsedFrame] = None
+        assert self.env is not None
+
         while self.state != DaemonState.STOPPING:
             try:
                 raw_data = self.socket.recv(
@@ -82,41 +83,23 @@ class SocketClient(DaemonBase):
                 if not raw_data:
                     LOG.info("%s: stream ended", self.name)
                     break
-                buf.append(raw_data)
+                new_frames = self.processor.process(
+                    raw_data, frame_size, self.mtu
+                )
+
+                # attempt to decode any new frames and publish them to the
+                # upstream consumer
+                for frame in new_frames:
+                    new_frame = decode_frame(
+                        self.channel_registry,
+                        frame,
+                        len(frame),
+                        self.expected_id,
+                    )
+                    if new_frame is not None:
+                        self.frames.put(new_frame)
             except timeout:
                 pass
             except OSError as exc:
                 LOG.error("%s: %s", self.name, exc)
                 break
-
-            # get the size of the next frame
-            if size_stale and buf.can_read(frame_size.type):
-                size = frame_size.read(buf, chomp=True)
-                size_stale = False
-
-                # clear buffer state if we get an unreasonable value
-                if size > self.mtu:
-                    buf = ByteBuffer()
-                    size_stale = True
-
-            # read the size of the next frame, then the frame-data itself
-            while not size_stale and size <= buf.remaining:
-                frame = buf.read_bytes(size, True)
-                size_stale = True
-
-                assert self.env is not None
-                new_frame = decode_frame(
-                    self.channel_registry, frame, len(frame), self.expected_id
-                )
-                if new_frame is not None:
-                    self.frames.put(new_frame)
-
-                # get the size of the next frame
-                if buf.can_read(frame_size.type):
-                    size = frame_size.read(buf, chomp=True)
-                    size_stale = False
-
-                    # clear buffer state if we get an unreasonable value
-                    if size > self.mtu:
-                        buf = ByteBuffer()
-                        size_stale = True

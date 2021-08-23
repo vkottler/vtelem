@@ -44,6 +44,14 @@ class ByteBuffer:
         self.order = order
         self.set_pos(0)
 
+    def reset(self) -> None:
+        """Re-initialize a mutable buffer to an empty one."""
+
+        assert self.mutable
+        self.data = bytearray()
+        self.size = 0
+        self.pos = 0
+
     @contextmanager
     def with_pos(self, pos: int = None) -> Iterator[None]:
         """
