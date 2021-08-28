@@ -10,10 +10,22 @@ import sys
 from typing import NamedTuple
 
 # internal
-from .channel.framer import build_dummy_frame
+from vtelem.channel.framer import build_dummy_frame
+from vtelem.frame import FRAME_OVERHEAD
 
 LOG = logging.getLogger(__name__)
-DEFAULT_MTU = 1500 - (60 + 8)
+
+
+def mtu_to_usable(mtu: int, medium_overhead: int = 60 + 8) -> int:
+    """
+    Given a desired overall size for transmission, get the usable size for
+    a data payload.
+    """
+
+    return mtu - (medium_overhead + FRAME_OVERHEAD)
+
+
+DEFAULT_MTU = mtu_to_usable(1500)
 
 
 class Host(NamedTuple):
@@ -72,7 +84,9 @@ def discover_mtu(
     )
 
     try:
-        count = sock.send(build_dummy_frame(probe_size, app_id_basis).raw()[0])
+        count = sock.send(
+            build_dummy_frame(probe_size, app_id_basis).with_size_header()[0]
+        )
         LOG.info("mtu probe successfully sent %d bytes", count)
     except OSError:
         pass

@@ -67,7 +67,7 @@ class WebsocketTelemetryDaemon(QueueClientManager, WebsocketDaemon):
 
                         complete, pending = await asyncio.wait(
                             [
-                                websocket.send(frame.raw()[0]),
+                                websocket.send(frame.with_size_header()[0]),
                                 websocket.wait_closed(),
                             ],
                             return_when=asyncio.FIRST_COMPLETED,

@@ -39,7 +39,7 @@ def parse_frames(
 
     total_parsed = []
     for frame in frames:
-        result = env.decode_frame(*frame.raw())
+        result = env.decode_frame(*frame.raw)
         assert result is not None
         total_parsed.append(result)
     return total_parsed

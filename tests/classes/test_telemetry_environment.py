@@ -51,7 +51,7 @@ def test_environment_with_metrics():
     env.dispatch_now()
     env.advance_time(1.0)
     env.dispatch_now()
-    frame = env.get_next_frame().raw()
+    frame = env.get_next_frame().raw
     frame_data = env.decode_frame(frame[0], frame[1])
     assert frame_data is not None
     assert frame_data.header.type == FrameType.DATA

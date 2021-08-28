@@ -11,6 +11,8 @@ from vtelem.classes.byte_buffer import ByteBuffer
 from vtelem.classes.type_primitive import TypePrimitive, new_default
 from vtelem.enums.primitive import random_integer
 
+FRAME_OVERHEAD = new_default("count").type.value.size
+
 
 def time_to_int(time: float, precision: int = 1000) -> int:
     """Convert a floating-point time value into an integer."""
@@ -91,16 +93,32 @@ class Frame:
         self.used += pad_amt
         return pad_amt
 
-    def pad_to_mtu(self, overhead: int = 0) -> None:
+    def pad_to_mtu(self) -> None:
         """Attempt to pad this frame to the full mtu size."""
 
-        self.pad(self.mtu - overhead - self.used)
+        self.pad(self.mtu - self.used)
 
+    @property
     def raw(self) -> Tuple[bytearray, int]:
         """Obtain the raw buffer, and its size, from this frame."""
 
         assert self.finalized
         return self.buffer.data, self.used
+
+    def with_size_header(
+        self, frame_size: TypePrimitive = None
+    ) -> Tuple[bytes, int]:
+        """
+        Get a buffer (and its size) for this frame, with the inter-frame
+        size header included.
+        """
+
+        if frame_size is None:
+            frame_size = new_default("count")
+
+        data, size = self.raw
+        assert frame_size.set(size)
+        return frame_size.buffer() + data, size + frame_size.type.value.size
 
     def finalize_hook(self) -> None:
         """Can be overridden by implementing classes."""

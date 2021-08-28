@@ -52,20 +52,13 @@ class StreamWriter(QueueDaemon):
             """Write this frame to all registered streams."""
 
             if frame is not None:
-                array, size = frame.raw()
-
-                # account for the frame-size header entry
-                assert frame_size.set(size)
-                size += frame_size.type.value.size
+                array, size = frame.with_size_header(frame_size)
 
                 with self.lock:
                     to_remove = []
                     for stream_id, stream in self.streams.items():
                         try:
-                            assert (
-                                stream.write(frame_size.buffer() + array)
-                                == size
-                            )
+                            assert stream.write(array) == size
                             self.increment_metric("stream_writes")
                             self.increment_metric("bytes_written", size)
                         except OSError as exc:

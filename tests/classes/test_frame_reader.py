@@ -36,7 +36,7 @@ def test_read_frame_basic():
     # parse the frames
     frames = []
     for _ in range(total_frames):
-        frame, size = env.get_next_frame().raw()
+        frame, size = env.get_next_frame().raw
         frames.append(env.decode_frame(frame, size))
     assert len(frames) == total_frames
 

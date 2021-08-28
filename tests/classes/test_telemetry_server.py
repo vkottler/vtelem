@@ -13,6 +13,7 @@ import requests
 import websockets
 
 # module under test
+from vtelem.frame import FRAME_OVERHEAD
 from vtelem.mtu import get_free_tcp_port, Host
 from vtelem.telemetry.server import TelemetryServer
 from vtelem.types.telemetry_server import Service, default_services
@@ -104,7 +105,9 @@ def test_telemetry_server_ws_telemetry():
                     frame = await websocket.recv()
                     telem = server.daemons.get("telemetry")
                     result = telem.decode_frame(
-                        frame, len(frame), telem.app_id
+                        frame[FRAME_OVERHEAD:],
+                        len(frame) - FRAME_OVERHEAD,
+                        telem.app_id,
                     )
                     assert result is not None
 

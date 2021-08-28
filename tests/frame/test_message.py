@@ -31,7 +31,7 @@ def test_message_frame_basic():
     frame.initialize_str(MessageFrame.create_fields(frame_values), message)
     assert frame.finalize(False) > 0
 
-    frame_bytes, frame_size = frame.raw()
+    frame_bytes, frame_size = frame.raw
     assert frame_size == frame.frame_size_str(message)
     parsed = env.decode_frame(frame_bytes, frame_size)
     assert parsed is not None

@@ -1,5 +1,5 @@
 """
-vtelm - A module providing utilities for parsing frames.
+vtelem - A module providing utilities for parsing frames.
 """
 
 # built-in

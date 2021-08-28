@@ -3,38 +3,12 @@ vtelem - Test the stream-writer class's correctness.
 """
 
 # built-in
-import random
-import sys
 import tempfile
-from typing import Tuple
 
 # module under test
 from vtelem.classes.stream_writer import default_writer
-
-
-class DummyFrame:
-    """Class for mocking a channel frame."""
-
-    def __init__(self) -> None:
-        """Construct an empty frame."""
-        self.data = bytearray()
-
-    def add_byte(self, val: int) -> None:
-        """Add a single byte to the frame."""
-        self.data.extend(val.to_bytes(1, sys.byteorder))
-
-    def raw(self) -> Tuple[bytearray, int]:
-        """Required to match the channel-frame interface."""
-        return self.data, len(self.data)
-
-
-def random_garbage_factory() -> DummyFrame:
-    """Create a dummy frame, containing a random number of random bytes."""
-
-    frame = DummyFrame()
-    for _ in range(int(random.random() * 1000.0)):
-        frame.add_byte(int(random.random() * 255.0))
-    return frame
+from vtelem.frame.framer import build_dummy_frame
+from vtelem.mtu import DEFAULT_MTU
 
 
 def test_stream_writer_basic():
@@ -58,7 +32,7 @@ def test_stream_writer_basic():
 
     # enqueue some frames
     for _ in range(100):
-        frame_queue.put(random_garbage_factory())
+        frame_queue.put(build_dummy_frame(DEFAULT_MTU))
 
     # remove some streams
     assert writer.remove_stream(a_id)
@@ -67,7 +41,7 @@ def test_stream_writer_basic():
 
     # enqueue some frames
     for _ in range(100):
-        frame_queue.put(random_garbage_factory())
+        frame_queue.put(build_dummy_frame(DEFAULT_MTU))
 
     assert writer.stop()
 

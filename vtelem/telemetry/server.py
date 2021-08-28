@@ -10,7 +10,7 @@ import threading
 from typing import Any, Dict, Iterator
 
 # internal
-from vtelem.mtu import discover_ipv4_mtu, DEFAULT_MTU, Host
+from vtelem.mtu import discover_ipv4_mtu, mtu_to_usable, DEFAULT_MTU, Host
 from vtelem.factories.daemon_manager import create_daemon_manager_commander
 from vtelem.factories.telemetry_environment import create_channel_commander
 from vtelem.factories.telemetry_server import register_http_handlers
@@ -67,7 +67,7 @@ class TelemetryServer(HttpDaemon):
         # dynamically build mtu, take the minimum of the system's loopback
         # interface, or a practical mtu based on a 1500-byte Ethernet II frame
         # (we will re-evalute mtu when we connect new clients)
-        mtu = discover_ipv4_mtu(Host(socket.getfqdn(), 0)) - (60 + 8)
+        mtu = mtu_to_usable(discover_ipv4_mtu(Host(socket.getfqdn(), 0)))
         telem = TelemetryDaemon(
             "telemetry",
             mtu,
