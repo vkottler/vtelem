@@ -41,15 +41,26 @@ def test_websocket_telemetry_client_basic():
         mtu=DEFAULT_MTU,
     )
 
-    with server.booted(), writer.booted():
+    # Test the server closing the connection.
+    with writer.booted():
+        server.start()
         time.sleep(0.1)
+        with client.booted():
+            time.sleep(0.1)
+            frame_queue.put(build_dummy_frame(64, app_basis))
+            assert output.get() is not None
+            server.stop()
+            time.sleep(0.1)
 
-        # Ensure that the connection can be restarted many times.
-        for _ in range(3):
-            print("iteration begin")
-            with client.booted():
-                time.sleep(0.2)
-                for _ in range(100):
-                    frame_queue.put(build_dummy_frame(64, app_basis))
-                    assert output.get() is not None
-                time.sleep(0.2)
+        with server.booted():
+            time.sleep(0.1)
+
+            # Ensure that the connection can be restarted many times.
+            for _ in range(3):
+                print("iteration begin")
+                with client.booted():
+                    time.sleep(0.2)
+                    for _ in range(100):
+                        frame_queue.put(build_dummy_frame(64, app_basis))
+                        assert output.get() is not None
+                    time.sleep(0.2)
