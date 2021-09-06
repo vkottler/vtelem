@@ -4,7 +4,6 @@ vtelem - Implements management of a synchronous task.
 
 # built-in
 import logging
-import time
 from typing import Callable, Any
 
 # internal
@@ -38,9 +37,6 @@ class Daemon(DaemonBase):
         super().__init__(name, env, time_keeper)
         self.function["task"] = task
         self.function["init"] = init
-        self.function["sleep"] = time.sleep
-        if time_keeper is not None:
-            self.function["sleep"] = time_keeper.sleep
         self.function["rate"] = rate
         if state_change_cb is not None:
             self.function["state_change"] = state_change_cb

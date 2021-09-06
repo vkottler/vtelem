@@ -20,6 +20,7 @@ class EventLoopDaemon(DaemonBase):
         name: str,
         env: TelemetryEnvironment = None,
         time_keeper: Any = None,
+        stop_grace: float = 2.0,
     ) -> None:
         """Construct a new event-loop daemon."""
 
@@ -44,14 +45,17 @@ class EventLoopDaemon(DaemonBase):
 
             # schedule event-loop shutdown, if we leave un-finished work behind
             # it's better than hanging
+            self.function["sleep"](stop_grace)
             self.eloop.call_soon_threadsafe(self.eloop.stop)
 
             # decrement the semaphore the required number of times
             waited = 0
             for _ in range(waits):
                 sig = self.wait_poster
-                if sig.acquire(True, 2):  # pylint:disable=consider-using-with
+                # pylint:disable=consider-using-with
+                if sig.acquire(True, stop_grace):
                     waited += 1
+                # pylint:enable=consider-using-with
 
             assert waited == waits
             with self.lock:

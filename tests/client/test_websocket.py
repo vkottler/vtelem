@@ -45,7 +45,8 @@ def test_websocket_telemetry_client_basic():
         time.sleep(0.1)
 
         # Ensure that the connection can be restarted many times.
-        for _ in range(1):
+        for _ in range(3):
+            print("iteration begin")
             with client.booted():
                 time.sleep(0.2)
                 for _ in range(100):

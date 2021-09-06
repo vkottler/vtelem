@@ -57,16 +57,15 @@ class WebsocketClient(EventLoopDaemon, TelemetryClient):
 
             frame_size = new_default("count")
             assert self.env is not None
-
-            while self.state != DaemonState.STOPPING:
-                try:
+            try:
+                while self.state != DaemonState.STOPPING:
                     self.handle_frames(
                         self.processor.process(
                             await websocket.recv(), frame_size, self.mtu
                         )
                     )
-                finally:
-                    pass
+            except websockets.exceptions.WebSocketException as exc:
+                LOG.error("Exception while awaiting frames: %s.", exc)
 
         async def connect() -> None:
             """Establish a connection and wait for the handler to complete."""
@@ -74,20 +73,17 @@ class WebsocketClient(EventLoopDaemon, TelemetryClient):
             uri_prefix = "{}://".format("wss" if secure else "ws")
             uri = f"{uri_prefix}{host.address}:{host.port}{uri_path}"
             LOG.info("Connecting to '%s'.", uri)
-            async with websockets.connect(  # type: ignore
-                uri, close_timeout=1
-            ) as websocket:
-                try:
-                    with self.lock:
-                        self.wait_count += 1
-                    self.connected = True
+            try:
+                with self.lock:
+                    self.wait_count += 1
+                self.connected = True
+                async with websockets.connect(  # type: ignore
+                    uri, close_timeout=1
+                ) as websocket:
                     await connection_handle(websocket, uri_path)
-                finally:
-                    # post first, if we never finish closing the connection
-                    # that's okay
-                    self.wait_poster.release()
-                    self.connected = False
-                    await websocket.close()
+            finally:
+                self.wait_poster.release()
+                self.connected = False
 
         def run_init(*_, **__) -> None:
             """

@@ -70,6 +70,11 @@ class DaemonBase(TimeEntity):
         self.function["metrics_data"] = defaultdict(lambda: 0)
         self.thread: Optional[threading.Thread] = None
 
+        # assign a 'sleep' function for general use
+        self.function["sleep"] = time.sleep
+        if time_keeper is not None:
+            self.function["sleep"] = time_keeper.sleep
+
         # add daemon enum definitions to the environment
         if self.env is not None:
             if not self.env.has_enum(DaemonBase.states):
