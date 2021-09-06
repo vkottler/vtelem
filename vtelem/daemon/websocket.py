@@ -92,7 +92,7 @@ class WebsocketDaemon(EventLoopDaemon):
             first_start: bool = False,
             service_registry: ServiceRegistry = None,
             **__
-        ):
+        ) -> None:
             """
             A function for setting up websocket serving once the thread's
             event loop is established.

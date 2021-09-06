@@ -18,13 +18,15 @@ def setup_environment() -> dict:
 
     result: dict = {}
     # set up an environment
-    env = TelemetryEnvironment(DEFAULT_MTU, metrics_rate=1.0, use_crc=False)
+    app_basis = 0.5
+    env = TelemetryEnvironment(
+        DEFAULT_MTU, metrics_rate=1.0, app_id_basis=app_basis, use_crc=False
+    )
 
     # set up a stream-writer
     writer, frame_queue = default_writer("test_writer", env=env)
 
     # set up the proxy
-    app_basis = 0.5
     proxy = UdpClient(
         Host("localhost", 0),
         writer.get_queue("proxy"),
