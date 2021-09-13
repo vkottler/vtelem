@@ -38,7 +38,7 @@ class TcpClient(SocketClient):
         def stop_server() -> None:
             """Nothing special needed to close this connection."""
 
-            sock.shutdown(socket.SHUT_RD)
+            self.socket.shutdown(socket.SHUT_RD)
 
         super().__init__(
             sock,
@@ -49,3 +49,13 @@ class TcpClient(SocketClient):
             env,
             mtu,
         )
+
+        def connect(curr_sock: socket.SocketType) -> socket.SocketType:
+            """Create a new socket on each start."""
+
+            result = curr_sock
+            if result.fileno() == -1:
+                result = socket.create_connection(host)
+            return result
+
+        self.function["init"] = connect

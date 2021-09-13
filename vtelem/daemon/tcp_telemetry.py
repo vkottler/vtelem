@@ -5,14 +5,16 @@ vtelem - An interface for managing telemetry-serving tcp servers.
 # built-in
 from io import BytesIO
 import logging
+from queue import Queue
 import socketserver
 from threading import Semaphore
 from typing import Any, Dict, Tuple
 
 # internal
 from vtelem.classes.stream_writer import StreamWriter, QueueClientManager
+from vtelem.client.tcp import TcpClient
 from vtelem.daemon import DaemonBase
-from vtelem.mtu import Host
+from vtelem.mtu import Host, DEFAULT_MTU
 from vtelem.telemetry.environment import TelemetryEnvironment
 
 LOG = logging.getLogger(__name__)
@@ -96,6 +98,23 @@ class TcpTelemetryDaemon(QueueClientManager, DaemonBase):
 
         self.function["inject_stop"] = stopper
         self.server.daemon = self  # type: ignore
+
+    def client(self, mtu: int = DEFAULT_MTU) -> Tuple[TcpClient, Queue]:
+        """Create a client and output queue for this server."""
+
+        assert self.env is not None
+        queue = self.writer.get_queue()
+        return (
+            TcpClient(
+                Host(*self.address),
+                queue,
+                self.env.channel_registry,
+                self.env.app_id,
+                self.env,
+                mtu,
+            ),
+            queue,
+        )
 
     @property
     def address(self) -> Tuple[str, int]:

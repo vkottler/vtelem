@@ -62,7 +62,6 @@ class DaemonBase(TimeEntity):
         if time_keeper is not None:
             time_keeper.add_slave(self)
         self.state: DaemonState = DaemonState.ERROR
-        assert name != ""
         self.name = name
         self.env = env
         self.function: Dict[str, Any] = {}

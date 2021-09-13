@@ -27,7 +27,7 @@ class SocketClient(DaemonBase, TelemetryClient):
 
     def __init__(
         self,
-        socket: SocketType,
+        sock: SocketType,
         stopper: Callable,
         output_stream: Queue,
         channel_registry: ChannelRegistry,
@@ -37,13 +37,23 @@ class SocketClient(DaemonBase, TelemetryClient):
     ) -> None:
         """Construct a new socket client."""
 
-        self.socket = socket
-        name = self.socket.getsockname()
-        name_str = "{}:{}".format(name[0], name[1])
+        self.socket = sock
         TelemetryClient.__init__(
-            self, name_str, output_stream, channel_registry, app_id, mtu
+            self, "", output_stream, channel_registry, app_id, mtu
         )
-        DaemonBase.__init__(self, name_str, env)
+        DaemonBase.__init__(self, "", env)
+        self.update_name(self.socket)
+
+        def closer() -> None:
+            """
+            Close the socket and signal the output stream that the stream has
+            ended.
+            """
+
+            self.socket.close()
+            output_stream.put(None)
+
+        self.function["close"] = closer
 
         def stop_server() -> None:
             """
@@ -52,13 +62,28 @@ class SocketClient(DaemonBase, TelemetryClient):
             """
             LOG.info("%s: closing socket reader", self.name)
             stopper()
-            socket.close()
-            output_stream.put(None)
+            self.close()
 
         self.function["inject_stop"] = stop_server
 
+    def update_name(self, sock: SocketType) -> None:
+        """Set a new name attribute based on the provided socket."""
+
+        name = sock.getsockname()
+        self.name = "{}:{}".format(name[0], name[1])
+
+    def close(self) -> None:
+        """Attempt to close this client connection."""
+
+        self.function["close"]()
+
     def run(self, *_, **__) -> None:
         """Read from the listener and enqueue decoded frames."""
+
+        # If an 'init' function is provided, re-initialize the socket.
+        if "init" in self.function:
+            self.socket = self.function["init"](self.socket)
+            self.update_name(self.socket)
 
         frame_size = new_default("count")
         assert self.env is not None

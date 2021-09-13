@@ -5,16 +5,34 @@ vtelem - Test the tcp telemetry daemon's correctness.
 # built-in
 import socket
 import time
+from typing import Tuple
 
 # module under test
 from vtelem.channel.framer import build_dummy_frame
 from vtelem.classes.metered_queue import MeteredQueue
-from vtelem.classes.stream_writer import default_writer
+from vtelem.classes.stream_writer import default_writer, StreamWriter
 from vtelem.client.tcp import TcpClient
 from vtelem.daemon.tcp_telemetry import TcpTelemetryDaemon
 from vtelem.frame.framer import Framer
 from vtelem.mtu import Host
 from vtelem.telemetry.environment import TelemetryEnvironment
+
+
+def tcp_env(
+    mtu: int = 64, basis: float = 0.5
+) -> Tuple[StreamWriter, TelemetryEnvironment, TcpTelemetryDaemon]:
+    """
+    Create a stream-writer, telemetry environment and tcp-telemetry daemon.
+    """
+
+    # create the environment and register its frame queue
+    env = TelemetryEnvironment(mtu, metrics_rate=1.0, app_id_basis=basis)
+    writer, _ = default_writer("frames", env=env, queue=env.frame_queue)
+
+    # create a tcp-daemon for this environment
+    daemon = TcpTelemetryDaemon("test", writer, env)
+
+    return writer, env, daemon
 
 
 def test_tcp_telemetry_daemon_boot():
@@ -46,16 +64,33 @@ def test_tcp_telemetry_many_clients():
                 sock.close()
 
 
+def test_tcp_telemetry_client_fn():
+    """
+    Create a client from a telemetry daemon, reboot the client a number of
+    times and verify that it decodes telemetry on each boot.
+    """
+
+    writer, env, daemon = tcp_env()
+    with writer.booted(), daemon.booted():
+        time.sleep(0.5)
+        client, out_queue = daemon.client()
+        for _ in range(5):
+            with client.booted():
+                time.sleep(0.5)
+                for _ in range(10):
+                    # advance time, dispatch to generate out-going frames
+                    env.advance_time(10)
+                    frame_count = env.dispatch_now()
+                    for _ in range(frame_count):
+                        assert out_queue.get() is not None
+
+            assert out_queue.get() is None
+
+
 def test_tcp_telemetry_real_client():
     """Test that a real client can receive and decode frames."""
 
-    # create the environment and register its frame queue
-    env = TelemetryEnvironment(64, metrics_rate=1.0)
-    writer, _ = default_writer("frames", env=env, queue=env.frame_queue)
-
-    # create a tcp-daemon for this environment
-    daemon = TcpTelemetryDaemon("test", writer, env)
-
+    writer, env, daemon = tcp_env()
     with writer.booted(), daemon.booted():
         time.sleep(0.1)
 
@@ -84,8 +119,7 @@ def test_tcp_telemetry_bad_app_id():
 
     # create the environment and register its frame queue
     basis = 0.5
-    env = TelemetryEnvironment(64, metrics_rate=1.0, app_id_basis=basis)
-    writer, _ = default_writer("frames", env=env, queue=env.frame_queue)
+    writer, env, daemon = tcp_env(basis=basis)
 
     # create a tcp-daemon for this environment
     daemon = TcpTelemetryDaemon("test", writer, env)
