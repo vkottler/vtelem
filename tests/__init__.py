@@ -4,10 +4,11 @@ vtelem - A module for generic test utilities.
 
 # built-in
 from queue import Queue
-from typing import Tuple
+from typing import cast, Tuple
 
 # internal
 from vtelem.daemon.command_queue import CommandQueueDaemon
+from vtelem.daemon.websocket_telemetry import queue_get
 from vtelem.types.command_queue_daemon import ResultCbType
 
 
@@ -29,4 +30,4 @@ def command_result(
     """Execute a command and get the result."""
 
     daemon.enqueue(cmd)
-    return result_queue.get()
+    return cast(Tuple[bool, str], queue_get(result_queue))

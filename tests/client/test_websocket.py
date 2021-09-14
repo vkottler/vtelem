@@ -8,7 +8,10 @@ import time
 # module under test
 from vtelem.classes.stream_writer import default_writer
 from vtelem.client.websocket import WebsocketClient
-from vtelem.daemon.websocket_telemetry import WebsocketTelemetryDaemon
+from vtelem.daemon.websocket_telemetry import (
+    WebsocketTelemetryDaemon,
+    queue_get,
+)
 from vtelem.channel.framer import Framer, build_dummy_frame
 from vtelem.mtu import DEFAULT_MTU, Host, get_free_tcp_port
 from vtelem.telemetry.environment import TelemetryEnvironment
@@ -48,7 +51,7 @@ def test_websocket_telemetry_client_basic():
         with client.booted():
             time.sleep(0.1)
             frame_queue.put(build_dummy_frame(64, app_basis))
-            assert output.get() is not None
+            assert queue_get(output) is not None
             server.stop()
             time.sleep(0.1)
 
@@ -62,5 +65,5 @@ def test_websocket_telemetry_client_basic():
                     time.sleep(0.2)
                     for _ in range(100):
                         frame_queue.put(build_dummy_frame(64, app_basis))
-                        assert output.get() is not None
+                        assert queue_get(output) is not None
                     time.sleep(0.2)

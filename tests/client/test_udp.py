@@ -6,6 +6,7 @@ vtelem - Test the telemetry proxy's correctness.
 from vtelem.channel.framer import Framer, build_dummy_frame
 from vtelem.classes.stream_writer import default_writer
 from vtelem.classes.udp_client_manager import UdpClientManager
+from vtelem.daemon.websocket_telemetry import queue_get
 from vtelem.mtu import DEFAULT_MTU, Host
 from vtelem.telemetry.environment import TelemetryEnvironment
 from vtelem.client.udp import UdpClient
@@ -70,7 +71,7 @@ def test_telemetry_proxy_read_error():
 
         # read expected number of frames
         for _ in range(frame_count):
-            frame = testenv["proxy"].frames.get()
+            frame = queue_get(testenv["proxy"].frames)
             assert frame is not None
 
         # close the server unexpectedly
@@ -105,7 +106,7 @@ def test_telemetry_proxy_basic():
 
     # read frames from proxy
     for _ in range(frame_count):
-        frame = testenv["proxy"].frames.get()
+        frame = queue_get(testenv["proxy"].frames)
         assert frame is not None
 
     assert testenv["proxy"].stop()
