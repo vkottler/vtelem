@@ -2,6 +2,9 @@
 vtelem - Test the telemetry proxy's correctness.
 """
 
+# built-in
+import time
+
 # module under test
 from vtelem.channel.framer import Framer, build_dummy_frame
 from vtelem.classes.stream_writer import default_writer
@@ -9,7 +12,24 @@ from vtelem.classes.udp_client_manager import UdpClientManager
 from vtelem.daemon.websocket_telemetry import queue_get
 from vtelem.mtu import DEFAULT_MTU, Host
 from vtelem.telemetry.environment import TelemetryEnvironment
-from vtelem.client.udp import UdpClient
+from vtelem.client.udp import UdpClient, create
+
+# internal
+from tests import udp_client_environment
+
+
+def test_udp_client_create():
+    """Test that a just-created telemetry client can decode telemetry."""
+
+    manager, env = udp_client_environment()
+    with create(manager, env) as (client, queue):
+        with client.booted(), manager.writer.booted():
+            time.sleep(0.5)
+            for _ in range(10):
+                env.advance_time(10)
+                frame_count = env.dispatch_now()
+                for _ in range(frame_count):
+                    assert queue_get(queue) is not None
 
 
 def setup_environment() -> dict:

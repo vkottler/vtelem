@@ -99,8 +99,8 @@ def discover_mtu(
     return sock.getsockopt(socket.IPPROTO_IP, SocketConstants.IP_MTU)
 
 
-def get_free_tcp_port(
-    interface_ip: str = "0.0.0.0", test_port: int = 0
+def get_free_port(
+    kind: IntEnum, interface_ip: str = "0.0.0.0", test_port: int = 0
 ) -> int:
     """
     Create a socket to determine an arbitrary port number that's available.
@@ -109,12 +109,22 @@ def get_free_tcp_port(
 
     host = Host(interface_ip, test_port)
 
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock = socket.socket(socket.AF_INET, kind)
     sock.bind((host.address, host.port))
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     _, port = sock.getsockname()
     sock.close()
     return port
+
+
+def get_free_tcp_port(
+    interface_ip: str = "0.0.0.0", test_port: int = 0
+) -> int:
+    """
+    Determine if a given port is available for binding a tcp socket.
+    """
+
+    return get_free_port(socket.SOCK_STREAM, interface_ip, test_port)
 
 
 def discover_ipv4_mtu(host: Host, probe_size: int = DEFAULT_MTU) -> int:

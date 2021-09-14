@@ -64,7 +64,7 @@ class UdpClientManager(LockEntity):
 
         return {host: self.add_client(host) for host in hosts}
 
-    def add_client(self, host: Host) -> Tuple[int, int]:
+    def add_client(self, host: Host, flush: bool = False) -> Tuple[int, int]:
         """Add a new client connection by hostname and port."""
 
         sock = create_udp_socket(host)
@@ -74,7 +74,7 @@ class UdpClientManager(LockEntity):
         sock_file.flush()
 
         with self.lock:
-            sock_id = self.writer.add_stream(sock_file)
+            sock_id = self.writer.add_stream(sock_file, flush=flush)
             self.clients[sock_id] = (sock, sock_file)
 
         name = sock.getsockname()

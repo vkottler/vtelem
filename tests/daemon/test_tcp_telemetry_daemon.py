@@ -18,6 +18,9 @@ from vtelem.frame.framer import Framer
 from vtelem.mtu import Host
 from vtelem.telemetry.environment import TelemetryEnvironment
 
+# internal
+from tests import writer_environment
+
 
 def tcp_env(
     mtu: int = 64, basis: float = 0.5
@@ -26,11 +29,8 @@ def tcp_env(
     Create a stream-writer, telemetry environment and tcp-telemetry daemon.
     """
 
-    # create the environment and register its frame queue
-    env = TelemetryEnvironment(mtu, metrics_rate=1.0, app_id_basis=basis)
-    writer, _ = default_writer("frames", env=env, queue=env.frame_queue)
-
     # create a tcp-daemon for this environment
+    writer, env = writer_environment(mtu, basis)
     daemon = TcpTelemetryDaemon("test", writer, env)
 
     return writer, env, daemon

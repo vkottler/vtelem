@@ -9,6 +9,7 @@ import logging
 from queue import Queue
 from threading import Semaphore
 from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import DefaultDict
 
 # internal
 from vtelem.daemon.queue import QueueDaemon
@@ -42,6 +43,9 @@ class StreamWriter(QueueDaemon):
         self.curr_id: int = 0
         self.queue_id: int = 0
         self.streams: Dict[int, BytesIO] = {}
+        self.stream_attrs: Dict[int, Dict[str, bool]] = DefaultDict(
+            lambda: DefaultDict(bool)
+        )
         self.stream_closers: Dict[int, Optional[Callable]] = {}
         self.queues: Dict[int, Queue] = {}
         self.error_handle = error_handle
@@ -59,6 +63,8 @@ class StreamWriter(QueueDaemon):
                     for stream_id, stream in self.streams.items():
                         try:
                             assert stream.write(array) == size
+                            if self.stream_attrs[stream_id]["flush"]:
+                                stream.flush()
                             self.increment_metric("stream_writes")
                             self.increment_metric("bytes_written", size)
                         except OSError as exc:
@@ -140,7 +146,10 @@ class StreamWriter(QueueDaemon):
         return self.add_queue(queue), queue
 
     def add_stream(
-        self, stream: BytesIO, stream_closer: Callable = None
+        self,
+        stream: BytesIO,
+        stream_closer: Callable = None,
+        flush: bool = False,
     ) -> int:
         """Add a stream and return its integer identifier."""
 
@@ -148,6 +157,7 @@ class StreamWriter(QueueDaemon):
             result = self.curr_id
             self.streams[result] = stream
             self.stream_closers[result] = stream_closer
+            self.stream_attrs[result]["flush"] = flush
             self.curr_id += 1
         self.increment_metric("stream_count")
         return result
