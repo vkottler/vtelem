@@ -20,7 +20,7 @@ class EventLoopDaemon(DaemonBase):
         name: str,
         env: TelemetryEnvironment = None,
         time_keeper: Any = None,
-        stop_grace: float = 2.0,
+        stop_grace: float = 6.0,
     ) -> None:
         """Construct a new event-loop daemon."""
 
@@ -43,9 +43,21 @@ class EventLoopDaemon(DaemonBase):
             for task in tasks:
                 task.cancel()
 
+            # allow 'stop_grace' amount of time to pass while we wait for tasks
+            # to complete, after this we'll stop the event loop and wait for
+            # all managed tasks we expect to 'post' the semaphore
+            start = self.function["time"]()
+            running = True
+            while running and self.function["time"]() - start < stop_grace:
+                running = False
+                tasks = asyncio.all_tasks(loop=self.eloop)
+                for task in tasks:
+                    if not task.done():
+                        running = True
+                        break
+
             # schedule event-loop shutdown, if we leave un-finished work behind
             # it's better than hanging
-            self.function["sleep"](stop_grace)
             self.eloop.call_soon_threadsafe(self.eloop.stop)
 
             # decrement the semaphore the required number of times

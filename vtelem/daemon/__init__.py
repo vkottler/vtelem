@@ -71,8 +71,10 @@ class DaemonBase(TimeEntity):
 
         # assign a 'sleep' function for general use
         self.function["sleep"] = time.sleep
+        self.function["time"] = time.time
         if time_keeper is not None:
             self.function["sleep"] = time_keeper.sleep
+            self.function["time"] = time_keeper.time_function
 
         # add daemon enum definitions to the environment
         if self.env is not None:

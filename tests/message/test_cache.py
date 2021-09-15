@@ -52,7 +52,6 @@ def test_message_cache_basic():
         new_cache = MessageCache(
             cache_dir, {MessageType.TEXT: [sample_callback]}
         )
-        print(new_cache.data)
         assert len(new_cache.complete(MessageType.TEXT)) == 1
         _, data = new_cache.content_str(MessageType.TEXT, completed[0])
         assert data == LONG_MESSAGE

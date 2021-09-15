@@ -12,7 +12,7 @@ import websockets
 
 # internal
 from vtelem.daemon.event_loop import EventLoopDaemon
-from vtelem.mtu import Host
+from vtelem.mtu import Host, get_free_tcp_port
 from vtelem.registry.service import ServiceRegistry
 from vtelem.telemetry.environment import TelemetryEnvironment
 
@@ -44,6 +44,7 @@ class WebsocketDaemon(EventLoopDaemon):
         env: TelemetryEnvironment = None,
         time_keeper: Any = None,
         ws_handler: Callable = None,
+        secure: bool = False,
     ) -> None:
         """Construct a new websocket daemon."""
 
@@ -51,8 +52,9 @@ class WebsocketDaemon(EventLoopDaemon):
 
         # listen on all interfaces, on an arbitrary port by default
         if address is None:
-            address = Host()
+            address = Host(port=get_free_tcp_port())
         self.address = address
+        self.secure = secure
         self.server = None
         self.serving = False
 

@@ -5,16 +5,17 @@ vtelem - An interface for managing websocket servers that serve telemetry data.
 # built-in
 import asyncio
 from queue import Empty, Queue
-from typing import Any, Set, Optional
+from typing import Any, Set, Optional, Tuple
 
 # third-party
 from websockets.exceptions import WebSocketException
 
 # internal
 from vtelem.classes.stream_writer import StreamWriter, QueueClientManager
+from vtelem.client.websocket import WebsocketClient
 from vtelem.daemon.websocket import WebsocketDaemon
 from vtelem.frame.channel import ChannelFrame
-from vtelem.mtu import Host
+from vtelem.mtu import Host, DEFAULT_MTU
 from vtelem.telemetry.environment import TelemetryEnvironment
 
 
@@ -89,4 +90,29 @@ class WebsocketTelemetryDaemon(QueueClientManager, WebsocketDaemon):
 
         WebsocketDaemon.__init__(
             self, name, None, address, env, time_keeper, telem_handle
+        )
+
+    def client(
+        self,
+        mtu: int = DEFAULT_MTU,
+        uri_path: str = "",
+        time_keeper: Any = None,
+    ) -> Tuple[WebsocketClient, Queue]:
+        """Create a connected websocket client from this daemon."""
+
+        assert self.env is not None
+        queue = self.writer.get_queue()
+        return (
+            WebsocketClient(
+                self.address,
+                queue,
+                self.env.channel_registry,
+                self.secure,
+                uri_path,
+                self.env.app_id,
+                self.env,
+                time_keeper,
+                mtu,
+            ),
+            queue,
         )

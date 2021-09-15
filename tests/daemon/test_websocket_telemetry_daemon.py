@@ -18,6 +18,32 @@ from vtelem.daemon.websocket_telemetry import (
 )
 from vtelem.mtu import get_free_tcp_port
 
+# internal
+from tests import writer_environment
+
+
+def test_websocket_telemetry_client_fn():
+    """
+    Test that a created websocket client can connect a few times and decode
+    telemetry.
+    """
+
+    writer, env = writer_environment()
+    daemon = WebsocketTelemetryDaemon("test", writer, env=env)
+    client, queue = daemon.client()
+    with writer.booted(), daemon.booted():
+        time.sleep(0.5)
+        for _ in range(3):
+            with client.booted():
+                time.sleep(0.5)
+                for _ in range(10):
+                    env.advance_time(10)
+                    frame_count = env.dispatch_now()
+                    for _ in range(frame_count):
+                        assert queue_get(queue) is not None
+
+            assert queue_get(queue) is None
+
 
 def test_websocket_telemetry_daemon_server_close_first():
     """
