@@ -39,6 +39,11 @@ renders:
   - "compiles-local"
   - "commands-help"
   - "renders-python_readme_header.md"
+- name: "docs_README.md"
+  output_dir: "docs"
+  output_path: "README.md"
+  dependencies:
+  - "compiles-local"
 - name: "LICENSE"
   key: "LICENSE_MIT"
   output_dir: "."
@@ -49,6 +54,7 @@ groups:
 - name: "all"
   dependencies:
   - "renders-README.md"
+  - "renders-docs_README.md"
   - "renders-LICENSE"
   - "groups-local-python"
   - "groups-local-docs"
