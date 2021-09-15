@@ -3,9 +3,8 @@ vtelem - An interface for managing websocket servers that serve telemetry data.
 """
 
 # built-in
-import asyncio
 from queue import Empty, Queue
-from typing import Any, Set, Optional, Tuple
+from typing import Any, Optional, Tuple
 
 # third-party
 from websockets.exceptions import WebSocketException
@@ -55,8 +54,6 @@ class WebsocketTelemetryDaemon(QueueClientManager, WebsocketDaemon):
                 Host(*websocket.remote_address)
             )
             should_continue = True
-            complete: Set[asyncio.Future] = set()
-            pending: Set[asyncio.Future] = set()
 
             try:
                 while should_continue:
@@ -66,27 +63,11 @@ class WebsocketTelemetryDaemon(QueueClientManager, WebsocketDaemon):
                             should_continue = False
                             break
 
-                        complete, pending = await asyncio.wait(
-                            [
-                                websocket.send(frame.with_size_header()[0]),
-                                websocket.wait_closed(),
-                            ],
-                            return_when=asyncio.FIRST_COMPLETED,
-                        )
-
-                        for future in complete:
-                            exc = future.exception()
-                            if exc is not None:
-                                raise exc
-
-                        for pend in pending:
-                            pend.cancel()
+                        await websocket.send(frame.with_size_header()[0])
                     except WebSocketException:
                         should_continue = False
             finally:
                 self.writer.remove_queue(queue_id, False)
-                for pend in pending:
-                    pend.cancel()
 
         WebsocketDaemon.__init__(
             self, name, None, address, env, time_keeper, telem_handle

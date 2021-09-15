@@ -10,12 +10,15 @@ import time
 
 # third-party
 import requests
+import pytest
 
 # internal
 from tests.resources import get_resource
 
 # module under test
 from vtelem.daemon.http import HttpDaemon
+
+WARN = "urllib3.exceptions.InsecureRequestWarning"
 
 
 def test_http_daemon_serve():
@@ -45,6 +48,7 @@ def test_http_daemon_serve():
     proc.join()
 
 
+@pytest.mark.filterwarnings(f"ignore::{WARN}")
 def test_http_daemon_with_tls():
     """Test that a daemon works with secure-socket layer enabled."""
 
