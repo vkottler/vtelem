@@ -53,7 +53,7 @@ def test_websocket_telemetry_client_basic():
             frame_queue.put(build_dummy_frame(64, app_basis))
             assert queue_get(output) is not None
             server.stop()
-            time.sleep(0.1)
+            time.sleep(5.0)
 
         with server.booted():
             time.sleep(0.1)

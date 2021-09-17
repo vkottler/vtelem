@@ -39,7 +39,7 @@ class ChannelGroup:
         # the environment should catch duplicate channel names for us
         try:
             val = default_val(instance)
-            real_name = "{}.{}".format(self.name, name)
+            real_name = f"{self.name}.{name}"
             chan_id = self.env.add_channel(
                 real_name,
                 instance,
@@ -77,7 +77,7 @@ class ChannelGroup:
 
         # the environment should catch duplicate channel names for us
         try:
-            real_name = "{}.{}".format(self.name, name)
+            real_name = f"{self.name}.{name}"
             chan_id = self.env.add_enum_channel(
                 real_name,
                 enum_name,

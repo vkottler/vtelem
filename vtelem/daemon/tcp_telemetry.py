@@ -38,9 +38,7 @@ class TcpTelemetryHandler(socketserver.StreamRequestHandler):
 
         # make sure our stream has a name attribute
         stream: BytesIO = self.wfile  # type: ignore
-        stream.name = "{}:{}".format(
-            self.client_address[0], self.client_address[1]
-        )
+        stream.name = f"{self.client_address[0]}:{self.client_address[1]}"
 
         # add the socket to the stream writer
         writer: StreamWriter = daemon.writer

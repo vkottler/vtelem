@@ -19,7 +19,7 @@ def test_read_frame_basic():
 
     chan_ids = []
     for i in range(10):
-        chan = env.add_channel("chan{}".format(i), Primitive.INT32, 0.1, True)
+        chan = env.add_channel(f"chan{i}", Primitive.INT32, 0.1, True)
         chan_ids.append(chan)
 
     # build some frames

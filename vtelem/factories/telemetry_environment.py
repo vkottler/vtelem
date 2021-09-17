@@ -22,7 +22,7 @@ def channel_set(
     """Attempt to set a channel from a command."""
 
     if "value" not in cmd:
-        return False, "no value provided to set '{}'".format(str(chan[0]))
+        return False, f"no value provided to set '{chan[0]}'"
 
     if env.is_enum_channel(chan[1]):
         result = env.command_enum_channel_id(chan[1], cmd["value"])
@@ -30,9 +30,7 @@ def channel_set(
         result = chan[0].command(cmd["value"], time, False)
 
     msg = "success" if result else "failure"
-    return result, "{}: set '{}' to '{}'".format(
-        msg, str(chan[0]), str(cmd["value"])
-    )
+    return result, f"{msg}: set '{chan[0]}' to '{cmd['value']}'"
 
 
 def channel_get(
@@ -54,16 +52,14 @@ def channel_increment(
     """Attempt to increment a channel by a certain amount."""
 
     if env.is_enum_channel(chan[1]):
-        return False, "can't increment enum channel '{}'".format(str(chan[0]))
+        return False, f"can't increment enum channel '{chan[0]}'"
 
     to_inc = 1
     if "value" in cmd:
         to_inc = cmd["value"]
     result = chan[0].command(to_inc, time, True)
     msg = "success" if result else "failure"
-    return result, "{}: incremented '{}' by '{}'".format(
-        msg, str(chan[0]), str(to_inc)
-    )
+    return result, f"{msg}: incremented '{chan[0]}' by '{to_inc}'"
 
 
 def channel_decrement(
@@ -75,16 +71,14 @@ def channel_decrement(
     """Attempt to decrement a channel by a certain amount."""
 
     if env.is_enum_channel(chan[1]):
-        return False, "can't decrement enum channel '{}'".format(str(chan[0]))
+        return False, f"can't decrement enum channel '{chan[0]}'"
 
     to_dec = 1
     if "value" in cmd:
         to_dec = cmd["value"]
     result = chan[0].command(to_dec * -1, time, True)
     msg = "success" if result else "failure"
-    return result, "{}: decremented '{}' by '{}'".format(
-        msg, str(chan[0]), str(to_dec)
-    )
+    return result, f"{msg}: decremented '{chan[0]}' by '{to_dec}'"
 
 
 def create_channel_commander(
@@ -113,18 +107,18 @@ def create_channel_commander(
                 if key in cmd:
                     found += 1
             if not found:
-                return False, "missing key from '{}'".format(str(key_list))
+                return False, f"missing key from '{key_list}'"
 
         # validate channel name, id, or both provided
         if "channel_name" in cmd:
             chan_name = cmd["channel_name"]
             if not env.has_channel(chan_name):
-                return False, "no channel '{}' known".format(chan_name)
+                return False, f"no channel '{chan_name}' known"
             chan_id = env.channel_registry.get_id(chan_name)
             assert chan_id is not None
             if "channel_id" in cmd and cmd["channel_id"] != chan_id:
-                msg = "id mismatch, '{}' != '{}'"
-                return False, msg.format(cmd["channel_id"], chan_id)
+                msg = f"id mismatch, '{cmd['channel_id']}' != '{chan_id}'"
+                return False, msg
         elif "channel_id" in cmd:
             chan_id = cmd["channel_id"]
 
@@ -132,22 +126,21 @@ def create_channel_commander(
         assert chan_id is not None
         chan = env.channel_registry.get_item(chan_id)
         if chan is None:
-            return False, "no channel with id '{}'".format(chan_id)
+            return False, f"no channel with id '{chan_id}'"
 
         # check the operation
         if cmd["operation"] not in supported_ops:
-            msg = "operation '{}' not supported"
-            return False, msg.format(cmd["operation"])
+            return False, f"operation '{cmd['operation']}' not supported"
 
         # return the result of the operation
         return supported_ops[cmd["operation"]](
             (chan, chan_id), cmd, env.get_time(), env
         )
 
-    ops_str = ", ".join("'{}'".format(val) for val in supported_ops)
+    ops_str = ", ".join(f"'{val}'" for val in supported_ops)
     daemon.register_consumer(
         command_name,
         channel_commander,
         result_cb,
-        "{} channels".format(ops_str),
+        f"{ops_str} channels",
     )

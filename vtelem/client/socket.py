@@ -70,7 +70,7 @@ class SocketClient(DaemonBase, TelemetryClient):
         """Set a new name attribute based on the provided socket."""
 
         name = sock.getsockname()
-        self.name = "{}:{}".format(name[0], name[1])
+        self.name = f"{name[0]}:{name[1]}"
 
     def close(self) -> None:
         """Attempt to close this client connection."""

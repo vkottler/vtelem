@@ -44,7 +44,7 @@ def test_websocket_daemon_basic():
             async def ping_test():
                 """Send an arbitrary message and expect the same back."""
 
-                uri = "ws://localhost:{}".format(port)
+                uri = f"ws://localhost:{port}"
                 async with websockets.connect(
                     uri, close_timeout=1
                 ) as websocket:

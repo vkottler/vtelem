@@ -97,9 +97,7 @@ def test_create_many_channels():
 
     chan_ids = []
     for i in range(1000):
-        chan_ids.append(
-            env.add_channel("chan{}".format(i), Primitive.FLOAT, 0.1)
-        )
+        chan_ids.append(env.add_channel(f"chan{i}", Primitive.FLOAT, 0.1))
 
     # set all channels and dispatch
     for _ in range(5):

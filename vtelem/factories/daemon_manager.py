@@ -30,8 +30,7 @@ def create_daemon_manager_commander(
         oper = cmd["operation"].lower()
         if is_operation(oper):
             if "daemons" not in cmd or not isinstance(cmd["daemons"], list):
-                msg = "'daemons' not provided as a list for '{}'"
-                return False, msg.format(oper)
+                return False, f"'daemons' not provided as a list for '{oper}'"
 
             # allow 'all' to be a special key
             daemons = cmd["daemons"]
@@ -52,10 +51,10 @@ def create_daemon_manager_commander(
         if oper == "states":
             return True, json.dumps(manager.states())
 
-        return False, "unknown 'operation' '{}'".format(oper)
+        return False, f"unknown 'operation' '{oper}'"
 
     oper_strs = [operation_str(op) for op in DaemonOperation]
-    ops_str = ", ".join("'{}'".format(val) for val in oper_strs)
+    ops_str = ", ".join(f"'{val}'" for val in oper_strs)
     daemon.register_consumer(
-        command_name, daemon_commander, result_cb, "{} daemons".format(ops_str)
+        command_name, daemon_commander, result_cb, f"{ops_str} daemons"
     )

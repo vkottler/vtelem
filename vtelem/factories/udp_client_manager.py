@@ -21,10 +21,8 @@ def add_client(manager: UdpClientManager, data: dict) -> Tuple[bool, str]:
 
     result = manager.add_client(Host(data["host"], data["port"]))
     client_name = manager.client_name(result[0])
-    client_str = "{}:{}".format(client_name[0], client_name[1])
-    msg = "client '{}' ({}) added with mtu '{}'".format(
-        result[0], client_str, result[1]
-    )
+    client_str = f"{client_name[0]}:{client_name[1]}"
+    msg = f"client '{result[0]}' ({client_str}) added with mtu '{result[1]}'"
     return True, msg
 
 
@@ -35,10 +33,9 @@ def remove_client(manager: UdpClientManager, data: dict) -> Tuple[bool, str]:
         if "id" not in data:
             return False, "client identifier not provided"
         if data["id"] not in manager.clients:
-            msg = "unknown client identifier '{}'"
-            return False, msg.format(data["id"])
+            return False, f"unknown client identifier '{data['id']}'"
         manager.remove_client(data["id"])
-    return True, "client '{}' removed".format(data["id"])
+    return True, f"client '{data['id']}' removed"
 
 
 def list_client(manager: UdpClientManager, data: dict) -> Tuple[bool, str]:
@@ -48,14 +45,13 @@ def list_client(manager: UdpClientManager, data: dict) -> Tuple[bool, str]:
         sock_ids = list(manager.clients.keys())
         if "id" in data:
             if data["id"] not in manager.clients:
-                msg = "unknown client identifier '{}'"
-                return False, msg.format(data["id"])
+                return False, f"unknown client identifier '{data['id']}'"
             sock_ids = [data["id"]]
 
         result = {}
         for sock_id in sock_ids:
             name = manager.client_name(sock_id)
-            result[sock_id] = "{}:{}".format(name[0], name[1])
+            result[sock_id] = f"{name[0]}:{name[1]}"
 
     return True, json.dumps(result)
 
@@ -80,13 +76,13 @@ def create_udp_client_commander(
         if "operation" not in cmd:
             return False, "no 'operation' specified"
         if cmd["operation"] not in commands:
-            return False, "'{}' not supported".format(cmd["operation"])
+            return False, f"'{cmd['operation']}' not supported"
         return commands[cmd["operation"]](manager, cmd)
 
-    ops_str = ", ".join("'{}'".format(val) for val in commands)
+    ops_str = ", ".join(f"'{val}'" for val in commands)
     daemon.register_consumer(
         command_name,
         udp_commander,
         result_cb,
-        "{} udp clients".format(ops_str),
+        f"{ops_str} udp clients",
     )

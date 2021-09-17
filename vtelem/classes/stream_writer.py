@@ -218,7 +218,7 @@ class QueueClientManager(LockEntity):
 
         name = None
         if addr is not None:
-            name = "{}.{}:{}".format(self.name, addr.address, addr.port)
+            name = f"{self.name}.{addr.address}:{addr.port}"
         queue_id, frame_queue = self.writer.registered_queue(name)
         with self.lock:
             self.active_client_queues.append(queue_id)

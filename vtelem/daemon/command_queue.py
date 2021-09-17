@@ -49,9 +49,7 @@ class CommandQueueDaemon(QueueDaemon):
             # make sure the element is a dictionary, has "command", has a
             # handler registered
             if not isinstance(elem, dict) or "command" not in elem:
-                err = (
-                    "{}: unknown or malformed command, " + "rejected"
-                ).format(self.name)
+                err = f"{self.name}: unknown or malformed command, rejected"
                 LOG.error(err)
                 self.increment_metric("rejected_count")
                 if cmd_cb is not None:
@@ -59,8 +57,9 @@ class CommandQueueDaemon(QueueDaemon):
                 return None
             if not self.handlers[elem["command"]]:
                 err = (
-                    "{}: command '{}' has no handlers, " + "rejected"
-                ).format(self.name, elem["command"])
+                    f"{self.name}: command '{elem['command']}' "
+                    "has no handlers, rejected"
+                )
                 LOG.error(err)
                 self.increment_metric("rejected_count")
                 if cmd_cb is not None:
@@ -81,7 +80,7 @@ class CommandQueueDaemon(QueueDaemon):
                 if cmd_cb is not None:
                     cmd_cb(result, message)
                 status = "success" if result else "failure"
-                self.increment_metric("{}_count".format(status))
+                self.increment_metric(f"{status}_count")
 
                 # log result
                 log_fn = LOG.info if result else LOG.warning
@@ -114,7 +113,7 @@ class CommandQueueDaemon(QueueDaemon):
             if data["command"] is not None:
                 # make sure the specified command exists
                 if data["command"] not in self.handlers:
-                    msg = "Unknown command '{}'".format(data["command"])
+                    msg = f"Unknown command '{data['command']}'"
                     return False, msg
                 commands = [data["command"]]
 

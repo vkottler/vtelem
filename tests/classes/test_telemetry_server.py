@@ -98,7 +98,7 @@ def test_telemetry_server_ws_telemetry():
         async def telemetry_test():
             """Send some commands to the server."""
 
-            uri = "ws://localhost:{}".format(port)
+            uri = f"ws://localhost:{port}"
             async with websockets.connect(uri, close_timeout=1) as websocket:
                 time.sleep(0.1)
                 for _ in range(10):
@@ -144,7 +144,7 @@ def test_telemetry_server_ws_commands():
             """Send some commands to the server."""
 
             nonlocal fails
-            uri = "ws://localhost:{}".format(port)
+            uri = f"ws://localhost:{port}"
             async with websockets.connect(uri, close_timeout=1) as websocket:
                 time.sleep(0.1)
 

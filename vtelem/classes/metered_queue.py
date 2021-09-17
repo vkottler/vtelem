@@ -23,19 +23,19 @@ class MeteredQueue(Queue):
 
         super().__init__(maxsize)
         self.env = env
-        self.name = "{}_queue".format(name)
+        self.name = f"{name}_queue"
         initial = (0, self.env.get_time())
         self.env.add_metric(
-            "{}.elements".format(self.name), Primitive.UINT16, False, initial
+            f"{self.name}.elements", Primitive.UINT16, False, initial
         )
         self.env.add_metric(
-            "{}.total_enqueued".format(self.name),
+            f"{self.name}.total_enqueued",
             Primitive.UINT32,
             False,
             initial,
         )
         self.env.add_metric(
-            "{}.total_dequeued".format(self.name),
+            f"{self.name}.total_dequeued",
             Primitive.UINT32,
             False,
             initial,
@@ -46,8 +46,8 @@ class MeteredQueue(Queue):
 
         result = super().get(block, timeout)
         time = self.env.get_time()
-        self.env.metric_add("{}.elements".format(self.name), -1, time)
-        self.env.metric_add("{}.total_dequeued".format(self.name), 1, time)
+        self.env.metric_add(f"{self.name}.elements", -1, time)
+        self.env.metric_add(f"{self.name}.total_dequeued", 1, time)
         return result
 
     def put(
@@ -56,8 +56,8 @@ class MeteredQueue(Queue):
         """Enqueue an element."""
 
         time = self.env.get_time()
-        self.env.metric_add("{}.elements".format(self.name), 1, time)
-        self.env.metric_add("{}.total_enqueued".format(self.name), 1, time)
+        self.env.metric_add(f"{self.name}.elements", 1, time)
+        self.env.metric_add(f"{self.name}.total_enqueued", 1, time)
         super().put(item, block, timeout)
 
 

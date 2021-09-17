@@ -41,7 +41,7 @@ class TypePrimitive:
     def __str__(self) -> str:
         """Conver this type primitive into a String."""
 
-        return "({}) {}".format(self.type.name, self.data)
+        return f"({self.type.name}) {self.data}"
 
     def add(self, data: Any, time: float = None) -> bool:
         """Safely add some amount to the primitive."""

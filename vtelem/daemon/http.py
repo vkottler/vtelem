@@ -74,10 +74,9 @@ class HttpDaemon(DaemonBase):
         """Get this server's root url as a String."""
 
         protocol = "http" if self.ssl_context is None else "https"
-        return "{}://{}:{}/".format(
-            protocol,
-            self.server.server_address[0],
-            self.server.server_address[1],
+        return (
+            f"{protocol}://{self.server.server_address[0]}"
+            f":{self.server.server_address[1]}/"
         )
 
     def add_handler(

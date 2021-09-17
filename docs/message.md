@@ -2,13 +2,13 @@
     =====================================
     generator=datazen
     version=1.7.9
-    hash=044a5de2bb1072b3a080b0c1274589a3
+    hash=cbdb63428fd5a6c6c9a7e21143310764
     =====================================
 -->
 
 # Frame Types
 
-([back](../README.md#documentation))
+([back](README.md#documentation))
 
 *See [Primitive Types](primitive.md#defaults) for `default` type
 mappings.*

@@ -70,7 +70,7 @@ class WebsocketClient(EventLoopDaemon, TelemetryClient):
         async def connect() -> None:
             """Establish a connection and wait for the handler to complete."""
 
-            uri_prefix = "{}://".format("wss" if secure else "ws")
+            uri_prefix = f"{'wss' if secure else 'ws'}://"
             uri = f"{uri_prefix}{host.address}:{host.port}{uri_path}"
             LOG.info("Connecting to '%s'.", uri)
             try:

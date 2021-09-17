@@ -2,13 +2,13 @@
     =====================================
     generator=datazen
     version=1.7.9
-    hash=e3d409cf75bfab5224276387d52279ee
+    hash=5f6a905f01276b575a400d75778f0d5f
     =====================================
 -->
 
 # Message Types
 
-([back](../README.md#documentation))
+([back](README.md#documentation))
 
 *See [Frame Types](message.md#message) for the message frame's
 definition.*

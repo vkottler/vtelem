@@ -168,7 +168,7 @@ class DaemonBase(TimeEntity):
     def get_metric_name(self, channel_name: str) -> str:
         """Build the name of a metric channel for this daemon."""
 
-        return "{}.{}".format(self.name, channel_name)
+        return f"{self.name}.{channel_name}"
 
     def set_state(self, state: DaemonState) -> bool:
         """Assigns a new run-state to this daemon."""

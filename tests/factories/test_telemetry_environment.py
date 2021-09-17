@@ -40,14 +40,12 @@ def test_channel_commander():  # pylint: disable=too-many-statements
     assert env.add_from_enum(EnumA) >= 0
     enum_ids = []
     for i in range(5):
-        enum_ids.append(
-            env.add_enum_channel("echan{}".format(i), "enum_a", 1.0)
-        )
+        enum_ids.append(env.add_enum_channel(f"echan{i}", "enum_a", 1.0))
     prim_ids = {}
     for prim in Primitive:
         prim_list = []
         for i in range(5):
-            chan_name = "{}_chan{}".format(get_name(prim), i)
+            chan_name = f"{get_name(prim)}_chan{i}"
             prim_list.append(env.add_channel(chan_name, prim, 1.0))
         prim_ids[get_name(prim)] = prim_list
 

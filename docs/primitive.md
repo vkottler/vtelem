@@ -2,13 +2,13 @@
     =====================================
     generator=datazen
     version=1.7.9
-    hash=e1452f27a343f9a622312b4abbf3f7a1
+    hash=c2cd426a94cf08ea1ba803b0a3e66209
     =====================================
 -->
 
 # Primitive Types
 
-([back](../README.md#documentation))
+([back](README.md#documentation))
 
 All transmission of information over a physical medium that uses binary bits
 must be formatted so that receivers can understand it.

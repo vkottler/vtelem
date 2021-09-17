@@ -79,9 +79,7 @@ class HttpRequestMapper:
         self.requests[request_type][path] = handle
         handle_data = {}
         handle_data["Description"] = description
-        handle_data["Content-Type"] = "{}; charset={}".format(
-            response_type, charset
-        )
+        handle_data["Content-Type"] = f"{response_type}; charset={charset}"
         if data is not None:
             handle_data.update(data)
         self.handle_data[request_type][path] = handle_data
@@ -118,7 +116,7 @@ class MapperAwareRequestHandler(BaseHTTPRequestHandler):
         Handle a response where no mapper is found for the requested path.
         """
 
-        msg = "no request-mapper for '{}' path '{}'".format(command, self.path)
+        msg = f"no request-mapper for '{command}' path '{self.path}'"
         self.send_error(HTTPStatus.NOT_FOUND, msg)
         self.end_headers()
         self.close_connection = True

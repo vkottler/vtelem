@@ -24,7 +24,7 @@ def test_telemetry_server_app_basic():
 
         nonlocal instance
         data["a"] = "a"
-        data["group_a"] = groups.create_group("channels_{}".format(instance))
+        data["group_a"] = groups.create_group(f"channels_{instance}")
         instance += 1
         groups.add_channel(data["group_a"], "a", Primitive.UINT32, 0.1)
         groups.add_channel(data["group_a"], "b", Primitive.UINT32, 0.1)

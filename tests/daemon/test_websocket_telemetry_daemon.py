@@ -66,7 +66,7 @@ def test_websocket_telemetry_daemon_server_close_first():
             to close first.
             """
 
-            uri = "ws://localhost:{}".format(port)
+            uri = f"ws://localhost:{port}"
             async with websockets.connect(uri, close_timeout=1) as websocket:
                 time.sleep(0.1)
 
