@@ -11,7 +11,7 @@ from threading import Semaphore
 from typing import Any, Dict, Tuple
 
 # internal
-from vtelem.classes.stream_writer import StreamWriter, QueueClientManager
+from vtelem.stream.writer import StreamWriter, QueueClientManager
 from vtelem.client.tcp import TcpClient
 from vtelem.daemon import DaemonBase
 from vtelem.mtu import Host, DEFAULT_MTU

@@ -4,12 +4,23 @@ vtelem - Uses daemon machinery to build the task that can consume outgoing
 """
 
 # built-in
+from contextlib import contextmanager
 from io import BytesIO
 import logging
+from pathlib import Path
 from queue import Queue
 from threading import Semaphore
-from typing import Any, Callable, Dict, List, Optional, Tuple
-from typing import DefaultDict
+from typing import (
+    Any,
+    cast,
+    Callable,
+    DefaultDict,
+    Dict,
+    List,
+    Iterator,
+    Optional,
+    Tuple,
+)
 
 # internal
 from vtelem.daemon.queue import QueueDaemon
@@ -18,8 +29,8 @@ from vtelem.mtu import Host
 from vtelem.telemetry.environment import TelemetryEnvironment
 from vtelem.classes import DEFAULTS
 from vtelem.classes.type_primitive import new_default
-from .metered_queue import create, MAX_SIZE
-from .time_entity import LockEntity
+from vtelem.classes.metered_queue import create, MAX_SIZE
+from vtelem.classes.time_entity import LockEntity
 
 LOG = logging.getLogger(__name__)
 
@@ -161,6 +172,33 @@ class StreamWriter(QueueDaemon):
             self.curr_id += 1
         self.increment_metric("stream_count")
         return result
+
+    @contextmanager
+    def stream_added(
+        self,
+        stream: BytesIO,
+        stream_closer: Callable = None,
+        flush: bool = False,
+    ) -> Iterator[None]:
+        """Provide an added-stream as a context."""
+
+        stream_id = self.add_stream(stream, stream_closer, flush)
+        try:
+            yield
+        finally:
+            self.remove_stream(stream_id, stream_closer is not None)
+
+    @contextmanager
+    def add_file(
+        self, path: Path, flush: bool = False, append: bool = True
+    ) -> Iterator[None]:
+        """Add a file as an output."""
+
+        mode = f"{'a' if append else 'w'}b"
+        with path.open(mode) as stream:
+            stream = cast(BytesIO, stream)
+            with self.stream_added(stream, flush=flush):
+                yield
 
     def add_semaphore_stream(self, stream: BytesIO) -> Tuple[int, Semaphore]:
         """

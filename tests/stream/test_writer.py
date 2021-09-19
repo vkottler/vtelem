@@ -3,12 +3,31 @@ vtelem - Test the stream-writer class's correctness.
 """
 
 # built-in
+from os.path import getsize
+from pathlib import Path
 import tempfile
 
 # module under test
-from vtelem.classes.stream_writer import default_writer
+from vtelem.stream.writer import default_writer
 from vtelem.frame.framer import build_dummy_frame
 from vtelem.mtu import DEFAULT_MTU
+
+# internal
+from tests import writer_environment
+
+
+def test_stream_writer_file():
+    """Test that a file can be written to."""
+
+    writer, env = writer_environment()
+    with writer.booted():
+        with tempfile.NamedTemporaryFile() as output:
+            with writer.add_file(Path(output.name)):
+                for _ in range(100):
+                    env.advance_time(10)
+                    env.dispatch_now()
+
+            assert getsize(output.name)
 
 
 def test_stream_writer_basic():

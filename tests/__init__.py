@@ -8,11 +8,11 @@ from typing import cast, Tuple
 
 # internal
 from vtelem.classes.udp_client_manager import UdpClientManager
-from vtelem.classes.stream_writer import StreamWriter, default_writer
 from vtelem.daemon.command_queue import CommandQueueDaemon
 from vtelem.daemon.websocket_telemetry import queue_get
 from vtelem.telemetry.environment import TelemetryEnvironment
 from vtelem.types.command_queue_daemon import ResultCbType
+from vtelem.stream.writer import StreamWriter, default_writer
 
 
 def writer_environment(

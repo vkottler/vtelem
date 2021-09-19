@@ -10,7 +10,7 @@ from typing import Any, Optional, Tuple
 from websockets.exceptions import WebSocketException
 
 # internal
-from vtelem.classes.stream_writer import StreamWriter, QueueClientManager
+from vtelem.stream.writer import StreamWriter, QueueClientManager
 from vtelem.client.websocket import WebsocketClient
 from vtelem.daemon.websocket import WebsocketDaemon
 from vtelem.frame.channel import ChannelFrame

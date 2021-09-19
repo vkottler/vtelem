@@ -10,12 +10,12 @@ from typing import Tuple
 # module under test
 from vtelem.channel.framer import build_dummy_frame
 from vtelem.classes.metered_queue import MeteredQueue
-from vtelem.classes.stream_writer import default_writer, StreamWriter
 from vtelem.client.tcp import TcpClient
 from vtelem.daemon.tcp_telemetry import TcpTelemetryDaemon
 from vtelem.daemon.websocket_telemetry import queue_get
 from vtelem.frame.framer import Framer
 from vtelem.mtu import Host
+from vtelem.stream.writer import default_writer, StreamWriter
 from vtelem.telemetry.environment import TelemetryEnvironment
 
 # internal

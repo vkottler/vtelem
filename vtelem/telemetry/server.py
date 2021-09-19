@@ -24,7 +24,6 @@ from vtelem.types.telemetry_server import (
 )
 from vtelem.channel.group_registry import ChannelGroupRegistry
 from vtelem.classes.http_request_mapper import MapperAwareRequestHandler
-from vtelem.classes.stream_writer import StreamWriter
 from vtelem.classes.time_keeper import TimeKeeper
 from vtelem.classes.udp_client_manager import UdpClientManager
 from vtelem.daemon import DaemonOperation
@@ -36,6 +35,7 @@ from vtelem.daemon.synchronous import Daemon
 from vtelem.daemon.websocket_telemetry import WebsocketTelemetryDaemon
 from vtelem.daemon.tcp_telemetry import TcpTelemetryDaemon
 from vtelem.registry.service import ServiceRegistry
+from vtelem.stream.writer import StreamWriter
 
 
 class TelemetryServer(HttpDaemon):

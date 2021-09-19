@@ -7,7 +7,7 @@ import time
 
 # module under test
 from vtelem.channel.framer import Framer, build_dummy_frame
-from vtelem.classes.stream_writer import default_writer
+from vtelem.stream.writer import default_writer
 from vtelem.classes.udp_client_manager import UdpClientManager
 from vtelem.daemon.websocket_telemetry import queue_get
 from vtelem.mtu import DEFAULT_MTU, Host

@@ -9,7 +9,7 @@ from typing import Dict, List, Tuple, Any
 
 # internal
 from vtelem.mtu import create_udp_socket, discover_mtu, Host
-from .stream_writer import StreamWriter
+from vtelem.stream.writer import StreamWriter
 from .time_entity import LockEntity
 
 LOG = logging.getLogger(__name__)
@@ -45,7 +45,7 @@ class UdpClientManager(LockEntity):
             LOG.info("closing stream client '%s:%d'", name[0], name[1])
             try:
                 sock_file.close()
-            except ConnectionRefusedError:
+            except ConnectionRefusedError:  # pragma: no cover
                 pass
             finally:
                 sock.close()
