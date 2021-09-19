@@ -14,7 +14,13 @@ from vtelem.channel.registry import ChannelRegistry
 from vtelem.classes.type_primitive import TypePrimitive
 from vtelem.classes.udp_client_manager import UdpClientManager
 from vtelem.client.socket import SocketClient
-from vtelem.mtu import create_udp_socket, get_free_port, DEFAULT_MTU, Host
+from vtelem.mtu import (
+    create_udp_socket,
+    get_free_port,
+    DEFAULT_MTU,
+    Host,
+    host_resolve_zero,
+)
 from vtelem.telemetry.environment import TelemetryEnvironment
 
 
@@ -35,6 +41,7 @@ class UdpClient(SocketClient):
     ) -> None:
         """Construct a new udp client."""
 
+        host = host_resolve_zero(socket.SOCK_DGRAM, host)
         sock = create_udp_socket(host, False)
 
         def stop_server() -> None:
@@ -42,7 +49,7 @@ class UdpClient(SocketClient):
             Close this listener by sending a final, zero-length payload to
             un-block recv, then closing the socket.
             """
-            sock.sendto(bytearray(), sock.getsockname())
+            self.socket.sendto(bytearray(), self.socket.getsockname())
 
         super().__init__(
             sock,
@@ -53,6 +60,18 @@ class UdpClient(SocketClient):
             env,
             mtu,
         )
+
+        def bind(curr_sock: socket.SocketType) -> socket.SocketType:
+            """
+            Re-bind a udp socket if the previously used one is now closed.
+            """
+
+            result = curr_sock
+            if result.fileno() == -1:
+                result = create_udp_socket(host, False)
+            return result
+
+        self.function["init"] = bind
 
 
 @contextmanager

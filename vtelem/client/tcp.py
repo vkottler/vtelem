@@ -11,7 +11,7 @@ from queue import Queue
 from vtelem.channel.registry import ChannelRegistry
 from vtelem.classes.type_primitive import TypePrimitive
 from vtelem.client.socket import SocketClient
-from vtelem.mtu import DEFAULT_MTU, Host
+from vtelem.mtu import DEFAULT_MTU, Host, host_resolve_zero
 from vtelem.telemetry.environment import TelemetryEnvironment
 
 
@@ -32,6 +32,7 @@ class TcpClient(SocketClient):
     ) -> None:
         """Construct a new tcp client."""
 
+        host = host_resolve_zero(socket.SOCK_STREAM, host)
         sock = socket.create_connection(host)
         sock.settimeout(0.1)
 

@@ -250,5 +250,5 @@ class TelemetryServer(HttpDaemon):
             self.state_sem.acquire()
             if not self.state_sem.acquire(True, timeout):  # type: ignore
                 self.stop_all()
-        except KeyboardInterrupt:
+        except KeyboardInterrupt:  # pragma: no cover
             self.stop_all()

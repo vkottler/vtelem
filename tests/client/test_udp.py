@@ -32,6 +32,23 @@ def test_udp_client_create():
                     assert queue_get(queue) is not None
 
 
+def test_udp_client_restart():
+    """Test that a just-created telemetry client can decode telemetry."""
+
+    manager, env = udp_client_environment()
+    with create(manager, env) as (client, queue):
+        with manager.writer.booted():
+            for _ in range(5):
+                with client.booted():
+                    time.sleep(0.2)
+                    for _ in range(10):
+                        env.advance_time(10)
+                        frame_count = env.dispatch_now()
+                        for _ in range(frame_count):
+                            assert queue_get(queue) is not None
+                assert queue_get(queue) is None
+
+
 def setup_environment() -> dict:
     """
     Test that unexpectedly closing a reading socket is handled correctly.

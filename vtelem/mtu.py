@@ -53,7 +53,7 @@ def create_udp_socket(host: Host, is_client: bool = True) -> socket.SocketType:
     if is_client:
         try:
             sock.connect(host)
-        except socket.gaierror as exc:
+        except socket.gaierror as exc:  # pragma: no cover
             LOG.error("%s, falling back to 'localhost:%d'", exc, host[1])
             sock.connect(("localhost", host[1]))
     else:
@@ -115,6 +115,17 @@ def get_free_port(
     _, port = sock.getsockname()
     sock.close()
     return port
+
+
+def host_resolve_zero(kind: IntEnum, host: Host) -> Host:
+    """
+    Convert a host with a zero port of a given kind to a host that resolves
+    that port to one that should be open.
+    """
+
+    if host.port == 0:
+        host = Host(host.address, get_free_port(kind, host.address))
+    return host
 
 
 def get_free_tcp_port(
