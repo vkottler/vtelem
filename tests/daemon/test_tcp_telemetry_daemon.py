@@ -12,9 +12,9 @@ from vtelem.channel.framer import build_dummy_frame
 from vtelem.classes.metered_queue import MeteredQueue
 from vtelem.client.tcp import TcpClient
 from vtelem.daemon.tcp_telemetry import TcpTelemetryDaemon
-from vtelem.daemon.websocket_telemetry import queue_get
 from vtelem.frame.framer import Framer
 from vtelem.mtu import Host
+from vtelem.stream import queue_get, queue_get_none
 from vtelem.stream.writer import default_writer, StreamWriter
 from vtelem.telemetry.environment import TelemetryEnvironment
 
@@ -85,7 +85,7 @@ def test_tcp_telemetry_client_fn():
                     for _ in range(frame_count):
                         assert queue_get(out_queue) is not None
 
-            assert queue_get(out_queue) is None
+            queue_get_none(out_queue)
 
 
 def test_tcp_telemetry_real_client():

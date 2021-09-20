@@ -11,11 +11,9 @@ import websockets
 
 # module under test
 from vtelem.channel.framer import build_dummy_frame
+from vtelem.stream import queue_get
 from vtelem.stream.writer import default_writer
-from vtelem.daemon.websocket_telemetry import (
-    WebsocketTelemetryDaemon,
-    queue_get,
-)
+from vtelem.daemon.websocket_telemetry import WebsocketTelemetryDaemon
 from vtelem.mtu import get_free_tcp_port
 
 # internal
@@ -41,8 +39,6 @@ def test_websocket_telemetry_client_fn():
                     frame_count = env.dispatch_now()
                     for _ in range(frame_count):
                         assert queue_get(queue) is not None
-
-            assert queue_get(queue) is None
 
 
 def test_websocket_telemetry_daemon_server_close_first():

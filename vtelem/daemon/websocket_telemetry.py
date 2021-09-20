@@ -3,7 +3,7 @@ vtelem - An interface for managing websocket servers that serve telemetry data.
 """
 
 # built-in
-from queue import Empty, Queue
+from queue import Queue
 from typing import Any, Optional, Tuple
 
 # third-party
@@ -15,19 +15,8 @@ from vtelem.client.websocket import WebsocketClient
 from vtelem.daemon.websocket import WebsocketDaemon
 from vtelem.frame.channel import ChannelFrame
 from vtelem.mtu import Host, DEFAULT_MTU
+from vtelem.stream import queue_get
 from vtelem.telemetry.environment import TelemetryEnvironment
-
-
-def queue_get(queue: Queue, timeout: int = 2) -> Optional[Any]:
-    """
-    Wrap a de-queue operation into one that will return None if the timeout
-    is met.
-    """
-
-    try:
-        return queue.get(timeout=timeout)
-    except Empty:
-        return None
 
 
 class WebsocketTelemetryDaemon(QueueClientManager, WebsocketDaemon):

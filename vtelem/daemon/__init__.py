@@ -252,7 +252,9 @@ class DaemonBase(TimeEntity):
         """To be implemented by parent."""
 
     @contextmanager
-    def booted(self, *args, **kwargs) -> Iterator[None]:
+    def booted(
+        self, *args, require_stop: bool = True, **kwargs
+    ) -> Iterator[None]:
         """
         Provide a context manager that yields when this daemon is running and
         automatically stops it.
@@ -262,7 +264,9 @@ class DaemonBase(TimeEntity):
             assert self.start(*args, **kwargs)
             yield
         finally:
-            assert self.stop()
+            stop_result = self.stop()
+            if require_stop:
+                assert stop_result
 
     def serve(self, *args, main_thread: MainThread = None, **kwargs) -> int:
         """

@@ -46,12 +46,15 @@ class TelemetryClient:
         self.mtu = new_mtu
         LOG.info("%s: mtu set to %d", self.name, new_mtu)
 
-    def handle_frames(self, new_frames: List[bytes]) -> None:
+    def handle_frames(self, new_frames: List[bytes]) -> int:
         """
         Attempt to decode any new frames and publish them to the upstream
         consumer.
+
+        Return the number of successfully decoded frames.
         """
 
+        count = 0
         for frame in new_frames:
             new_frame = decode_frame(
                 self.channel_registry,
@@ -61,3 +64,5 @@ class TelemetryClient:
             )
             if new_frame is not None:
                 self.frames.put(new_frame)
+                count += 1
+        return count

@@ -35,6 +35,12 @@ class QueueDaemon(DaemonBase):
 
         self.function["inject_stop"] = stop_injector
 
+    def await_empty(self, interval: float = 0.1) -> None:
+        """Wait until this daemon's queue is empty, via polling."""
+
+        while not self.queue.empty():
+            self.function["sleep"](interval)
+
     def run(self, *_, **__) -> None:
         """Continue servicing the queue until None is de-queued."""
 

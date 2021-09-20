@@ -7,9 +7,9 @@ import time
 
 # module under test
 from vtelem.channel.framer import Framer, build_dummy_frame
+from vtelem.stream import queue_get, queue_get_none
 from vtelem.stream.writer import default_writer
 from vtelem.classes.udp_client_manager import UdpClientManager
-from vtelem.daemon.websocket_telemetry import queue_get
 from vtelem.mtu import DEFAULT_MTU, Host
 from vtelem.telemetry.environment import TelemetryEnvironment
 from vtelem.client.udp import UdpClient, create
@@ -46,7 +46,7 @@ def test_udp_client_restart():
                         frame_count = env.dispatch_now()
                         for _ in range(frame_count):
                             assert queue_get(queue) is not None
-                assert queue_get(queue) is None
+                queue_get_none(queue)
 
 
 def setup_environment() -> dict:
