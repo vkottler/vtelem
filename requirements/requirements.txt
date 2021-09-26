@@ -1,3 +1,4 @@
-requests
+cerberus
 netifaces
+requests
 websockets
