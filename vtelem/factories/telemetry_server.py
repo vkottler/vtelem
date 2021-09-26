@@ -10,6 +10,7 @@ from typing import Any, Tuple
 # internal
 from vtelem.daemon.command_queue import CommandQueueDaemon
 from vtelem.daemon.telemetry import TelemetryDaemon
+from vtelem.registry import DEFAULT_INDENT
 
 
 def register_http_handlers(
@@ -51,7 +52,9 @@ def register_http_handlers(
         rdata = {}
         for key, registry in telem.registries.items():
             rdata[key] = json.loads(registry.describe())
-        return True, json.dumps(rdata, indent=(4 if indented else None))
+        return True, json.dumps(
+            rdata, indent=(DEFAULT_INDENT if indented else None)
+        )
 
     def run_command(_: BaseHTTPRequestHandler, data: dict) -> Tuple[bool, str]:
         """Execute a command through the command-queue daemon."""

@@ -18,6 +18,7 @@ from vtelem.types.command_queue_daemon import (
 )
 from vtelem.classes.metered_queue import create
 from vtelem.daemon.queue import QueueDaemon
+from vtelem.registry import DEFAULT_INDENT
 from vtelem.telemetry.environment import TelemetryEnvironment
 
 LOG = logging.getLogger(__name__)
@@ -124,7 +125,9 @@ class CommandQueueDaemon(QueueDaemon):
                     cmd_help[command].append(help_msg)
 
             indented = data["indent"] is not None
-            return True, json.dumps(cmd_help, indent=(4 if indented else None))
+            return True, json.dumps(
+                cmd_help, indent=(DEFAULT_INDENT if indented else None)
+            )
 
         # add a 'help' handler
         help_msg = "inquire about available command usages"

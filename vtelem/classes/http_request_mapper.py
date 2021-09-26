@@ -13,6 +13,9 @@ from typing import Dict, Callable, List, Tuple
 from typing import Optional as Opt
 import urllib
 
+# internal
+from vtelem.registry import DEFAULT_INDENT
+
 RequestHandle = Callable[[BaseHTTPRequestHandler, dict], Tuple[bool, str]]
 LOG = logging.getLogger(__name__)
 
@@ -47,7 +50,7 @@ class HttpRequestMapper:
                     if handle_inst is not None:
                         handle_data["description"] = handle_inst["Description"]
                     handles[method].append(handle_data)
-            return True, json.dumps(handles, indent=4)
+            return True, json.dumps(handles, indent=DEFAULT_INDENT)
 
         self.add_handler("GET", "", index_handler, "request index")
 

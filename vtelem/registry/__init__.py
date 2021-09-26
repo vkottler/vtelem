@@ -8,6 +8,9 @@ import json
 from typing import TypeVar, Generic, Tuple, Optional, Dict, List, Any
 import threading
 
+# internal
+from vtelem.classes.serdes import DEFAULT_INDENT
+
 TYP = TypeVar("TYP")
 
 
@@ -83,7 +86,7 @@ class Registry(Generic[TYP]):
     def describe_raw(self, indented: bool = False, cls: Any = None) -> str:
         """Obtain a JSON String of the registry's current state."""
 
-        indent = 4 if indented else None
+        indent = DEFAULT_INDENT if indented else None
         with self.lock:
             result = json.dumps(
                 self.data, indent=indent, cls=cls, sort_keys=True

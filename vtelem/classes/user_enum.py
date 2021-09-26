@@ -11,6 +11,7 @@ from typing import Dict, Callable, Iterator, Optional, Type
 # internal
 from vtelem.enums.primitive import get_size
 from vtelem.names import to_snake, class_to_snake
+from vtelem.registry import DEFAULT_INDENT
 from . import DEFAULTS
 from .type_primitive import TypePrimitive, new_default
 
@@ -80,7 +81,7 @@ class UserEnum:
     def describe(self, indented: bool = False) -> str:
         """Describe this enumeration as a JSON String."""
 
-        indent = 4 if indented else None
+        indent = DEFAULT_INDENT if indented else None
         return json.dumps(
             self.enum, indent=indent, sort_keys=True, cls=UserEnumEncoder
         )
@@ -93,7 +94,7 @@ class UserEnumEncoder(json.JSONEncoder):
         """Implement serialization for the primitive enum value."""
 
         assert isinstance(o, UserEnum)
-        return {"name": o.name, "mappings": o.enum}
+        return {"name": o.name, "mappings": o.enum, "default": o.default_val}
 
 
 def from_enum(enum_class: Type[IntEnum]) -> UserEnum:

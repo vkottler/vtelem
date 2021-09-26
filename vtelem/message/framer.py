@@ -10,6 +10,9 @@ from vtelem.frame.framer import Framer
 from vtelem.frame.message import MessageFrame, frames_required
 from vtelem.types.frame import MessageType
 
+# should be a NamedTuple
+SerializedFrames = Tuple[Sequence[MessageFrame], int]
+
 
 class MessageFramer(Framer):
     """A class implementing a message framer for serializing message frames."""
@@ -41,7 +44,7 @@ class MessageFramer(Framer):
         message: bytes,
         time: float = None,
         message_type: MessageType = MessageType.AGNOSTIC,
-    ) -> Tuple[Sequence[MessageFrame], int]:
+    ) -> SerializedFrames:
         """Serialize an arbitrary message into one or more frames."""
 
         frame = self.message_frame(time)
@@ -84,7 +87,7 @@ class MessageFramer(Framer):
         message: str,
         time: float = None,
         message_type: MessageType = MessageType.TEXT,
-    ) -> Tuple[Sequence[MessageFrame], int]:
+    ) -> SerializedFrames:
         """Serialize an arbitrary String-based message."""
 
         return self.serialize_message(message.encode(), time, message_type)
