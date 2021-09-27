@@ -1,0 +1,5 @@
+{
+	"a": {"type": "string"},
+	"b": {"type": "string"},
+	"c": {"type": "string"}
+}

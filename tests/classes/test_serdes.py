@@ -6,7 +6,22 @@ vtelem - Test the Serializable class's correctness.
 from cerberus import Validator
 
 # module under test
-from vtelem.classes.serdes import Serializable, SerializableParams
+from vtelem.classes.serdes import ObjectData, Serializable, SerializableParams
+
+KEYS = "abc"
+
+
+def default_object(
+    data: ObjectData = None,
+    params: SerializableParams = None,
+) -> Serializable:
+    """Get a generic serializable object."""
+
+    if data is None:
+        data = {}
+        for idx, string in enumerate(KEYS):
+            data[string] = idx + 1
+    return Serializable(data, params)
 
 
 def test_serializable_basic():
@@ -17,27 +32,22 @@ def test_serializable_basic():
 
     assert Serializable()
 
-    keys = "abc"
-    data = {}
-    for idx, string in enumerate(keys):
-        data[string] = idx + 1
-
-    obj = Serializable(data)
+    obj = default_object()
     new_obj = obj.load_str(obj.json_str())
     assert obj == new_obj
 
     schema = {}
-    for key in keys:
+    for key in KEYS:
         schema[key] = {"type": "integer"}
 
     # Verify that schema validation works.
     params = SerializableParams(schema=Validator(schema))
-    obj = Serializable(data, params)
+    obj = Serializable(obj.data, params)
     assert obj.valid
 
     schema = {}
-    for key in keys:
+    for key in KEYS:
         schema[key] = {"type": "string"}
     params = SerializableParams(schema=Validator(schema))
-    obj = Serializable(data, params)
+    obj = Serializable(obj.data, params)
     assert not obj.valid
