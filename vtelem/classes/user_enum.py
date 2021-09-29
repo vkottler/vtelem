@@ -40,7 +40,7 @@ class UserEnum:
         # set a viable default value
         val = default if default is not None else list(self.strings.keys())[0]
         assert val is not None
-        self.default_val = val
+        self.default: str = val
 
     def __iter__(self) -> Iterator[str]:
         """Iterate over all valid String keys in this enum."""
@@ -59,11 +59,6 @@ class UserEnum:
         result = self.strings[val.lower()]
         assert result is not None
         return result
-
-    def default(self) -> str:
-        """Get the default value for this enum."""
-
-        return self.default_val
 
     def get_primitive(
         self, value: str, changed_cb: Callable = None
@@ -94,7 +89,7 @@ class UserEnumEncoder(json.JSONEncoder):
         """Implement serialization for the primitive enum value."""
 
         assert isinstance(o, UserEnum)
-        return {"name": o.name, "mappings": o.enum, "default": o.default_val}
+        return {"name": o.name, "mappings": o.enum, "default": o.default}
 
 
 def from_enum(enum_class: Type[IntEnum]) -> UserEnum:

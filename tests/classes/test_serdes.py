@@ -6,22 +6,10 @@ vtelem - Test the Serializable class's correctness.
 from cerberus import Validator
 
 # module under test
-from vtelem.classes.serdes import ObjectData, Serializable, SerializableParams
+from vtelem.classes.serdes import Serializable, SerializableParams
 
-KEYS = "abc"
-
-
-def default_object(
-    data: ObjectData = None,
-    params: SerializableParams = None,
-) -> Serializable:
-    """Get a generic serializable object."""
-
-    if data is None:
-        data = {}
-        for idx, string in enumerate(KEYS):
-            data[string] = idx + 1
-    return Serializable(data, params)
+# internal
+from tests.classes import KEYS, default_object
 
 
 def test_serializable_basic():

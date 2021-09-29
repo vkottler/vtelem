@@ -73,7 +73,7 @@ class ChannelGroup:
         # get the default enum value
         enum = self.env.enum_registry.get_item(enum_id)
         assert enum is not None
-        val = enum.default()
+        val = enum.default
 
         # the environment should catch duplicate channel names for us
         try:

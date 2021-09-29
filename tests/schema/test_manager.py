@@ -21,3 +21,4 @@ def test_schema_manager_basic():
     manager.load_dir(Path(get_resource("schemas")))
     assert manager["test_valid"] is not None
     assert manager.get(Serializable) is not None
+    assert Serializable.schema(manager) is not None

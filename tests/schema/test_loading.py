@@ -11,7 +11,7 @@ from vtelem.schema import load_schema, load_schema_dir
 
 # internal
 from tests.resources import get_test_schema, get_resource
-from tests.classes.test_serdes import default_object
+from tests.classes import default_object
 
 
 def test_load_schema():

@@ -12,6 +12,9 @@ from typing import Dict, NamedTuple, Optional, TextIO, Type, Union
 # third-party
 from cerberus import Validator
 
+# internal
+from vtelem.schema.manager import SchemaManager
+
 LOG = logging.getLogger(__name__)
 DEFAULT_INDENT = 2
 
@@ -59,6 +62,12 @@ class Serializable:
         self.log = log
         self.init(self.data)
         self.valid = self.validate()
+
+    @classmethod
+    def schema(cls, manager: SchemaManager) -> Validator:
+        """Get the schema for this class from a schema manager."""
+
+        return manager.get(cls)
 
     def validate(self, log: bool = True) -> bool:
         """
