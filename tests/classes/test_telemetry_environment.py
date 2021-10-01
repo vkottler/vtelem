@@ -8,7 +8,7 @@ import time
 # module under test
 from vtelem.channel import Channel
 from vtelem.channel.framer import Framer
-from vtelem.classes.user_enum import UserEnum
+from vtelem.classes.user_enum import user_enum
 from vtelem.enums.frame import FrameType
 from vtelem.enums.primitive import Primitive
 from vtelem.telemetry.environment import TelemetryEnvironment
@@ -117,9 +117,9 @@ def test_telemetry_environment_basic():
     env = TelemetryEnvironment(2 ** 8, start_time, None, [chan_1, chan_2])
 
     # add some basic enums
-    env.add_enum(UserEnum("a", {0: "a", 1: "b", 2: "c"}))
-    env.add_enum(UserEnum("b", {0: "a", 1: "b", 2: "c"}))
-    env.add_enum(UserEnum("c", {0: "a", 1: "b", 2: "c"}))
+    env.add_enum(user_enum("a", {0: "a", 1: "b", 2: "c"}))
+    env.add_enum(user_enum("b", {0: "a", 1: "b", 2: "c"}))
+    env.add_enum(user_enum("c", {0: "a", 1: "b", 2: "c"}))
 
     # add some enum channels
     a_tok = env.add_enum_channel("enum_chan_a", "a", 1.0, True)

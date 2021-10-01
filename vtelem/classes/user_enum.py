@@ -9,43 +9,71 @@ from typing import cast, Dict, Callable, Iterator, Optional, Type
 
 # internal
 from vtelem.classes import DEFAULTS
-from vtelem.classes.serdes import ObjectData, ObjectMap
+from vtelem.classes.serdes import ObjectData, ObjectMap, Serializable
 from vtelem.classes.type_primitive import TypePrimitive, new_default
 from vtelem.enums.primitive import get_size
 from vtelem.names import to_snake, class_to_snake
 
+IntStrMap = Dict[int, str]
 
-class UserEnum:
+
+def coerce_enum(values: IntStrMap) -> IntStrMap:
+    """
+    Given a map of integers to Strings, ensure that a returned map conforms
+    strictly to runtime enumeration conventions.
+    """
+
+    enum: Dict[int, str] = defaultdict(lambda: "unknown")
+    enum.update(values)
+    for key, val in enum.items():
+        enum[key] = val.lower()
+
+    # Ensure this data is valid in the context of a protocol "enum" store.
+    assert len(enum.keys()) <= (2 ** (get_size(DEFAULTS["enum"]) * 8))
+    assert len(enum.keys()) > 0
+
+    return enum
+
+
+def reverse_map(enum_map: IntStrMap) -> Dict[str, Optional[int]]:
+    """
+    Create a reverse mapping of an int->str map that returns None by default.
+    """
+
+    strings: Dict[str, Optional[int]] = defaultdict(lambda: None)
+    for key, val in enum_map.items():
+        strings[val.lower()] = key
+    return strings
+
+
+def user_enum_data(
+    name: str, values: IntStrMap, default: str = None
+) -> ObjectData:
+    """Create object data for a runtime enumeration from constituents."""
+
+    return {
+        "name": to_snake(name),
+        "mappings": cast(ObjectMap, coerce_enum(values)),
+        "default": default,
+    }
+
+
+class UserEnum(Serializable):
     """A container for runtime, user-defined enumerations."""
 
-    def __init__(
-        self, name: str, values: Dict[int, str], default: str = None
-    ) -> None:
-        """Build a runtime enumeration."""
+    def init(self, data: ObjectData) -> None:
+        """
+        Can be implemented to set up a serializable from some initial data.
+        """
 
-        self.data: ObjectData = {}
-        self.data["name"] = to_snake(name)
+        # Maintain a reverse mapping for convenience.
+        self.strings = reverse_map(cast(IntStrMap, data["mappings"]))
 
-        self.enum: Dict[int, str] = defaultdict(lambda: "unknown")
-        self.enum.update(values)
-        for key, val in self.enum.items():
-            self.enum[key] = val.lower()
-
-        assert len(self.enum.keys()) <= (2 ** (get_size(DEFAULTS["enum"]) * 8))
-        assert len(self.enum.keys()) > 0
-        mappings: ObjectMap = {}
-        mappings.update(cast(ObjectMap, self.enum))
-        self.data["mappings"] = mappings
-
-        # maintain a reverse mapping for convenience
-        self.strings: Dict[str, Optional[int]] = defaultdict(lambda: None)
-        for key, val in self.enum.items():
-            self.strings[val.lower()] = key
-
-        # set a viable default value
+        # Set a viable default value.
+        default = data["default"]
         val = default if default is not None else list(self.strings.keys())[0]
         assert val is not None
-        self.data["default"] = val
+        data["default"] = val
 
     @property
     def default(self) -> str:
@@ -68,7 +96,8 @@ class UserEnum:
     def get_str(self, val: int) -> str:
         """Look up the String represented by the integer enum value."""
 
-        return self.enum[val]
+        mappings = cast(ObjectMap, self.data["mappings"])
+        return cast(str, mappings[val])
 
     def get_value(self, val: str) -> int:
         """Get the integer value of an enum String."""
@@ -91,6 +120,12 @@ class UserEnum:
         return result
 
 
+def user_enum(name: str, values: IntStrMap, default: str = None) -> UserEnum:
+    """Create a user enum from a name and map of values."""
+
+    return UserEnum(user_enum_data(name, values, default))
+
+
 def from_enum(enum_class: Type[IntEnum]) -> UserEnum:
     """From an enum class, create a user enum."""
 
@@ -99,4 +134,4 @@ def from_enum(enum_class: Type[IntEnum]) -> UserEnum:
         assert isinstance(inst.value, int)
         assert inst.value not in values
         values[inst.value] = inst.name.lower()
-    return UserEnum(class_to_snake(enum_class), values)
+    return user_enum(class_to_snake(enum_class), values)
