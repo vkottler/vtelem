@@ -5,15 +5,14 @@ vtelem - Implements an object for storing a runtime enumeration.
 # built-in
 from collections import defaultdict
 from enum import IntEnum
-import json
-from typing import Dict, Callable, Iterator, Optional, Type
+from typing import cast, Dict, Callable, Iterator, Optional, Type
 
 # internal
+from vtelem.classes import DEFAULTS
+from vtelem.classes.serdes import ObjectData, ObjectMap
+from vtelem.classes.type_primitive import TypePrimitive, new_default
 from vtelem.enums.primitive import get_size
 from vtelem.names import to_snake, class_to_snake
-from vtelem.registry import DEFAULT_INDENT
-from . import DEFAULTS
-from .type_primitive import TypePrimitive, new_default
 
 
 class UserEnum:
@@ -24,13 +23,19 @@ class UserEnum:
     ) -> None:
         """Build a runtime enumeration."""
 
+        self.data: ObjectData = {}
+        self.data["name"] = to_snake(name)
+
         self.enum: Dict[int, str] = defaultdict(lambda: "unknown")
         self.enum.update(values)
         for key, val in self.enum.items():
             self.enum[key] = val.lower()
-        self.name = to_snake(name)
+
         assert len(self.enum.keys()) <= (2 ** (get_size(DEFAULTS["enum"]) * 8))
         assert len(self.enum.keys()) > 0
+        mappings: ObjectMap = {}
+        mappings.update(cast(ObjectMap, self.enum))
+        self.data["mappings"] = mappings
 
         # maintain a reverse mapping for convenience
         self.strings: Dict[str, Optional[int]] = defaultdict(lambda: None)
@@ -40,7 +45,19 @@ class UserEnum:
         # set a viable default value
         val = default if default is not None else list(self.strings.keys())[0]
         assert val is not None
-        self.default: str = val
+        self.data["default"] = val
+
+    @property
+    def default(self) -> str:
+        """Get the default value for this enum."""
+
+        return cast(str, self.data["default"])
+
+    @property
+    def name(self) -> str:
+        """Get the name of this enum."""
+
+        return cast(str, self.data["name"])
 
     def __iter__(self) -> Iterator[str]:
         """Iterate over all valid String keys in this enum."""
@@ -72,24 +89,6 @@ class UserEnum:
         assert val is not None
         assert result.set(val)
         return result
-
-    def describe(self, indented: bool = False) -> str:
-        """Describe this enumeration as a JSON String."""
-
-        indent = DEFAULT_INDENT if indented else None
-        return json.dumps(
-            self.enum, indent=indent, sort_keys=True, cls=UserEnumEncoder
-        )
-
-
-class UserEnumEncoder(json.JSONEncoder):
-    """A JSON encoder for a primitive enum."""
-
-    def default(self, o) -> dict:
-        """Implement serialization for the primitive enum value."""
-
-        assert isinstance(o, UserEnum)
-        return {"name": o.name, "mappings": o.enum, "default": o.default}
 
 
 def from_enum(enum_class: Type[IntEnum]) -> UserEnum:

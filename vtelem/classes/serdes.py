@@ -7,7 +7,7 @@ vtelem - A module exposing a base for implementing a class that can be encoded
 from json import dump, load, JSONEncoder, JSONDecoder
 import logging
 from io import StringIO
-from typing import Dict, NamedTuple, Optional, TextIO, Type, Union
+from typing import Dict, NamedTuple, List, Optional, TextIO, Type, Union
 
 # third-party
 from cerberus import Validator
@@ -19,7 +19,13 @@ LOG = logging.getLogger(__name__)
 DEFAULT_INDENT = 2
 
 # See RFC 8259.
-ObjectData = Dict[Union[int, str], Union[float, int, str, bool, None]]
+ObjectKey = Union[int, str]
+ObjectElement = Union[float, int, str, bool, None]
+ObjectMap = Dict[ObjectKey, ObjectElement]
+ObjectData = Dict[
+    ObjectKey,
+    Union[ObjectElement, List[ObjectElement], ObjectMap],
+]
 
 
 class SerializableEncoder(JSONEncoder):

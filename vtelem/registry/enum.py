@@ -6,15 +6,26 @@ vtelem - Contains a class for managing known enumeration sets.
 from collections import defaultdict
 from enum import IntEnum
 import logging
+from json import JSONEncoder
 from typing import Tuple, List, Type
 
 # internal
 from vtelem.classes import DEFAULTS
-from vtelem.classes.user_enum import UserEnum, from_enum, UserEnumEncoder
+from vtelem.classes.user_enum import UserEnum, from_enum
 from vtelem.registry import Registry
 from vtelem.registry.type import TypeRegistry
 
 LOG = logging.getLogger(__name__)
+
+
+class UserEnumEncoder(JSONEncoder):
+    """A JSON encoder for a primitive enum."""
+
+    def default(self, o) -> dict:
+        """Implement serialization for the primitive enum value."""
+
+        assert isinstance(o, UserEnum)
+        return o.data
 
 
 class EnumRegistry(Registry[UserEnum]):
