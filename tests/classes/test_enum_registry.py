@@ -10,6 +10,9 @@ from vtelem.classes.user_enum import from_enum, user_enum
 from vtelem.registry.type import get_default
 from vtelem.registry.enum import EnumRegistry
 
+# internal
+from tests.classes.test_serdes import is_serializable
+
 
 def test_from_enum():
     """Test that an enum can be constructed from an existing class."""
@@ -32,6 +35,13 @@ def test_from_enum():
     # make sure we can register this enum
     registry = EnumRegistry()
     assert registry.add_from_enum(EnumA)[0]
+
+
+def test_enum_serdes():
+    """Verify that an enum can be serialized."""
+
+    enum = is_serializable(user_enum("a", {0: "a", 1: "b", 2: "c"}))
+    assert all(isinstance(key, int) for key in enum.data["mappings"])
 
 
 def test_enum_registry_basic():

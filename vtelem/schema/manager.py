@@ -9,9 +9,19 @@ from typing import Type
 # third-party
 from cerberus import Validator
 from datazen.paths import get_file_name
+from pkg_resources import resource_filename
 
 # internal
+from vtelem import PKG_NAME
 from vtelem.schema import SchemaMap, load_schema, load_schema_dir
+
+
+def package_schemas(
+    pkg: str = PKG_NAME, subdir: str = "serializables"
+) -> Path:
+    """Get a package directory that contains schema data."""
+
+    return Path(resource_filename(pkg, str(Path("data", subdir))))
 
 
 class SchemaManager:
@@ -55,3 +65,10 @@ class SchemaManager:
 
         self.schemas.update(load_schema_dir(path, **kwargs))
         return self.schemas
+
+    def load_package(
+        self, pkg: str = PKG_NAME, subdir: str = "serializables", **kwargs
+    ) -> SchemaMap:
+        """Load schemas from a package directory."""
+
+        return self.load_dir(package_schemas(pkg, subdir), **kwargs)

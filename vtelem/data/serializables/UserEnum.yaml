@@ -1,0 +1,11 @@
+name:
+  type: string
+default: 
+  type: string
+mappings:
+  type: dict
+  keysrules:
+    type: integer
+  valuesrules:
+    type: string
+    regex: "[a-z]+"

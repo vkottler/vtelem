@@ -9,10 +9,16 @@ from typing import cast, Dict, Callable, Iterator, Optional, Type
 
 # internal
 from vtelem.classes import DEFAULTS
-from vtelem.classes.serdes import ObjectData, ObjectMap, Serializable
+from vtelem.classes.serdes import (
+    ObjectData,
+    ObjectMap,
+    Serializable,
+    SerializableParams,
+)
 from vtelem.classes.type_primitive import TypePrimitive, new_default
 from vtelem.enums.primitive import get_size
 from vtelem.names import to_snake, class_to_snake
+from vtelem.schema.manager import SchemaManager
 
 IntStrMap = Dict[int, str]
 
@@ -67,6 +73,9 @@ class UserEnum(Serializable):
         """
 
         # Maintain a reverse mapping for convenience.
+        data["mappings"] = Serializable.int_keys(
+            cast(ObjectMap, data["mappings"])
+        )
         self.strings = reverse_map(cast(IntStrMap, data["mappings"]))
 
         # Set a viable default value.
@@ -120,10 +129,18 @@ class UserEnum(Serializable):
         return result
 
 
-def user_enum(name: str, values: IntStrMap, default: str = None) -> UserEnum:
+def user_enum(
+    name: str,
+    values: IntStrMap,
+    default: str = None,
+    manager: SchemaManager = None,
+) -> UserEnum:
     """Create a user enum from a name and map of values."""
 
-    return UserEnum(user_enum_data(name, values, default))
+    params = None
+    if manager is not None:
+        params = SerializableParams(schema=UserEnum.schema(manager))
+    return UserEnum(user_enum_data(name, values, default), params)
 
 
 def from_enum(enum_class: Type[IntEnum]) -> UserEnum:

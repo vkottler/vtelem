@@ -7,10 +7,25 @@ from pathlib import Path
 
 # built-in
 from vtelem.classes.serdes import Serializable
+from vtelem.classes.user_enum import user_enum
 from vtelem.schema.manager import SchemaManager
 
 # internal
+from tests.classes.test_serdes import is_serializable
 from tests.resources import get_test_schema, get_resource
+
+
+def test_user_enum_schema():
+    """
+    Test that a UserEnum can be loaded with a schema sourced from this package.
+    """
+
+    manager = SchemaManager()
+    manager.load_package(require_all=True)
+    enum = user_enum("test", {0: "a", 1: "b", 2: "c"}, manager=manager)
+    assert enum.valid
+    new_enum = is_serializable(enum)
+    assert new_enum.valid
 
 
 def test_schema_manager_basic():
@@ -22,3 +37,5 @@ def test_schema_manager_basic():
     assert manager["test_valid"] is not None
     assert manager.get(Serializable) is not None
     assert Serializable.schema(manager) is not None
+
+    assert "UserEnum" in manager.load_package()

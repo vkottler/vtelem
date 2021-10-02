@@ -12,6 +12,14 @@ from vtelem.classes.serdes import Serializable, SerializableParams
 from tests.classes import KEYS, default_object
 
 
+def is_serializable(obj: Serializable) -> Serializable:
+    """Verify that a serializable can be correctly encoded and decoded."""
+
+    new_obj = obj.load_str(obj.json_str())
+    assert obj == new_obj
+    return new_obj
+
+
 def test_serializable_basic():
     """
     Test that a serializable object can be decoded and then encoded while
@@ -20,9 +28,7 @@ def test_serializable_basic():
 
     assert Serializable()
 
-    obj = default_object()
-    new_obj = obj.load_str(obj.json_str())
-    assert obj == new_obj
+    obj = is_serializable(default_object())
 
     schema = {}
     for key in KEYS:

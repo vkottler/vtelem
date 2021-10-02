@@ -69,6 +69,12 @@ class Serializable:
         self.init(self.data)
         self.valid = self.validate()
 
+    @staticmethod
+    def int_keys(data: ObjectMap) -> ObjectMap:
+        """Coerce keys in a map to integer."""
+
+        return {int(key): value for key, value in data.items()}
+
     @classmethod
     def schema(cls, manager: SchemaManager) -> Validator:
         """Get the schema for this class from a schema manager."""
