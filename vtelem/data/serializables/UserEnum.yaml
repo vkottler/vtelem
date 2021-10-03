@@ -1,11 +1,6 @@
-name:
-  type: string
-default: 
-  type: string
+default: {type: string}
 mappings:
+  keysrules: {type: integer}
   type: dict
-  keysrules:
-    type: integer
-  valuesrules:
-    type: string
-    regex: "[a-z]+"
+  valuesrules: {regex: '[a-z]+', type: string}
+name: {regex: '[a-z_]+', type: string}

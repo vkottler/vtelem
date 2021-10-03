@@ -1,8 +1,8 @@
 <!--
     =====================================
     generator=datazen
-    version=1.7.9
-    hash=8f2282df1a18737d14c65a6bd14860b3
+    version=1.7.11
+    hash=ff46b798ef7097802b7a7c32a3178a8b
     =====================================
 -->
 
@@ -66,3 +66,4 @@ directory.
 * [Frame Types](docs/message.md)
 * [Message Types](docs/message_type.md)
 * [Channel Identifiers](docs/channel_identifier.md)
+* [Serializable Data Structures](docs/serializable.md)

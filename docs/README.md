@@ -1,8 +1,8 @@
 <!--
     =====================================
     generator=datazen
-    version=1.7.9
-    hash=705a5443656f4a4fdd8d133be68acd15
+    version=1.7.11
+    hash=23402d4bc292cb94dfbb4c6b2ee1a0a6
     =====================================
 -->
 
@@ -21,3 +21,4 @@ platforms can communicate information via telemetry and messages.
 * [Frame Types](message.md)
 * [Message Types](message_type.md)
 * [Channel Identifiers](channel_identifier.md)
+* [Serializable Data Structures](serializable.md)

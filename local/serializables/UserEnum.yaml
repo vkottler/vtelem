@@ -1,0 +1,26 @@
+description: >-
+  The `name` value should be
+  [snake case](https://en.wikipedia.org/wiki/Snake_case). Note that although
+  keys for `mappings` are integers, they need to be converted back to integers
+  from their JSON representation (since JSON only has String keys, see
+  [RFC 7159](https://datatracker.ietf.org/doc/html/rfc7159#section-4)).
+cerberus:
+  name:
+    type: string
+    regex: "[a-z_]+"
+  default: 
+    type: string
+  mappings:
+    type: dict
+    keysrules:
+      type: integer
+    valuesrules:
+      type: string
+      regex: "[a-z]+"
+example:
+  name: "sample_enum"
+  mappings:
+    1: "a"
+    2: "b"
+    3: "c"
+  default: "a"

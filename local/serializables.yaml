@@ -1,0 +1,23 @@
+compiles:
+- name: "serializables"
+  configs:
+  - "local/serializables"
+- name: "serializables-{slug}"
+  index_path: "{slug}.cerberus"
+  output_path: "{slug}"
+  output_dir: "{{project}}/data/serializables"
+  configs:
+  - "local/serializables"
+
+renders:
+- name: "serializable.md"
+  output_dir: "docs"
+  dependencies:
+  - "compiles-local"
+  - "compiles-serializables"
+
+groups:
+- name: "serializables"
+  dependencies:
+  - "compiles-serializables-UserEnum"
+  - "renders-serializable.md"

@@ -10,6 +10,7 @@ includes:
 - "config/includes/help.yaml"
 - "local/docs.yaml"
 - "local/python.yaml"
+- "local/serializables.yaml"
 
 schemas:
 - "local/schemas"
@@ -58,3 +59,4 @@ groups:
   - "renders-LICENSE"
   - "groups-local-python"
   - "groups-local-docs"
+  - "groups-serializables"
