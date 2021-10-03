@@ -3,9 +3,11 @@ vtelem - A module exposing message serialization methods.
 """
 
 # built-in
-from typing import Dict, Tuple, Sequence
+from json import dumps, JSONEncoder
+from typing import Dict, Tuple, Sequence, Type
 
 # internal
+from vtelem.classes.serdes import ObjectData, Serializable
 from vtelem.frame.framer import Framer
 from vtelem.frame.message import MessageFrame, frames_required
 from vtelem.types.frame import MessageType
@@ -91,3 +93,30 @@ class MessageFramer(Framer):
         """Serialize an arbitrary String-based message."""
 
         return self.serialize_message(message.encode(), time, message_type)
+
+    def serialize_message_json(
+        self,
+        message: ObjectData,
+        time: float = None,
+        message_type: MessageType = MessageType.JSON,
+        cls: Type[JSONEncoder] = None,
+        **dump_kwargs,
+    ) -> SerializedFrames:
+        """Serialize an arbitrary JSON-based message."""
+
+        return self.serialize_message_str(
+            dumps(message, cls=cls, **dump_kwargs), time, message_type
+        )
+
+    def serialize_object(
+        self,
+        message: Serializable,
+        time: float = None,
+        message_type: MessageType = MessageType.JSON,
+        **dump_kwargs,
+    ) -> SerializedFrames:
+        """Serialize an object that supports JSON-serialization."""
+
+        return self.serialize_message_str(
+            message.json_str(**dump_kwargs), time, message_type
+        )

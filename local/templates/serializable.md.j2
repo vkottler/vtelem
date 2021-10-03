@@ -2,6 +2,10 @@
 
 ([back](README.md#documentation))
 
+{% for schema in serializable["schemas"] %}
+* [{{schema}}](#{{schema|lower}})
+{% endfor %}
+
 It's frequent that a telemetry protocol needs to support a negotiation or
 configuration handshake for individual entities to transfer data as densely as
 possible.
@@ -52,6 +56,9 @@ decoding.
 ### {{schema}}
 
 {{data["description"]}}
+
+*This can be sent as an
+[`{{data["message"]}}`](message_type.md#{{data["message"]}}) message.*
 
 #### [Cerberus](https://docs.python-cerberus.org/en/stable/) Data
 

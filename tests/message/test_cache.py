@@ -2,11 +2,8 @@
 vtelem - Test message cache correctness.
 """
 
-# built-in
-import tempfile
-
 # module under test
-from vtelem.message.cache import MessageCache
+from vtelem.message.cache import MessageCache, from_temp_dir
 from vtelem.types.frame import MessageType
 
 # internal
@@ -27,8 +24,7 @@ def test_message_cache_basic():
         assert number >= 0
         assert data.decode() == LONG_MESSAGE
 
-    with tempfile.TemporaryDirectory() as cache_dir:
-        cache = MessageCache(cache_dir)
+    with from_temp_dir() as cache:
         cache.add_callback(MessageType.TEXT, sample_callback)
 
         for message in parsed:
@@ -50,7 +46,7 @@ def test_message_cache_basic():
         # confirm the cache can be loaded
         cache.write()
         new_cache = MessageCache(
-            cache_dir, {MessageType.TEXT: [sample_callback]}
+            cache.cache_dir, {MessageType.TEXT: [sample_callback]}
         )
         assert len(new_cache.complete(MessageType.TEXT)) == 1
         _, data = new_cache.content_str(MessageType.TEXT, completed[0])

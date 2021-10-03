@@ -1,7 +1,7 @@
 # =====================================
 # generator=datazen
 # version=1.7.11
-# hash=0ef86a1ac5fd67f67061169fe9bf45be
+# hash=6ad12f0c46bc8295a8e58f43d4069540
 # =====================================
 """
 vtelem - Useful type definitions for working with frames.
@@ -63,6 +63,7 @@ class MessageType(IntEnum):
     AGNOSTIC = 0
     TEXT = 1
     JSON = 2
+    ENUM = 3
 
 
 MESSAGE_TYPES = from_enum(MessageType)

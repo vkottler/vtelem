@@ -2,11 +2,68 @@
 vtelem - Test message framer correctness.
 """
 
+# built-in
+import json
+from typing import List
+
 # module under test
+from vtelem.classes.user_enum import user_enum, UserEnum
 from vtelem.frame.fields import to_parsed
+from vtelem.message.cache import from_temp_dir
+from vtelem.types.frame import ParsedFrame, MessageType
 
 # internal
 from tests.message import LONG_MESSAGE, create_env, parse_frames
+
+
+def cache_message_str(
+    frames: List[ParsedFrame],
+    mtype: MessageType,
+) -> str:
+    """Use a temporary message cache to decode a String-based message."""
+
+    with from_temp_dir() as cache:
+        # Load the message and verify we collect it.
+        for message in frames:
+            cache.ingest(message)
+        messages = cache.complete(mtype)
+        assert len(messages) == 1
+
+        # Return the contents.
+        result = cache.content_str(mtype, messages[0])
+        assert result is not None
+        return result[1]
+
+
+def test_message_framer_object():
+    """Test that a UserEnum object can be transferred."""
+
+    framer, env = create_env()
+
+    # Serialize an enum.
+    enum = user_enum("test", {0: "a", 1: "b", 2: "c"})
+    frames, _ = framer.serialize_object(enum, message_type=MessageType.ENUM)
+
+    # Verify the enum loaded is equivalent to the one sent..
+    message = cache_message_str(parse_frames(env, frames), MessageType.ENUM)
+    new_enum = enum.load_str(message)
+    assert new_enum == enum
+    assert isinstance(new_enum, UserEnum)
+
+
+def test_message_framer_json():
+    """Test that a JSON message can be transferred."""
+
+    framer, env = create_env()
+
+    # Serialize some data into message frames.
+    data = {"a": 1, "b": 2, "c": 3}
+    frames, _ = framer.serialize_message_json(data)
+
+    # Verify the message loaded is equivalent to the one sent.
+    message = cache_message_str(parse_frames(env, frames), MessageType.JSON)
+    new_data = json.loads(message)
+    assert new_data == data
 
 
 def test_message_framer_basic():  # pylint: disable=too-many-locals

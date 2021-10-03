@@ -1,9 +1,10 @@
-description: >-
+description: |
   The `name` value should be
   [snake case](https://en.wikipedia.org/wiki/Snake_case). Note that although
   keys for `mappings` are integers, they need to be converted back to integers
   from their JSON representation (since JSON only has String keys, see
   [RFC 7159](https://datatracker.ietf.org/doc/html/rfc7159#section-4)).
+message: enum
 cerberus:
   name:
     type: string

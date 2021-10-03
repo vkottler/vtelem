@@ -106,14 +106,14 @@ class Serializable:
         result = False
         if hasattr(other, "data"):
             result = self.data == other.data
-        return result
+        return result and isinstance(other, type(self))
 
     def init(self, data: ObjectData) -> None:
         """
         Can be implemented to set up a serializable from some initial data.
         """
 
-    def json(self, stream: TextIO, indent: int = None) -> None:
+    def json(self, stream: TextIO, indent: int = None, **dump_kwargs) -> None:
         """Encode this object as JSON to the provided stream."""
 
         dump(
@@ -122,23 +122,24 @@ class Serializable:
             indent=indent,
             sort_keys=True,
             cls=self.params.encoder,
+            **dump_kwargs,
         )
 
-    def json_str(self, indent: int = None) -> str:
+    def json_str(self, indent: int = None, **dump_kwargs) -> str:
         """Encode this object as a JSON String."""
 
         with StringIO() as stream:
-            self.json(stream, indent)
+            self.json(stream, indent, **dump_kwargs)
             return stream.getvalue()
 
-    def load(self, stream: TextIO) -> "Serializable":
+    def load(self, stream: TextIO, **load_kwargs) -> "Serializable":
         """Create a serializable from a text stream loaded as JSON."""
 
-        data: ObjectData = load(stream, cls=self.params.decoder)
+        data: ObjectData = load(stream, cls=self.params.decoder, **load_kwargs)
         return self.__class__(data, self.params)
 
-    def load_str(self, data: str) -> "Serializable":
+    def load_str(self, data: str, **load_kwargs) -> "Serializable":
         """Create a serializable from a String loaded as JSON."""
 
         with StringIO(data) as stream:
-            return self.load(stream)
+            return self.load(stream, **load_kwargs)

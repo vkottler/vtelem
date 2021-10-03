@@ -34,3 +34,15 @@ entries:
 
     Application's may use this message to send application data, but they must
     implement logic for determining the data's purpose.
+- name: "enum"
+  value: 3
+  summary: >-
+    A message that should be interpreted as
+    [JSON](https://www.json.org/json-en.html)-encoded
+    [UserEnum](serializable.md#userenum) data.
+  description: |
+    This message contains runtime enumeration data. Whether by using the `name`
+    attribute (to identify a protocol-significant enumeration) or defining
+    further protocol-specific messages, a runtime enumeration may have
+    significance at the protocol level. Other enumerations may only be
+    significant to the application or runtime context.

@@ -3,8 +3,10 @@ vtelem - A module implementing a message storage.
 """
 
 # built-in
+from contextlib import contextmanager
 import os
-from typing import Dict, Callable, List, Optional, Tuple
+from tempfile import TemporaryDirectory
+from typing import Dict, Callable, List, Optional, Iterator, Tuple
 
 # internal
 from vtelem.classes.data_cache import DataCache
@@ -212,3 +214,13 @@ class MessageCache(DataCache, MessageDispatcher):
                 self.service_callbacks(
                     message.type, full_message[0], full_message[1]
                 )
+
+
+@contextmanager
+def from_temp_dir(
+    initial_callbacks: CallbackMap = None,
+) -> Iterator[MessageCache]:
+    """Create a message cache using a temporary directory."""
+
+    with TemporaryDirectory() as cache_dir:
+        yield MessageCache(cache_dir, initial_callbacks)

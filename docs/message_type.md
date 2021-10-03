@@ -2,7 +2,7 @@
     =====================================
     generator=datazen
     version=1.7.11
-    hash=5f6a905f01276b575a400d75778f0d5f
+    hash=5986909c2f48a3753133a85262e236be
     =====================================
 -->
 
@@ -30,6 +30,7 @@ Name | Value | Description
 [`agnostic`](#agnostic) | 0 | A message that has no protocol-defined interpretation.
 [`text`](#text) | 1 | A message that should be interpreted as [UTF-8](https://en.wikipedia.org/wiki/UTF-8)-encoded, plain text.
 [`json`](#json) | 2 | A message that should be interpreted as [UTF-8](https://en.wikipedia.org/wiki/UTF-8)-encoded, arbitrary [JSON](https://www.json.org/json-en.html).
+[`enum`](#enum) | 3 | A message that should be interpreted as [JSON](https://www.json.org/json-en.html)-encoded [UserEnum](serializable.md#userenum) data.
 
 ### Agnostic
 
@@ -58,3 +59,12 @@ new message type shall be defined and shall offer a supplementing schema.
 
 Application's may use this message to send application data, but they must
 implement logic for determining the data's purpose.
+
+
+### Enum
+
+This message contains runtime enumeration data. Whether by using the `name`
+attribute (to identify a protocol-significant enumeration) or defining
+further protocol-specific messages, a runtime enumeration may have
+significance at the protocol level. Other enumerations may only be
+significant to the application or runtime context.

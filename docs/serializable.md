@@ -2,13 +2,15 @@
     =====================================
     generator=datazen
     version=1.7.11
-    hash=67a0553df65683c6ae8cd2e664db6f94
+    hash=4b18188cdfb9c35b5a586e330cc2c0c8
     =====================================
 -->
 
 # Serializable Data Structures
 
 ([back](README.md#documentation))
+
+* [UserEnum](#userenum)
 
 It's frequent that a telemetry protocol needs to support a negotiation or
 configuration handshake for individual entities to transfer data as densely as
@@ -57,7 +59,15 @@ decoding.
 
 ### UserEnum
 
-The `name` value should be [snake case](https://en.wikipedia.org/wiki/Snake_case). Note that although keys for `mappings` are integers, they need to be converted back to integers from their JSON representation (since JSON only has String keys, see [RFC 7159](https://datatracker.ietf.org/doc/html/rfc7159#section-4)).
+The `name` value should be
+[snake case](https://en.wikipedia.org/wiki/Snake_case). Note that although
+keys for `mappings` are integers, they need to be converted back to integers
+from their JSON representation (since JSON only has String keys, see
+[RFC 7159](https://datatracker.ietf.org/doc/html/rfc7159#section-4)).
+
+
+*This can be sent as an
+[`enum`](message_type.md#enum) message.*
 
 #### [Cerberus](https://docs.python-cerberus.org/en/stable/) Data
 
