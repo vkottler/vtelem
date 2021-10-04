@@ -3,7 +3,7 @@ vtelem - Common test resources.
 """
 
 # built-in
-from enum import Enum
+from enum import IntEnum
 
 # module under test
 from vtelem.classes.serdes import ObjectData, Serializable, SerializableParams
@@ -11,7 +11,7 @@ from vtelem.classes.serdes import ObjectData, Serializable, SerializableParams
 KEYS = "abc"
 
 
-class EnumA(Enum):
+class EnumA(IntEnum):
     """Sample enumeration."""
 
     A = 0

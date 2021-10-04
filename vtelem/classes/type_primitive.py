@@ -5,14 +5,22 @@ vtelem - A generic element that can be read from and written to buffers.
 # built-in
 import logging
 import struct
-from typing import Any, Callable
+from typing import Callable, Tuple
 
 # internal
-from vtelem.enums.primitive import Primitive, default_val, get_size
+from vtelem.enums.primitive import (
+    Primitive,
+    PrimitiveValue,
+    default_val,
+    get_size,
+)
 from . import DEFAULTS
 from .byte_buffer import ByteBuffer
 
 LOG = logging.getLogger(__name__)
+ChangeCallback = Callable[
+    [Tuple[PrimitiveValue, float], Tuple[PrimitiveValue, float]], None
+]
 
 
 class TypePrimitive:
@@ -22,12 +30,12 @@ class TypePrimitive:
     """
 
     def __init__(
-        self, instance: Primitive, changed_cb: Callable = None
+        self, instance: Primitive, changed_cb: ChangeCallback = None
     ) -> None:
         """Construct a new primitive storage of a certain type."""
 
         self.type = instance
-        self.data: Any = default_val(self.type)
+        self.data: PrimitiveValue = default_val(self.type)
         self.changed_cb = changed_cb
         self.last_set: float = float()
 
@@ -43,12 +51,12 @@ class TypePrimitive:
 
         return f"({self.type.name}) {self.data}"
 
-    def add(self, data: Any, time: float = None) -> bool:
+    def add(self, data: PrimitiveValue, time: float = None) -> bool:
         """Safely add some amount to the primitive."""
 
         return self.set(self.get() + data, time)
 
-    def set(self, data: Any, time: float = None) -> bool:
+    def set(self, data: PrimitiveValue, time: float = None) -> bool:
         """Set this primitive's data manually."""
 
         if time is None:
@@ -87,7 +95,7 @@ class TypePrimitive:
         )
         return False
 
-    def get(self) -> Any:
+    def get(self) -> PrimitiveValue:
         """Get this primitive's data."""
 
         return self.data
@@ -106,7 +114,7 @@ class TypePrimitive:
 
     def read(
         self, buf: ByteBuffer, pos: int = None, chomp: bool = False
-    ) -> Any:
+    ) -> PrimitiveValue:
         """
         Read this primitive out of a buffer, assign its data and return the
         result.
@@ -123,7 +131,9 @@ class TypePrimitive:
         return struct.pack(order + self.type.value.fmt, self.data)
 
 
-def new_default(default: str, changed_cb: Callable = None) -> TypePrimitive:
+def new_default(
+    default: str, changed_cb: ChangeCallback = None
+) -> TypePrimitive:
     """Construct a new type primitive from a default type alias."""
 
     assert default in DEFAULTS

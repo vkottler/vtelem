@@ -9,6 +9,9 @@ cerberus:
   name:
     type: string
     regex: "[a-z_]+"
+  type:
+    type: string
+    regex: "^user_enum$"
   default: 
     type: string
   mappings:
@@ -25,3 +28,4 @@ example:
     2: "b"
     3: "c"
   default: "a"
+  type: "user_enum"

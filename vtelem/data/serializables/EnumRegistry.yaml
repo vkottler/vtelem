@@ -1,0 +1,9 @@
+enums:
+  keysrules: {type: string}
+  type: dict
+  valuesrules: {type: dict}
+mappings:
+  keysrules: {type: integer}
+  type: dict
+  valuesrules: {type: string}
+type: {regex: ^enum_registry$, type: string}

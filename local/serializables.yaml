@@ -20,4 +20,5 @@ groups:
 - name: "serializables"
   dependencies:
   - "compiles-serializables-UserEnum"
+  - "compiles-serializables-EnumRegistry"
   - "renders-serializable.md"

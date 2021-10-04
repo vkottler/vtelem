@@ -1,0 +1,49 @@
+description: |
+  A registry for storing runtime enumerations (see also [UserEnum](#userenum)).
+  A mapping of integers to enumeration names is provided so that a specific
+  enumeration can map to an integer via a registry. An integer reference to an
+  enumeration may be required to allow channel values to map to the correct
+  Strings (and thus, the channel keeps track of this integer identifier for the
+  enumeration that it uses).
+
+  All data under `enums` can be transparently interpreted as individual
+  [UserEnum](#userenum)'s.
+message: enum_registry
+cerberus:
+  type:
+    regex: ^enum_registry$
+    type: string
+  mappings:
+    type: dict
+    keysrules:
+      type: integer
+    valuesrules:
+      type: string
+  enums:
+    type: dict
+    keysrules:
+      type: string
+    valuesrules:
+      type: dict
+example:
+  type: "enum_registry"
+  mappings:
+    0: "enum_a"
+    1: "enum_b"
+  enums:
+    enum_a:
+      name: "enum_a"
+      type: "user_enum"
+      default: "a"
+      mappings:
+        1: "a"
+        2: "b"
+        3: "c"
+    enum_b:
+      name: "enum_b"
+      type: "user_enum"
+      default: "d"
+      mappings:
+        1: "d"
+        2: "e"
+        3: "f"

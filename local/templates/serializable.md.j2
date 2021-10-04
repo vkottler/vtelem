@@ -58,7 +58,8 @@ decoding.
 {{data["description"]}}
 
 *This can be sent as an
-[`{{data["message"]}}`](message_type.md#{{data["message"]}}) message.*
+[`{{data["message"]}}`](message_type.md#{{data["message"]|replace("_", "-")}})
+message.*
 
 #### [Cerberus](https://docs.python-cerberus.org/en/stable/) Data
 

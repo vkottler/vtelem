@@ -1,4 +1,7 @@
-{% macro sentence_case(text) %}{{text[0]|upper}}{{text[1:]}}{% endmacro %}
+{% macro sentence_case(text) %}
+{% set with_spaces = text|replace("_", " ") %}
+{{with_spaces|title}}
+{%- endmacro %}
 # {{docs["message_type"]}}
 
 ([back](README.md#documentation))
@@ -21,11 +24,11 @@ Appication-specific messaging proxied through this protocol can use the
 Name | Value | Description
 -----|-------|------------
 {% for item in message_types["entries"] %}
-[`{{item["name"]}}`](#{{item["name"]}}) | {{item["value"]}} | {{item["summary"]}}
+[`{{item["name"]}}`](#{{item["name"]|replace("_", "-")}}) | {{item["value"]}} | {{item["summary"]}}
 {% endfor %}
 {% for item in message_types["entries"] %}
 
 ### {{sentence_case(item["name"])}}
 
 {{item["description"]}}
-{% endfor %}
+{%- endfor %}

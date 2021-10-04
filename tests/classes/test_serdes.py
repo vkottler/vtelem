@@ -20,6 +20,20 @@ def is_serializable(obj: Serializable) -> Serializable:
     return new_obj
 
 
+def test_serializable_int_keys():
+    """
+    Test that the method for converting dictionary keys from Strings to
+    integers works with more than one path argument.
+    """
+
+    obj = Serializable()
+    str_keys = {"1": "a", "2": "b", "3": "c"}
+    data = {"a": {"b": str_keys}}
+    obj.coerce_int_keys(["a", "b"], data)
+    assert all(isinstance(x, int) for x in data["a"]["b"])
+    assert data["a"]["b"] == {1: "a", 2: "b", 3: "c"}
+
+
 def test_serializable_basic():
     """
     Test that a serializable object can be decoded and then encoded while
@@ -30,7 +44,7 @@ def test_serializable_basic():
 
     obj = is_serializable(default_object())
 
-    schema = {}
+    schema = {"type": {"type": "string"}}
     for key in KEYS:
         schema[key] = {"type": "integer"}
 

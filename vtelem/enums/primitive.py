@@ -1,7 +1,7 @@
 # =====================================
 # generator=datazen
 # version=1.7.11
-# hash=bd9a431625b4df30b83cf32e0fa25023
+# hash=11f68748bdd3c161b1dbe364ad9c83d1
 # =====================================
 """
 vtelem - A definition of the supported primitive types for this library.
@@ -11,7 +11,9 @@ vtelem - A definition of the supported primitive types for this library.
 from enum import Enum
 from json import JSONEncoder
 import random
-from typing import Any, Callable, NamedTuple, Tuple, Type
+from typing import Any, Callable, NamedTuple, Tuple, Type, Union
+
+PrimitiveValue = Union[int, float, bool]
 
 
 class BasePrimitive(NamedTuple):
@@ -174,7 +176,7 @@ def get_size(inst: Primitive) -> int:
     return inst.value.size
 
 
-def default_val(inst: Primitive) -> Any:
+def default_val(inst: Primitive) -> PrimitiveValue:
     """Get the default value for a specific primitive."""
 
     return inst.value.type()

@@ -4,3 +4,4 @@ mappings:
   type: dict
   valuesrules: {regex: '[a-z]+', type: string}
 name: {regex: '[a-z_]+', type: string}
+type: {regex: ^user_enum$, type: string}

@@ -7,12 +7,13 @@ vtelem - A module exposing a base for implementing a class that can be encoded
 from json import dump, load, JSONEncoder, JSONDecoder
 import logging
 from io import StringIO
-from typing import Dict, NamedTuple, List, Optional, TextIO, Type, Union
+from typing import cast, Dict, NamedTuple, List, Optional, TextIO, Type, Union
 
 # third-party
 from cerberus import Validator
 
 # internal
+from vtelem.names import class_to_snake
 from vtelem.schema.manager import SchemaManager
 
 LOG = logging.getLogger(__name__)
@@ -54,20 +55,28 @@ class Serializable:
         data: ObjectData = None,
         params: SerializableParams = None,
         log: logging.Logger = LOG,
+        manager: SchemaManager = None,
     ) -> None:
         """Construct a new serializable object."""
 
+        super().__init__()
         if data is None:
             data = {}
         self.data = data
 
+        # Set a 'type' attribute so it's easier to keep track of what a given
+        # serializable is actually supposed to be.
+        if "type" not in self.data:
+            self.data["type"] = class_to_snake(type(self))
+
         if params is None:
             params = SerializableParams()
         self.params = params
+        self.manager: Optional[SchemaManager] = manager
 
         self.log = log
         self.init(self.data)
-        self.valid = self.validate()
+        self.valid = self.validate(manager=self.manager)
 
     @staticmethod
     def int_keys(data: ObjectMap) -> ObjectMap:
@@ -81,23 +90,31 @@ class Serializable:
 
         return manager.get(cls)
 
-    def validate(self, log: bool = True) -> bool:
+    def validate(
+        self, log: bool = True, manager: SchemaManager = None
+    ) -> bool:
         """
         Attempt to validate this object's data against a schema, if one was
         provided at initialization.
         """
 
         result = True
-        if self.params.schema is not None:
-            result = self.params.schema.validate(self.data)
+
+        # Use either the provided schema, or one sourced from a schema manager.
+        schema = self.params.schema
+        if schema is None and manager is not None:
+            schema = manager.get(self.__class__)
+
+        if schema is not None:
+            result = schema.validate(self.data)
             if not result and log:
                 self.log.error(
                     "Schema validation error(s) for an instance of '%s': %s",
                     self.__class__.__name__,
-                    self.params.schema.errors,
+                    schema.errors,
                 )
                 self.log.error("data: %s", self.data)
-                self.log.error("schema: %s", self.params.schema.schema)
+                self.log.error("schema: %s", schema.schema)
         return result
 
     def __eq__(self, other) -> bool:
@@ -143,3 +160,37 @@ class Serializable:
 
         with StringIO(data) as stream:
             return self.load(stream, **load_kwargs)
+
+    def coerce_int_keys(
+        self, paths: List[ObjectKey], data: ObjectData = None
+    ) -> None:
+        """
+        Coerce keys in a mapping at some path (from 'data' root) to integers.
+        """
+
+        data = self.data if data is None else data
+        assert paths
+        for i in range(len(paths) - 1):
+            data = cast(ObjectData, data.get(paths[i], {}))
+
+        to_convert = data.get(paths[-1], {})
+        data[paths[-1]] = Serializable.int_keys(cast(ObjectMap, to_convert))
+
+    @property
+    def name(self) -> str:
+        """Get the name of this object."""
+
+        return cast(str, self.data.get("name", type(self).__name__))
+
+
+def max_key(data: ObjectMap) -> int:
+    """
+    Get the highest integer-value key in a given map, or -1 if no integer keys
+    are found.
+    """
+
+    result = -1
+    for key in data:
+        if isinstance(key, int) and key > result:
+            result = key
+    return result

@@ -2,7 +2,7 @@
     =====================================
     generator=datazen
     version=1.7.11
-    hash=4b18188cdfb9c35b5a586e330cc2c0c8
+    hash=aeaf3d6b0d069f81dfce47496d11a3df
     =====================================
 -->
 
@@ -11,6 +11,7 @@
 ([back](README.md#documentation))
 
 * [UserEnum](#userenum)
+* [EnumRegistry](#enumregistry)
 
 It's frequent that a telemetry protocol needs to support a negotiation or
 configuration handshake for individual entities to transfer data as densely as
@@ -67,7 +68,8 @@ from their JSON representation (since JSON only has String keys, see
 
 
 *This can be sent as an
-[`enum`](message_type.md#enum) message.*
+[`enum`](message_type.md#enum)
+message.*
 
 #### [Cerberus](https://docs.python-cerberus.org/en/stable/) Data
 
@@ -89,6 +91,10 @@ from their JSON representation (since JSON only has String keys, see
     "name": {
         "regex": "[a-z_]+",
         "type": "string"
+    },
+    "type": {
+        "regex": "^user_enum$",
+        "type": "string"
     }
 }
 ```
@@ -103,6 +109,86 @@ from their JSON representation (since JSON only has String keys, see
         "2": "b",
         "3": "c"
     },
-    "name": "sample_enum"
+    "name": "sample_enum",
+    "type": "user_enum"
+}
+```
+### EnumRegistry
+
+A registry for storing runtime enumerations (see also [UserEnum](#userenum)).
+A mapping of integers to enumeration names is provided so that a specific
+enumeration can map to an integer via a registry. An integer reference to an
+enumeration may be required to allow channel values to map to the correct
+Strings (and thus, the channel keeps track of this integer identifier for the
+enumeration that it uses).
+
+All data under `enums` can be transparently interpreted as individual
+[UserEnum](#userenum)'s.
+
+
+*This can be sent as an
+[`enum_registry`](message_type.md#enum-registry)
+message.*
+
+#### [Cerberus](https://docs.python-cerberus.org/en/stable/) Data
+
+```
+{
+    "enums": {
+        "keysrules": {
+            "type": "string"
+        },
+        "type": "dict",
+        "valuesrules": {
+            "type": "dict"
+        }
+    },
+    "mappings": {
+        "keysrules": {
+            "type": "integer"
+        },
+        "type": "dict",
+        "valuesrules": {
+            "type": "string"
+        }
+    },
+    "type": {
+        "regex": "^enum_registry$",
+        "type": "string"
+    }
+}
+```
+
+#### Example
+
+```
+{
+    "enums": {
+        "enum_a": {
+            "default": "a",
+            "mappings": {
+                "1": "a",
+                "2": "b",
+                "3": "c"
+            },
+            "name": "enum_a",
+            "type": "user_enum"
+        },
+        "enum_b": {
+            "default": "d",
+            "mappings": {
+                "1": "d",
+                "2": "e",
+                "3": "f"
+            },
+            "name": "enum_b",
+            "type": "user_enum"
+        }
+    },
+    "mappings": {
+        "0": "enum_a",
+        "1": "enum_b"
+    },
+    "type": "enum_registry"
 }
 ```

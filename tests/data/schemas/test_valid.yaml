@@ -4,3 +4,5 @@ b:
   type: integer
 c:
   type: integer
+type:
+  type: string

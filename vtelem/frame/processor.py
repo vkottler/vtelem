@@ -3,7 +3,7 @@ vtelem - A module providing utilities for parsing frames.
 """
 
 # built-in
-from typing import List
+from typing import cast, List
 
 # internal
 from vtelem.classes.byte_buffer import ByteBuffer
@@ -31,7 +31,7 @@ class FrameProcessor:
         """
 
         if self.size_stale and self.buffer.can_read(frame_size.type):
-            self.size = frame_size.read(self.buffer, chomp=True)
+            self.size = cast(int, frame_size.read(self.buffer, chomp=True))
             self.size_stale = False
 
         # clear buffer state if we get an unreasonable value

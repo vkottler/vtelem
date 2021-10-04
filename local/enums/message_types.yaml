@@ -46,3 +46,13 @@ entries:
     further protocol-specific messages, a runtime enumeration may have
     significance at the protocol level. Other enumerations may only be
     significant to the application or runtime context.
+- name: "enum_registry"
+  value: 4
+  summary: >-
+    A message that should be interpreted as
+    [JSON](https://www.json.org/json-en.html)-encoded
+    [EnumRegistry](serializable.md#enumregistry) data.
+  description: |
+    This message contains a registry of runtime enumerations. Enumerations are
+    mapped to integer identifiers so they can be referenced as integers when a
+    type reference should be packed into a frame or message.

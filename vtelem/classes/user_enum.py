@@ -73,9 +73,7 @@ class UserEnum(Serializable):
         """
 
         # Maintain a reverse mapping for convenience.
-        data["mappings"] = Serializable.int_keys(
-            cast(ObjectMap, data["mappings"])
-        )
+        self.coerce_int_keys(["mappings"], data)
         self.strings = reverse_map(cast(IntStrMap, data["mappings"]))
 
         # Set a viable default value.
@@ -89,12 +87,6 @@ class UserEnum(Serializable):
         """Get the default value for this enum."""
 
         return cast(str, self.data["default"])
-
-    @property
-    def name(self) -> str:
-        """Get the name of this enum."""
-
-        return cast(str, self.data["name"])
 
     def __iter__(self) -> Iterator[str]:
         """Iterate over all valid String keys in this enum."""
