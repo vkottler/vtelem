@@ -7,7 +7,7 @@ vtelem - A module exposing a base for implementing a class that can be encoded
 from json import dump, load, JSONEncoder, JSONDecoder
 import logging
 from io import StringIO
-from typing import cast, Dict, NamedTuple, List, Optional, TextIO, Type, Union
+from typing import cast, NamedTuple, List, Optional, TextIO, Type
 
 # third-party
 from cerberus import Validator
@@ -15,18 +15,14 @@ from cerberus import Validator
 # internal
 from vtelem.names import class_to_snake
 from vtelem.schema.manager import SchemaManager
+from vtelem.types.serializable import (
+    ObjectKey,
+    ObjectMap,
+    ObjectData,
+)
 
 LOG = logging.getLogger(__name__)
 DEFAULT_INDENT = 2
-
-# See RFC 8259.
-ObjectKey = Union[int, str]
-ObjectElement = Union[float, int, str, bool, None]
-ObjectMap = Dict[ObjectKey, ObjectElement]
-ObjectData = Dict[
-    ObjectKey,
-    Union[ObjectElement, List[ObjectElement], ObjectMap],
-]
 
 
 class SerializableEncoder(JSONEncoder):
@@ -181,6 +177,11 @@ class Serializable:
         """Get the name of this object."""
 
         return cast(str, self.data.get("name", type(self).__name__))
+
+    def __hash__(self) -> int:
+        """Allow serializables to be hashable by name."""
+
+        return hash(self.name)
 
 
 def max_key(data: ObjectMap) -> int:

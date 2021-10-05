@@ -1,0 +1,7 @@
+integer: {type: boolean}
+max: {required: false, type: integer}
+min: {required: false, type: integer}
+name: {type: string}
+signed: {type: boolean}
+size: {type: integer}
+type: {regex: ^serializable_primitive$, type: string}

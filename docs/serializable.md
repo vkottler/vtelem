@@ -2,7 +2,7 @@
     =====================================
     generator=datazen
     version=1.7.11
-    hash=aeaf3d6b0d069f81dfce47496d11a3df
+    hash=615acc661decc9cafed36a841c7cfa3b
     =====================================
 -->
 
@@ -12,6 +12,7 @@
 
 * [UserEnum](#userenum)
 * [EnumRegistry](#enumregistry)
+* [SerializablePrimitive](#serializableprimitive)
 
 It's frequent that a telemetry protocol needs to support a negotiation or
 configuration handshake for individual entities to transfer data as densely as
@@ -190,5 +191,60 @@ message.*
         "1": "enum_b"
     },
     "type": "enum_registry"
+}
+```
+### SerializablePrimitive
+
+An expression of a primitive type constituting a base unit that channels,
+types and other entities may claim as an attribute. It contains information
+allowing an implementation to store it and perform arithmetic operations on
+it.
+
+
+*This can be sent as an
+[`primitive`](message_type.md#primitive)
+message.*
+
+#### [Cerberus](https://docs.python-cerberus.org/en/stable/) Data
+
+```
+{
+    "integer": {
+        "type": "boolean"
+    },
+    "max": {
+        "required": false,
+        "type": "integer"
+    },
+    "min": {
+        "required": false,
+        "type": "integer"
+    },
+    "name": {
+        "type": "string"
+    },
+    "signed": {
+        "type": "boolean"
+    },
+    "size": {
+        "type": "integer"
+    },
+    "type": {
+        "regex": "^serializable_primitive$",
+        "type": "string"
+    }
+}
+```
+
+#### Example
+
+```
+{
+    "integer": true,
+    "max": 127,
+    "min": -128,
+    "name": "int8",
+    "signed": true,
+    "size": 1
 }
 ```

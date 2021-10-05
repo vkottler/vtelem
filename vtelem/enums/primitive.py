@@ -1,7 +1,7 @@
 # =====================================
 # generator=datazen
 # version=1.7.11
-# hash=11f68748bdd3c161b1dbe364ad9c83d1
+# hash=5563c8184eff3fca4638a2a6432ace8e
 # =====================================
 """
 vtelem - A definition of the supported primitive types for this library.
@@ -12,6 +12,9 @@ from enum import Enum
 from json import JSONEncoder
 import random
 from typing import Any, Callable, NamedTuple, Tuple, Type, Union
+
+# internal
+from vtelem.types.serializable import ObjectData
 
 PrimitiveValue = Union[int, float, bool]
 
@@ -139,25 +142,6 @@ def random_integer(prim: Primitive) -> int:
     return random.randint(prim.value.min, prim.value.max)
 
 
-class PrimitiveEncoder(JSONEncoder):
-    """A JSON encoder for a primitive enum."""
-
-    def default(self, o) -> dict:
-        """Implement serialization for the primitive enum value."""
-
-        assert isinstance(o, Primitive)
-        val: BasePrimitive = o.value
-        data = {
-            "size": val.size,
-            "name": val.name,
-            "signed": val.signed,
-        }
-        if val.min != 0 or val.max != 0:
-            data["min"] = val.min
-            data["max"] = val.max
-        return data
-
-
 def get_name(inst: Primitive) -> str:
     """Get a primitive's canonical name."""
 
@@ -192,3 +176,29 @@ INTEGER_PRIMITIVES = [
     Primitive.INT64,
     Primitive.UINT64,
 ]
+
+
+def to_dict(prim: Primitive) -> ObjectData:
+    """Convert a primitive to a dictionary for serialization."""
+
+    val: BasePrimitive = prim.value
+    data: ObjectData = {
+        "name": val.name,
+        "size": val.size,
+        "signed": val.signed,
+        "integer": prim in INTEGER_PRIMITIVES,
+    }
+    if val.min != 0 or val.max != 0:
+        data["min"] = val.min
+        data["max"] = val.max
+    return data
+
+
+class PrimitiveEncoder(JSONEncoder):
+    """A JSON encoder for a primitive enum."""
+
+    def default(self, o) -> dict:
+        """Implement serialization for the primitive enum value."""
+
+        assert isinstance(o, Primitive)
+        return to_dict(o)

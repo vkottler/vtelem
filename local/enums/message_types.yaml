@@ -56,3 +56,18 @@ entries:
     This message contains a registry of runtime enumerations. Enumerations are
     mapped to integer identifiers so they can be referenced as integers when a
     type reference should be packed into a frame or message.
+- name: "primitive"
+  value: 5
+  summary: >-
+    A message that should be interpreted as
+    [JSON](https://www.json.org/json-en.html)-encoded
+    [SerializablePrimitive](serializable.md#serializableprimitive) data.
+  description: |
+    This message describes a fundamental type. It can be used by bespoke
+    implementations to corroborate how numerical, boolean or other values
+    should be interpreted.
+
+    A primitive type can be assigned an integer value so that an entity
+    transferred via this protocol can express the type of that entity by that
+    value (also requiring the "primitive type mapping" to be exchanged in
+    advance).

@@ -1,0 +1,31 @@
+description: |
+  An expression of a primitive type constituting a base unit that channels,
+  types and other entities may claim as an attribute. It contains information
+  allowing an implementation to store it and perform arithmetic operations on
+  it.
+message: primitive
+cerberus:
+  name:
+    type: string
+  size:
+    type: integer
+  signed:
+    type: boolean
+  integer:
+    type: boolean
+  min:
+    type: integer
+    required: false
+  max:
+    type: integer
+    required: false
+  type:
+    regex: ^serializable_primitive$
+    type: string
+example:
+  name: "int8"
+  size: 1
+  signed: true
+  integer: true
+  min: -128
+  max: 127

@@ -2,7 +2,7 @@
     =====================================
     generator=datazen
     version=1.7.11
-    hash=3739b705fedce4f12628a44d6ab19d47
+    hash=943116cbc50f3ad89bb285b9de51a831
     =====================================
 -->
 
@@ -32,6 +32,7 @@ Name | Value | Description
 [`json`](#json) | 2 | A message that should be interpreted as [UTF-8](https://en.wikipedia.org/wiki/UTF-8)-encoded, arbitrary [JSON](https://www.json.org/json-en.html).
 [`enum`](#enum) | 3 | A message that should be interpreted as [JSON](https://www.json.org/json-en.html)-encoded [UserEnum](serializable.md#userenum) data.
 [`enum_registry`](#enum-registry) | 4 | A message that should be interpreted as [JSON](https://www.json.org/json-en.html)-encoded [EnumRegistry](serializable.md#enumregistry) data.
+[`primitive`](#primitive) | 5 | A message that should be interpreted as [JSON](https://www.json.org/json-en.html)-encoded [SerializablePrimitive](serializable.md#serializableprimitive) data.
 
 ### Agnostic
 
@@ -72,3 +73,14 @@ significant to the application or runtime context.
 This message contains a registry of runtime enumerations. Enumerations are
 mapped to integer identifiers so they can be referenced as integers when a
 type reference should be packed into a frame or message.
+
+### Primitive
+
+This message describes a fundamental type. It can be used by bespoke
+implementations to corroborate how numerical, boolean or other values
+should be interpreted.
+
+A primitive type can be assigned an integer value so that an entity
+transferred via this protocol can express the type of that entity by that
+value (also requiring the "primitive type mapping" to be exchanged in
+advance).
