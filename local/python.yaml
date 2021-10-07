@@ -18,6 +18,11 @@ renders:
   dependencies:
   - "compiles-enums"
 
+- name: "post_json.sh"
+  output_path: "release.sh"
+  dependencies:
+  - "compiles-release-post-data"
+
 groups:
 - name: "local-python"
   dependencies:
@@ -25,4 +30,5 @@ groups:
   - "renders-primitive.py"
   - "renders-frame.py"
   - "renders-frame_types.py"
+  - "renders-post_json.sh"
   - "groups-python"

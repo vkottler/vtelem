@@ -8,6 +8,7 @@ params:
 includes:
 - "config/includes/python.yaml"
 - "config/includes/help.yaml"
+- "config/includes/git.yaml"
 - "local/docs.yaml"
 - "local/python.yaml"
 - "local/serializables.yaml"

@@ -14,3 +14,5 @@ htmlcov
 .task_data_cache
 datazen-out
 tags
+local/generated
+.secrets

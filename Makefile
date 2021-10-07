@@ -8,7 +8,7 @@ $(error target this Makefile with 'mk', not '$(MAKE)' ($(MK_INFO)))
 endif
 ###############################################################################
 
-.PHONY: all clean run run-help readme
+.PHONY: all clean run run-help readme check-env release
 
 .DEFAULT_GOAL := all
 
@@ -29,3 +29,24 @@ readme:
 
 render-%:
 	mk grip-render GRIP_FILE=docs/$*.md GRIP_PORT=$(GRIP_PORT)
+
+$($(PROJ)_DIR)/.secrets:
+	@rm -f $@
+	@echo "export GITHUB_API_USER=$$USER" >> $@
+	@echo "export GITHUB_API_TOKEN=`secrethub read vkottler/github/tokens/public_repo-api-token`" >> $@
+	+@echo "wrote '$@'"
+
+check-env: | $($(PROJ)_DIR)/.secrets
+ifndef GITHUB_API_USER
+	$(error GITHUB_API_USER not set, run 'source $($(PROJ)_DIR)/.secrets')
+endif
+ifndef GITHUB_API_TOKEN
+	$(error GITHUB_API_TOKEN not set, run 'source $($(PROJ)_DIR)/.secrets')
+endif
+
+release: check-env $(DZ_PREFIX)sync
+	@rm -f $($(PROJ)_DIR)/local/generated/git.*
+	$(PYTHON_BIN)/dz $(DZ_ARGS) -c
+	$(PYTHON_BIN)/dz $(DZ_ARGS)
+	@chmod +x $($(PROJ)_DIR)/datazen-out/release.sh
+	$($(PROJ)_DIR)/datazen-out/release.sh
