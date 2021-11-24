@@ -3,7 +3,7 @@ vtelem - Contains a class for managing known type primitives.
 """
 
 # built-in
-from typing import Tuple, Optional, List
+from typing import List, Optional, Tuple
 
 # internal
 from vtelem.enums.primitive import Primitive, PrimitiveEncoder, get_name

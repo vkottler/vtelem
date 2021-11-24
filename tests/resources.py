@@ -5,6 +5,7 @@ vtelem - Utilities for accessing file resouces for tests.
 # built-in
 import os
 from pathlib import Path
+
 import pkg_resources
 
 

@@ -3,7 +3,7 @@ vtelem - Constants for tests related to messages.
 """
 
 # built-in
-from typing import List, Tuple, Sequence
+from typing import List, Sequence, Tuple
 
 # module under test
 from vtelem.frame.message import MessageFrame

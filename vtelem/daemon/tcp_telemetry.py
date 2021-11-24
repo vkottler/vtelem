@@ -11,10 +11,10 @@ from threading import Semaphore
 from typing import Any, Dict, Tuple
 
 # internal
-from vtelem.stream.writer import StreamWriter, QueueClientManager
 from vtelem.client.tcp import TcpClient
 from vtelem.daemon import DaemonBase
-from vtelem.mtu import Host, DEFAULT_MTU
+from vtelem.mtu import DEFAULT_MTU, Host
+from vtelem.stream.writer import QueueClientManager, StreamWriter
 from vtelem.telemetry.environment import TelemetryEnvironment
 
 LOG = logging.getLogger(__name__)

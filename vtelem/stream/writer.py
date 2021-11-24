@@ -12,25 +12,25 @@ from queue import Queue
 from threading import Semaphore
 from typing import (
     Any,
-    cast,
     Callable,
     DefaultDict,
     Dict,
-    List,
     Iterator,
+    List,
     Optional,
     Tuple,
+    cast,
 )
 
 # internal
+from vtelem.classes import DEFAULTS
+from vtelem.classes.metered_queue import MAX_SIZE, create
+from vtelem.classes.time_entity import LockEntity
+from vtelem.classes.type_primitive import new_default
 from vtelem.daemon.queue import QueueDaemon
 from vtelem.frame.channel import ChannelFrame
 from vtelem.mtu import Host
 from vtelem.telemetry.environment import TelemetryEnvironment
-from vtelem.classes import DEFAULTS
-from vtelem.classes.type_primitive import new_default
-from vtelem.classes.metered_queue import create, MAX_SIZE
-from vtelem.classes.time_entity import LockEntity
 
 LOG = logging.getLogger(__name__)
 

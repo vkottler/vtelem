@@ -2,12 +2,12 @@
 vtelem - Test the file client's correctness.
 """
 
+# internal
+from tests import writer_environment
+
 # module under test
 from vtelem.client.file import create
 from vtelem.stream import queue_get, queue_get_none
-
-# internal
-from tests import writer_environment
 
 
 def test_file_client_frame_restrict():

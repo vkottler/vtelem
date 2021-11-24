@@ -7,13 +7,13 @@ from os.path import getsize
 from pathlib import Path
 import tempfile
 
-# module under test
-from vtelem.stream.writer import default_writer
-from vtelem.frame.framer import build_dummy_frame
-from vtelem.mtu import DEFAULT_MTU
-
 # internal
 from tests import writer_environment
+
+# module under test
+from vtelem.frame.framer import build_dummy_frame
+from vtelem.mtu import DEFAULT_MTU
+from vtelem.stream.writer import default_writer
 
 
 def test_stream_writer_file():

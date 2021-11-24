@@ -4,10 +4,10 @@ vtelem - A module exposing a base for implementing a class that can be encoded
 """
 
 # built-in
-from json import dump, load, JSONEncoder, JSONDecoder
-import logging
 from io import StringIO
-from typing import cast, NamedTuple, List, Optional, TextIO, Type
+from json import JSONDecoder, JSONEncoder, dump, load
+import logging
+from typing import List, NamedTuple, Optional, TextIO, Type, cast
 
 # third-party
 from cerberus import Validator
@@ -15,11 +15,7 @@ from cerberus import Validator
 # internal
 from vtelem.names import class_to_snake
 from vtelem.schema.manager import SchemaManager
-from vtelem.types.serializable import (
-    ObjectKey,
-    ObjectMap,
-    ObjectData,
-)
+from vtelem.types.serializable import ObjectData, ObjectKey, ObjectMap
 
 LOG = logging.getLogger(__name__)
 DEFAULT_INDENT = 2

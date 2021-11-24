@@ -5,16 +5,16 @@ vtelem - Allows singleton management of application daemons.
 # built-in
 from collections import defaultdict
 import logging
-from typing import Dict, Optional, List
+from typing import Dict, List, Optional
 
 # internal
+from vtelem.classes.time_entity import LockEntity
 from vtelem.daemon import DaemonBase
 from vtelem.enums.daemon import (
     DaemonOperation,
-    str_to_operation,
     operation_str,
+    str_to_operation,
 )
-from vtelem.classes.time_entity import LockEntity
 
 LOG = logging.getLogger(__name__)
 NAME_DENYLIST = ["all"]

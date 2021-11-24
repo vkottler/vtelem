@@ -5,13 +5,13 @@ vtelem - Test schema loading from files.
 # built-in
 from pathlib import Path
 
+# internal
+from tests.classes import default_object
+from tests.resources import get_resource, get_test_schema
+
 # module under test
 from vtelem.classes.serdes import SerializableParams
 from vtelem.schema import load_schema, load_schema_dir
-
-# internal
-from tests.resources import get_test_schema, get_resource
-from tests.classes import default_object
 
 
 def test_load_schema():

@@ -6,12 +6,12 @@ vtelem - A module implementing a message storage.
 from contextlib import contextmanager
 import os
 from tempfile import TemporaryDirectory
-from typing import Dict, Callable, List, Optional, Iterator, Tuple
+from typing import Callable, Dict, Iterator, List, Optional, Tuple
 
 # internal
 from vtelem.classes.data_cache import DataCache
 from vtelem.frame.fields import to_parsed
-from vtelem.types.frame import ParsedFrame, FrameType, MessageType
+from vtelem.types.frame import FrameType, MessageType, ParsedFrame
 
 MessageCallback = Callable[[MessageType, int, bytes], None]
 CallbackMap = Dict[MessageType, List[MessageCallback]]

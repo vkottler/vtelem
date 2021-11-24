@@ -6,12 +6,12 @@ vtelem - Test the websocket telemetry client's correctness.
 import time
 
 # module under test
+from vtelem.channel.framer import Framer, build_dummy_frame
 from vtelem.client.websocket import WebsocketClient
 from vtelem.daemon.websocket_telemetry import (
     WebsocketTelemetryDaemon,
     queue_get,
 )
-from vtelem.channel.framer import Framer, build_dummy_frame
 from vtelem.mtu import DEFAULT_MTU, Host, get_free_tcp_port
 from vtelem.stream.writer import default_writer
 from vtelem.telemetry.environment import TelemetryEnvironment

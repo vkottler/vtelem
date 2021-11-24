@@ -5,12 +5,13 @@ vtelem - An interface for simplifying registering implementations for
 
 # built-in
 from collections import defaultdict
-from http.server import BaseHTTPRequestHandler
 from http import HTTPStatus
+from http.server import BaseHTTPRequestHandler
 import json
 import logging
-from typing import Dict, Callable, List, Tuple
+from typing import Callable, Dict, List
 from typing import Optional as Opt
+from typing import Tuple
 import urllib
 
 # internal

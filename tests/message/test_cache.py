@@ -2,12 +2,12 @@
 vtelem - Test message cache correctness.
 """
 
+# internal
+from tests.message import LONG_MESSAGE, create_env, parse_frames
+
 # module under test
 from vtelem.message.cache import MessageCache, from_temp_dir
 from vtelem.types.frame import MessageType
-
-# internal
-from tests.message import LONG_MESSAGE, create_env, parse_frames
 
 
 def test_message_cache_basic():

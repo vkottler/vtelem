@@ -15,10 +15,10 @@ from vtelem.classes.type_primitive import TypePrimitive
 from vtelem.classes.udp_client_manager import UdpClientManager
 from vtelem.client.socket import SocketClient
 from vtelem.mtu import (
-    create_udp_socket,
-    get_free_port,
     DEFAULT_MTU,
     Host,
+    create_udp_socket,
+    get_free_port,
     host_resolve_zero,
 )
 from vtelem.telemetry.environment import TelemetryEnvironment

@@ -5,9 +5,9 @@ vtelem - Contains a class for managing known enumeration sets.
 # built-in
 from collections import defaultdict
 from enum import IntEnum
-import logging
 from json import JSONEncoder
-from typing import Tuple, List, Type
+import logging
+from typing import List, Tuple, Type
 
 # internal
 from vtelem.classes import DEFAULTS

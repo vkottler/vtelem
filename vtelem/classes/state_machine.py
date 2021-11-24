@@ -6,11 +6,12 @@ vtelem - A module for orchestrating state-machine implementation.
 from collections import defaultdict
 from contextlib import contextmanager
 import logging
-from typing import Dict, List, Iterator, Tuple, Optional
+from typing import Dict, Iterator, List, Optional, Tuple
 
 # internal
 from vtelem.channel.group import ChannelGroup
 from vtelem.telemetry.environment import TelemetryEnvironment
+
 from . import DEFAULTS
 from .state import State
 from .time_entity import LockEntity

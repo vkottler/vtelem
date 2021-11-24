@@ -9,15 +9,15 @@ import time
 # third-party
 import websockets
 
-# module under test
-from vtelem.channel.framer import build_dummy_frame
-from vtelem.stream import queue_get
-from vtelem.stream.writer import default_writer
-from vtelem.daemon.websocket_telemetry import WebsocketTelemetryDaemon
-from vtelem.mtu import get_free_tcp_port
-
 # internal
 from tests import writer_environment
+
+# module under test
+from vtelem.channel.framer import build_dummy_frame
+from vtelem.daemon.websocket_telemetry import WebsocketTelemetryDaemon
+from vtelem.mtu import get_free_tcp_port
+from vtelem.stream import queue_get
+from vtelem.stream.writer import default_writer
 
 
 def test_websocket_telemetry_client_fn():

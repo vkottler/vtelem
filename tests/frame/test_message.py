@@ -3,8 +3,8 @@ vtelem - Test message frame correctness.
 """
 
 # module under test
-from vtelem.frame.message import MessageFrame, frames_required
 from vtelem.frame.framer import Framer
+from vtelem.frame.message import MessageFrame, frames_required
 from vtelem.telemetry.environment import TelemetryEnvironment
 from vtelem.types.frame import MessageType
 

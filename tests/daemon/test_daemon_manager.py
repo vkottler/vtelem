@@ -5,15 +5,15 @@ vtelem - Test the correctness of the daemon manager.
 # built-in
 import json
 
-# module under test
-from vtelem.daemon import DaemonOperation, DaemonState
-from vtelem.daemon.manager import DaemonManager
-from vtelem.daemon.command_queue import CommandQueueDaemon
-from vtelem.classes.time_keeper import TimeKeeper
-from vtelem.factories.daemon_manager import create_daemon_manager_commander
-
 # internal
-from tests import make_queue_cb, command_result
+from tests import command_result, make_queue_cb
+
+# module under test
+from vtelem.classes.time_keeper import TimeKeeper
+from vtelem.daemon import DaemonOperation, DaemonState
+from vtelem.daemon.command_queue import CommandQueueDaemon
+from vtelem.daemon.manager import DaemonManager
+from vtelem.factories.daemon_manager import create_daemon_manager_commander
 
 
 def get_test_manager() -> DaemonManager:

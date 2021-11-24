@@ -3,8 +3,8 @@ vtelem - Test the channel-group registry's correctness.
 """
 
 # module under test
-from vtelem.enums.primitive import Primitive
 from vtelem.channel.group_registry import ChannelGroupRegistry
+from vtelem.enums.primitive import Primitive
 from vtelem.telemetry.environment import TelemetryEnvironment
 
 # internal

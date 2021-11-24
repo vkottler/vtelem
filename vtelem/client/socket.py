@@ -6,15 +6,15 @@ vtelem - A daemon that provides decoded telemetry frames into a queue, from a
 # built-in
 import logging
 from queue import Queue
-from socket import timeout, SocketType
+from socket import SocketType, timeout
 from typing import Callable
 
 # internal
-from vtelem.mtu import DEFAULT_MTU
 from vtelem.channel.registry import ChannelRegistry
 from vtelem.classes.type_primitive import TypePrimitive, new_default
 from vtelem.client import TelemetryClient
 from vtelem.daemon import DaemonBase, DaemonState
+from vtelem.mtu import DEFAULT_MTU
 from vtelem.telemetry.environment import TelemetryEnvironment
 
 LOG = logging.getLogger(__name__)

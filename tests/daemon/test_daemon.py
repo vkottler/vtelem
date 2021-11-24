@@ -6,10 +6,9 @@ vtelem - Test the daemon class's correctness.
 import time
 
 # module under test
-from vtelem.daemon import DaemonState
-from vtelem.daemon.synchronous import Daemon
 from vtelem.classes.time_keeper import TimeKeeper
-from vtelem.daemon import DaemonOperation
+from vtelem.daemon import DaemonOperation, DaemonState
+from vtelem.daemon.synchronous import Daemon
 
 
 def test_daemon_callbacks():

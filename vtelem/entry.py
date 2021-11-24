@@ -1,7 +1,7 @@
 # =====================================
 # generator=datazen
-# version=1.7.11
-# hash=cbd385123e52c803c5dff3fceab24b89
+# version=1.9.4
+# hash=cb981b5a5f293d8f07d0d8a1fa549f21
 # =====================================
 
 """
@@ -16,8 +16,8 @@ import sys
 from typing import List
 
 # internal
-from vtelem import VERSION, DESCRIPTION
-from vtelem.app import entry, add_app_args
+from vtelem import DESCRIPTION, VERSION
+from vtelem.app import add_app_args, entry
 
 
 def main(argv: List[str] = None) -> int:

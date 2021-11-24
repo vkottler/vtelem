@@ -4,7 +4,7 @@ vtelem - A class for managing application time.
 
 # built-in
 import time
-from typing import Callable, List, Any
+from typing import Any, Callable, List
 
 # internal
 from vtelem.daemon.synchronous import Daemon

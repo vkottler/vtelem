@@ -6,12 +6,12 @@ vtelem - Exposes a base class for building http services that can be managed
 # built-in
 from http.server import (
     BaseHTTPRequestHandler,
-    ThreadingHTTPServer,
     SimpleHTTPRequestHandler,
+    ThreadingHTTPServer,
 )
 import logging
 import ssl
-from typing import Type, Optional
+from typing import Optional, Type
 
 # internal
 from vtelem.classes.http_request_mapper import HttpRequestMapper, RequestHandle

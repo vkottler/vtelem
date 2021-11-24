@@ -7,10 +7,10 @@ vtelem - A module that implements storage for channel data, restricted by
 from typing import Any
 
 # internal
-from vtelem.enums.primitive import Primitive, get_size
 from vtelem.classes import DEFAULTS, EventType
 from vtelem.classes.byte_buffer import ByteBuffer
 from vtelem.classes.type_primitive import TypePrimitive, new_default
+from vtelem.enums.primitive import Primitive, get_size
 from vtelem.frame import Frame, time_to_int
 
 

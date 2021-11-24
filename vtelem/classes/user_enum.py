@@ -5,7 +5,7 @@ vtelem - Implements an object for storing a runtime enumeration.
 # built-in
 from collections import defaultdict
 from enum import IntEnum
-from typing import cast, Dict, Callable, Iterator, Optional, Type
+from typing import Callable, Dict, Iterator, Optional, Type, cast
 
 # internal
 from vtelem.classes import DEFAULTS
@@ -17,7 +17,7 @@ from vtelem.classes.serdes import (
 )
 from vtelem.classes.type_primitive import TypePrimitive, new_default
 from vtelem.enums.primitive import get_size
-from vtelem.names import to_snake, class_to_snake
+from vtelem.names import class_to_snake, to_snake
 from vtelem.schema.manager import SchemaManager
 
 IntStrMap = Dict[int, str]

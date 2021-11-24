@@ -10,18 +10,6 @@ import threading
 from typing import Any, Dict, Iterator
 
 # internal
-from vtelem.mtu import discover_ipv4_mtu, mtu_to_usable, DEFAULT_MTU, Host
-from vtelem.factories.daemon_manager import create_daemon_manager_commander
-from vtelem.factories.telemetry_environment import create_channel_commander
-from vtelem.factories.telemetry_server import register_http_handlers
-from vtelem.factories.udp_client_manager import create_udp_client_commander
-from vtelem.factories.websocket_daemon import commandable_websocket_daemon
-from vtelem.types.telemetry_server import (
-    AppSetup,
-    AppLoop,
-    TelemetryServices,
-    default_services,
-)
 from vtelem.channel.group_registry import ChannelGroupRegistry
 from vtelem.classes.http_request_mapper import MapperAwareRequestHandler
 from vtelem.classes.time_keeper import TimeKeeper
@@ -30,12 +18,24 @@ from vtelem.daemon import DaemonOperation
 from vtelem.daemon.command_queue import CommandQueueDaemon
 from vtelem.daemon.http import HttpDaemon
 from vtelem.daemon.manager import DaemonManager
-from vtelem.daemon.telemetry import TelemetryDaemon
 from vtelem.daemon.synchronous import Daemon
-from vtelem.daemon.websocket_telemetry import WebsocketTelemetryDaemon
 from vtelem.daemon.tcp_telemetry import TcpTelemetryDaemon
+from vtelem.daemon.telemetry import TelemetryDaemon
+from vtelem.daemon.websocket_telemetry import WebsocketTelemetryDaemon
+from vtelem.factories.daemon_manager import create_daemon_manager_commander
+from vtelem.factories.telemetry_environment import create_channel_commander
+from vtelem.factories.telemetry_server import register_http_handlers
+from vtelem.factories.udp_client_manager import create_udp_client_commander
+from vtelem.factories.websocket_daemon import commandable_websocket_daemon
+from vtelem.mtu import DEFAULT_MTU, Host, discover_ipv4_mtu, mtu_to_usable
 from vtelem.registry.service import ServiceRegistry
 from vtelem.stream.writer import StreamWriter
+from vtelem.types.telemetry_server import (
+    AppLoop,
+    AppSetup,
+    TelemetryServices,
+    default_services,
+)
 
 
 class TelemetryServer(HttpDaemon):

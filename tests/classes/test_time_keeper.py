@@ -9,8 +9,8 @@ import signal
 import time
 
 # module under test
-from vtelem.classes.time_keeper import TimeKeeper
 from vtelem.classes.time_entity import TimeEntity
+from vtelem.classes.time_keeper import TimeKeeper
 from vtelem.daemon import DaemonState
 
 

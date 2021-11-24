@@ -9,7 +9,7 @@ import logging
 from pathlib import Path
 from queue import Queue
 from tempfile import NamedTemporaryFile
-from typing import NamedTuple, List, Optional, Iterator, Tuple
+from typing import Iterator, List, NamedTuple, Optional, Tuple
 
 # internal
 from vtelem.channel.registry import ChannelRegistry

@@ -4,8 +4,8 @@ vtelem - A daemon that provides decoded telemetry frames into a queue, from a
 """
 
 # built-in
-import socket
 from queue import Queue
+import socket
 
 # internal
 from vtelem.channel.registry import ChannelRegistry

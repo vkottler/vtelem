@@ -5,15 +5,16 @@ vtelem - Test the telemetry-environment factory functions.
 # built-in
 from queue import Queue
 
+# internal
+from tests.classes import EnumA
+
+from tests import command_result, make_queue_cb
+
 # module under test
 from vtelem.daemon.command_queue import CommandQueueDaemon
 from vtelem.enums.primitive import Primitive, get_name
 from vtelem.factories.telemetry_environment import create_channel_commander
 from vtelem.telemetry.environment import TelemetryEnvironment
-
-# internal
-from tests import command_result, make_queue_cb
-from tests.classes import EnumA
 
 
 def assert_get_id(

@@ -4,7 +4,7 @@ vtelem - A daemon that provides decoded telemetry frames into a queue, from a
 """
 
 # built-in
-from asyncio import ensure_future, Task
+from asyncio import Task, ensure_future
 import logging
 from queue import Queue
 from typing import Any, Optional

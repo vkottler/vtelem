@@ -10,9 +10,9 @@ from typing import List
 # internal
 from vtelem.channel.registry import ChannelRegistry
 from vtelem.classes.type_primitive import TypePrimitive
-from vtelem.parsing.encapsulation import decode_frame
 from vtelem.frame.processor import FrameProcessor
 from vtelem.mtu import DEFAULT_MTU
+from vtelem.parsing.encapsulation import decode_frame
 
 LOG = logging.getLogger(__name__)
 

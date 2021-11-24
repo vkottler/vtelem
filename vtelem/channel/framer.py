@@ -5,14 +5,14 @@ vtelem - A module for building frames of channel data from emissions.
 # built-in
 import logging
 from queue import Queue
-from typing import Tuple, List
+from typing import List, Tuple
 
 # internal
-from vtelem.enums.primitive import Primitive
 from vtelem.channel import Channel
 from vtelem.channel.registry import ChannelRegistry
 from vtelem.classes.event_queue import EventQueue
 from vtelem.classes.time_entity import OptionalRLock
+from vtelem.enums.primitive import Primitive
 from vtelem.frame import Frame
 from vtelem.frame.channel import ChannelFrame
 from vtelem.frame.framer import Framer

@@ -3,7 +3,7 @@ vtelem - Type definition for use with serializables.
 """
 
 # built-in
-from typing import Union, Dict, List
+from typing import Dict, List, Union
 
 # See RFC 8259.
 ObjectKey = Union[int, str]

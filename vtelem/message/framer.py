@@ -3,8 +3,8 @@ vtelem - A module exposing message serialization methods.
 """
 
 # built-in
-from json import dumps, JSONEncoder
-from typing import Dict, Tuple, Sequence, Type
+from json import JSONEncoder, dumps
+from typing import Dict, Sequence, Tuple, Type
 
 # internal
 from vtelem.classes.serdes import ObjectData, Serializable

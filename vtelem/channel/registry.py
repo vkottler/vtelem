@@ -6,8 +6,8 @@ vtelem - A module for managing channel registrations.
 from typing import List, Tuple
 
 # internal
-from vtelem.enums.primitive import Primitive
 from vtelem.channel import Channel, ChannelEncoder
+from vtelem.enums.primitive import Primitive
 from vtelem.registry import Registry
 
 

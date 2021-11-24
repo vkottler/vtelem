@@ -3,7 +3,7 @@ vtelem - A module providing utilities for parsing frames.
 """
 
 # built-in
-from typing import cast, List
+from typing import List, cast
 
 # internal
 from vtelem.classes.byte_buffer import ByteBuffer

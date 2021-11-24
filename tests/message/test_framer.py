@@ -6,14 +6,14 @@ vtelem - Test message framer correctness.
 import json
 from typing import List
 
-# module under test
-from vtelem.classes.user_enum import user_enum, UserEnum
-from vtelem.frame.fields import to_parsed
-from vtelem.message.cache import from_temp_dir
-from vtelem.types.frame import ParsedFrame, MessageType
-
 # internal
 from tests.message import LONG_MESSAGE, create_env, parse_frames
+
+# module under test
+from vtelem.classes.user_enum import UserEnum, user_enum
+from vtelem.frame.fields import to_parsed
+from vtelem.message.cache import from_temp_dir
+from vtelem.types.frame import MessageType, ParsedFrame
 
 
 def cache_message_str(

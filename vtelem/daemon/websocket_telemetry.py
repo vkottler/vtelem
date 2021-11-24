@@ -10,12 +10,12 @@ from typing import Any, Optional, Tuple
 from websockets.exceptions import WebSocketException
 
 # internal
-from vtelem.stream.writer import StreamWriter, QueueClientManager
 from vtelem.client.websocket import WebsocketClient
 from vtelem.daemon.websocket import WebsocketDaemon
 from vtelem.frame.channel import ChannelFrame
-from vtelem.mtu import Host, DEFAULT_MTU
+from vtelem.mtu import DEFAULT_MTU, Host
 from vtelem.stream import queue_get
+from vtelem.stream.writer import QueueClientManager, StreamWriter
 from vtelem.telemetry.environment import TelemetryEnvironment
 
 

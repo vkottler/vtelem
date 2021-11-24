@@ -1,7 +1,7 @@
 # =====================================
 # generator=datazen
-# version=1.7.11
-# hash=983aa7017890602bda755a6b27d8aae1
+# version=1.9.4
+# hash=66e354225a2442bd48a32123c0cba8e9
 # =====================================
 
 """
@@ -9,11 +9,13 @@ vtelem - Package definition for distribution.
 """
 
 # third-party
-from vmklib.setup import setup
+try:
+    from vmklib.setup import setup
+except (ImportError, ModuleNotFoundError):
+    from vtelem_bootstrap.setup import setup  # type: ignore
 
 # internal
-from vtelem import PKG_NAME, VERSION, DESCRIPTION
-
+from vtelem import DESCRIPTION, PKG_NAME, VERSION
 
 author_info = {
     "name": "Vaughn Kottler",

@@ -7,10 +7,10 @@ from json import JSONEncoder
 from typing import Any, Optional
 
 # internal
-from vtelem.enums.primitive import Primitive
 from vtelem.classes import EventType
-from vtelem.classes.type_primitive import TypePrimitive
 from vtelem.classes.event_queue import EventQueue
+from vtelem.classes.type_primitive import TypePrimitive
+from vtelem.enums.primitive import Primitive
 
 
 class Channel(TypePrimitive):

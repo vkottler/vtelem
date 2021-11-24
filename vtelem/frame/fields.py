@@ -9,7 +9,6 @@ from typing import List, NamedTuple
 from vtelem.classes import DEFAULTS
 from vtelem.types.frame import FieldType, MessageType
 
-
 MESSAGE_FIELDS: List[FieldType] = [
     FieldType("message_type", DEFAULTS["enum"]),
     FieldType("message_number", DEFAULTS["id"]),

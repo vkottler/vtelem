@@ -9,8 +9,8 @@ import signal
 import time
 
 # third-party
-import requests
 import pytest
+import requests
 
 # internal
 from tests.resources import get_resource

@@ -10,8 +10,8 @@ from typing import Callable, Dict, Type
 # internal
 from vtelem.classes import DEFAULTS
 from vtelem.classes.type_primitive import TypePrimitive, new_default
-from vtelem.enums.primitive import random_integer
 from vtelem.enums.frame import FRAME_TYPES
+from vtelem.enums.primitive import random_integer
 from vtelem.frame import Frame, time_to_int
 from vtelem.frame.channel import ChannelFrame
 from vtelem.frame.message import MessageFrame

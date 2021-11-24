@@ -1,7 +1,7 @@
 # =====================================
 # generator=datazen
-# version=1.7.11
-# hash=ca376242c43e745908cf43cf52d2f059
+# version=1.9.4
+# hash=e82122bb683e32a9f7a7add208f34950
 # =====================================
 """
 vtelem - Useful type definitions for working with frames.
@@ -19,9 +19,9 @@ from vtelem.enums.primitive import Primitive
 class FrameType(IntEnum):
     """An enumeration for possible frame types."""
 
-    INVALID = 0
     DATA = 1
     EVENT = 2
+    INVALID = 0
     MESSAGE = 3
     STREAM = 4
 

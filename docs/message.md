@@ -1,8 +1,8 @@
 <!--
     =====================================
     generator=datazen
-    version=1.7.11
-    hash=cbdb63428fd5a6c6c9a7e21143310764
+    version=1.9.4
+    hash=5986e333e4611fde732fb78e7af829b4
     =====================================
 -->
 
@@ -68,22 +68,11 @@ possible that new frame types will be added.
 
 Name | Value | Description
 -----|-------|------------
-[`invalid`](#invalid) | 0 | A frame type of zero is not considered any kind of frame, though it is sometimes useful to use when testing protocol or client/server machinery without any real data to transfer.
 [`data`](#data) | 1 | A simple frame containing an array of channel indices followed by channel data appearing in the same order as indicated by the array of indices.
 [`event`](#event) | 2 | A simple frame containing an array of channel indices followed by an "event" structure containing a "previous" and "current" pair of values and timestamps. This frame is useful for data that warrants asynchronous updates more than synchronous ones.
+[`invalid`](#invalid) | 0 | A frame type of zero is not considered any kind of frame, though it is sometimes useful to use when testing protocol or client/server machinery without any real data to transfer.
 [`message`](#message) | 3 | A frame containing bytes for one portion of a variable-length message.
 [`stream`](#stream) | 4 | A frame containing bytes from a stream channel starting at a provided index.
-
-### Invalid
-
-No further interpretation of an `invalid` frame can be made. If a client
-is expecting to process real data and encounters this frame, discard and
-move on to the next delivery of the frame-encapsulating transmission.
-
-If the transport mechanism is stream-oriented and can't distinguish
-discrete transmissions, the client should close the stream and indicate
-error.
-
 
 ### Data
 
@@ -125,6 +114,17 @@ appeared where an event structure is as follows:
 
 `channel_id[0]` | . . . | `channel_id[size - 1]` | `channel_event[0]` | . . . | `channel_event[size - 1]`
 ----------------|-------|------------------------|--------------------|-------|--------------------------
+
+
+### Invalid
+
+No further interpretation of an `invalid` frame can be made. If a client
+is expecting to process real data and encounters this frame, discard and
+move on to the next delivery of the frame-encapsulating transmission.
+
+If the transport mechanism is stream-oriented and can't distinguish
+discrete transmissions, the client should close the stream and indicate
+error.
 
 
 ### Message

@@ -4,15 +4,15 @@ vtelem - A module for generic test utilities.
 
 # built-in
 from queue import Queue
-from typing import cast, Tuple
+from typing import Tuple, cast
 
 # internal
 from vtelem.classes.udp_client_manager import UdpClientManager
 from vtelem.daemon.command_queue import CommandQueueDaemon
 from vtelem.daemon.websocket_telemetry import queue_get
+from vtelem.stream.writer import StreamWriter, default_writer
 from vtelem.telemetry.environment import TelemetryEnvironment
 from vtelem.types.command_queue_daemon import ResultCbType
-from vtelem.stream.writer import StreamWriter, default_writer
 
 
 def writer_environment(

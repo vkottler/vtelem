@@ -7,7 +7,7 @@ from typing import FrozenSet
 
 # internal
 from vtelem.classes.serdes import Serializable
-from vtelem.enums.primitive import Primitive, to_dict, get_name
+from vtelem.enums.primitive import Primitive, get_name, to_dict
 from vtelem.types.serializable import ObjectData
 
 

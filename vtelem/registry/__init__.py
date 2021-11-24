@@ -5,8 +5,8 @@ vtelem - A generic registrar implementation.
 # built-in
 from collections import defaultdict
 import json
-from typing import TypeVar, Generic, Tuple, Optional, Dict, List, Any
 import threading
+from typing import Any, Dict, Generic, List, Optional, Tuple, TypeVar
 
 # internal
 from vtelem.classes.serdes import DEFAULT_INDENT

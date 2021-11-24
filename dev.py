@@ -1,4 +1,3 @@
-
 """
 vtelem - Useful script entry-point.
 """
@@ -8,7 +7,6 @@ import sys
 
 # internal
 from vtelem.entry import main
-
 
 if __name__ == "__main__":
     sys.exit(main(sys.argv))

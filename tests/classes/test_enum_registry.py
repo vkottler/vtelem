@@ -5,13 +5,13 @@ vtelem - Test the enum-registry class's correctness.
 # built-in
 from enum import Enum
 
-# module under test
-from vtelem.classes.user_enum import from_enum, user_enum
-from vtelem.registry.type import get_default
-from vtelem.registry.enum import EnumRegistry
-
 # internal
 from tests.classes.test_serdes import is_serializable
+
+# module under test
+from vtelem.classes.user_enum import from_enum, user_enum
+from vtelem.registry.enum import EnumRegistry
+from vtelem.registry.type import get_default
 
 
 def test_from_enum():

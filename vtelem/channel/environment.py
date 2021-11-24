@@ -5,20 +5,20 @@ vtelem - Exposes a runtime environment for managing sets of channels.
 # built-in
 from collections import defaultdict
 import logging
-from typing import Any, List, Tuple, Dict, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 # internal
-from vtelem.enums.primitive import Primitive
-from vtelem.parsing.encapsulation import decode_frame, ParsedFrame
 from vtelem.channel import Channel
-from vtelem.channel.registry import ChannelRegistry
 from vtelem.channel.framer import ChannelFramer
+from vtelem.channel.registry import ChannelRegistry
 from vtelem.classes import LOG_PERIOD
 from vtelem.classes.event_queue import EventQueue
 from vtelem.classes.metered_queue import MeteredQueue
 from vtelem.classes.time_entity import TimeEntity
 from vtelem.classes.type_primitive import TypePrimitive
+from vtelem.enums.primitive import Primitive
 from vtelem.frame.channel import ChannelFrame
+from vtelem.parsing.encapsulation import ParsedFrame, decode_frame
 from vtelem.registry import Registry
 
 LOG = logging.getLogger(__name__)

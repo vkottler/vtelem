@@ -14,6 +14,7 @@ from vtelem.enums.primitive import (
     default_val,
     get_size,
 )
+
 from . import DEFAULTS
 from .byte_buffer import ByteBuffer
 

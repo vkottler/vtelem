@@ -7,6 +7,9 @@ import socket
 import time
 from typing import Tuple
 
+# internal
+from tests import writer_environment
+
 # module under test
 from vtelem.channel.framer import build_dummy_frame
 from vtelem.classes.metered_queue import MeteredQueue
@@ -15,11 +18,8 @@ from vtelem.daemon.tcp_telemetry import TcpTelemetryDaemon
 from vtelem.frame.framer import Framer
 from vtelem.mtu import Host
 from vtelem.stream import queue_get, queue_get_none
-from vtelem.stream.writer import default_writer, StreamWriter
+from vtelem.stream.writer import StreamWriter, default_writer
 from vtelem.telemetry.environment import TelemetryEnvironment
-
-# internal
-from tests import writer_environment
 
 
 def tcp_env(

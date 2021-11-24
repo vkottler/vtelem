@@ -8,8 +8,8 @@ from typing import Dict
 
 # third-party
 from cerberus import Validator
-from datazen.parsing import load
 from datazen.load import load_dir
+from datazen.parsing import load
 
 SchemaMap = Dict[str, Validator]
 

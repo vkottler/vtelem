@@ -4,7 +4,7 @@ vtelem - Parsing frames into runtime data.
 
 # built-in
 import logging
-from typing import cast, Optional, Tuple
+from typing import Optional, Tuple, cast
 
 # internal
 from vtelem.channel.registry import ChannelRegistry
@@ -12,8 +12,8 @@ from vtelem.classes import DEFAULTS
 from vtelem.classes.byte_buffer import ByteBuffer
 from vtelem.classes.type_primitive import TypePrimitive
 from vtelem.enums.frame import PARSERS
-from vtelem.types.frame import FrameType, FrameHeader, FrameFooter, ParsedFrame
 from vtelem.enums.primitive import get_size
+from vtelem.types.frame import FrameFooter, FrameHeader, FrameType, ParsedFrame
 
 LOG = logging.getLogger(__name__)
 

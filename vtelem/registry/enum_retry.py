@@ -4,10 +4,10 @@ vtelem - A module providing assets for managing enumerations at runtime.
 
 # built-in
 from enum import IntEnum
-from typing import cast, Dict, Type
+from typing import Dict, Type, cast
 
 # internal
-from vtelem.classes.serdes import Serializable, ObjectData, max_key, ObjectMap
+from vtelem.classes.serdes import ObjectData, ObjectMap, Serializable, max_key
 from vtelem.classes.time_entity import LockEntity
 from vtelem.classes.user_enum import UserEnum, from_enum
 

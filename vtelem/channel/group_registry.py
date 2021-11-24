@@ -4,11 +4,11 @@ vtelem - Allows channel groups to be managed by a single entity.
 
 # built-in
 from contextlib import contextmanager
-from typing import Dict, Iterator, Any
+from typing import Any, Dict, Iterator
 
 # internal
-from vtelem.enums.primitive import Primitive
 from vtelem.channel.group import ChannelGroup
+from vtelem.enums.primitive import Primitive
 from vtelem.registry import Registry
 from vtelem.telemetry.environment import TelemetryEnvironment
 

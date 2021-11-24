@@ -3,8 +3,8 @@ vtelem - Test the channel group class's correctness.
 """
 
 # module under test
-from vtelem.enums.primitive import Primitive
 from vtelem.channel.group import ChannelGroup
+from vtelem.enums.primitive import Primitive
 from vtelem.telemetry.environment import TelemetryEnvironment
 
 # internal

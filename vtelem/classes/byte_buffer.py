@@ -9,7 +9,7 @@ from typing import Any, Iterator
 import zlib
 
 # internal
-from vtelem.enums.primitive import Primitive, get_size, get_fstring
+from vtelem.enums.primitive import Primitive, get_fstring, get_size
 
 
 def crc(data: bytes, size: int = None, initial_val: int = 0) -> int:

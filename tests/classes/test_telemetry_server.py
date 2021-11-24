@@ -14,7 +14,7 @@ import websockets
 
 # module under test
 from vtelem.frame import FRAME_OVERHEAD
-from vtelem.mtu import get_free_tcp_port, Host
+from vtelem.mtu import Host, get_free_tcp_port
 from vtelem.telemetry.server import TelemetryServer
 from vtelem.types.telemetry_server import Service, default_services
 

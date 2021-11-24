@@ -5,17 +5,17 @@ vtelem - Test the telemetry proxy's correctness.
 # built-in
 import time
 
-# module under test
-from vtelem.channel.framer import Framer, build_dummy_frame
-from vtelem.stream import queue_get, queue_get_none
-from vtelem.stream.writer import default_writer
-from vtelem.classes.udp_client_manager import UdpClientManager
-from vtelem.mtu import DEFAULT_MTU, Host
-from vtelem.telemetry.environment import TelemetryEnvironment
-from vtelem.client.udp import UdpClient, create
-
 # internal
 from tests import udp_client_environment
+
+# module under test
+from vtelem.channel.framer import Framer, build_dummy_frame
+from vtelem.classes.udp_client_manager import UdpClientManager
+from vtelem.client.udp import UdpClient, create
+from vtelem.mtu import DEFAULT_MTU, Host
+from vtelem.stream import queue_get, queue_get_none
+from vtelem.stream.writer import default_writer
+from vtelem.telemetry.environment import TelemetryEnvironment
 
 
 def test_udp_client_create():

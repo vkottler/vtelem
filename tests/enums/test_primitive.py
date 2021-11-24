@@ -5,10 +5,10 @@ vtelem - Test the correctness of primitive information.
 # module under test
 from vtelem.classes.type_primitive import TypePrimitive
 from vtelem.enums.primitive import (
+    INTEGER_PRIMITIVES,
     Primitive,
     integer_can_hold,
     random_integer,
-    INTEGER_PRIMITIVES,
 )
 
 

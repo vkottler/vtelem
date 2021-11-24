@@ -6,16 +6,15 @@ vtelem - A definition of the supported frame types for this library.
 from typing import Callable, Dict
 
 # internal
-from vtelem.classes.byte_buffer import ByteBuffer
 from vtelem.channel.registry import ChannelRegistry
+from vtelem.classes.byte_buffer import ByteBuffer
 from vtelem.classes.user_enum import from_enum
 from vtelem.parsing.frames import (
 {% for item in frames["entries"] %}
     parse_{{item["name"]}}_frame,
 {% endfor %}
 )
-from vtelem.types.frame import FrameType, FrameHeader
-
+from vtelem.types.frame import FrameHeader, FrameType
 
 FrameParser = Callable[[FrameHeader, ByteBuffer, ChannelRegistry], dict]
 PARSERS: Dict[FrameType, FrameParser] = {

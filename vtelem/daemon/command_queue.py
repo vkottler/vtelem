@@ -8,18 +8,18 @@ from collections import defaultdict
 import json
 import logging
 from threading import Semaphore
-from typing import Any, Dict, List, Tuple, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 # internal
-from vtelem.types.command_queue_daemon import (
-    ConsumerType,
-    ResultCbType,
-    HandlersType,
-)
 from vtelem.classes.metered_queue import create
 from vtelem.daemon.queue import QueueDaemon
 from vtelem.registry import DEFAULT_INDENT
 from vtelem.telemetry.environment import TelemetryEnvironment
+from vtelem.types.command_queue_daemon import (
+    ConsumerType,
+    HandlersType,
+    ResultCbType,
+)
 
 LOG = logging.getLogger(__name__)
 

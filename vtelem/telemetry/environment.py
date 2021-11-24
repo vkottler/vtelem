@@ -5,7 +5,7 @@ vtelem - An environment that supports management of telemetry.
 # built-in
 from collections import defaultdict
 from enum import IntEnum
-from typing import List, Dict, Type, Tuple, Optional
+from typing import Dict, List, Optional, Tuple, Type
 
 # internal
 from vtelem.channel import Channel

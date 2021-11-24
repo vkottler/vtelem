@@ -8,6 +8,7 @@ from typing import Callable, Optional
 # internal
 from vtelem.channel.group import ChannelGroup
 from vtelem.telemetry.environment import TelemetryEnvironment
+
 from . import DEFAULTS
 
 

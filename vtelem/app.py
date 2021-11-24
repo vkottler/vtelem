@@ -13,8 +13,8 @@ import netifaces  # type: ignore
 from vtelem.mtu import Host
 from vtelem.telemetry.server import TelemetryServer
 from vtelem.types.telemetry_server import (
-    TelemetryServices,
     Service,
+    TelemetryServices,
     default_services,
 )
 

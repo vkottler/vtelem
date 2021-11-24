@@ -6,7 +6,7 @@ vtelem - Test the maximum-transmission-unit size calculation module.
 import socket
 
 # module under test
-from vtelem.mtu import discover_ipv4_mtu, create_udp_socket
+from vtelem.mtu import create_udp_socket, discover_ipv4_mtu
 
 
 def test_mtu_discovery_basic():

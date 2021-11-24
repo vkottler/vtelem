@@ -3,7 +3,7 @@ vtelem - Contains a class for managing known services.
 """
 
 # built-in
-from typing import Tuple, List
+from typing import List, Tuple
 
 # internal
 from vtelem.registry import Registry

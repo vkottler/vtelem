@@ -6,8 +6,8 @@ vtelem - Test the frame-reader class's correctness.
 import time
 
 # module under test
-from vtelem.enums.primitive import Primitive
 from vtelem.enums.frame import FrameType
+from vtelem.enums.primitive import Primitive
 from vtelem.telemetry.environment import TelemetryEnvironment
 
 

@@ -4,13 +4,13 @@ vtelem - Tests for the enum registry module.
 
 # built-in
 
+# internal
+from tests.classes import EnumA
+
 # module under test
 from vtelem.classes.user_enum import from_enum
 from vtelem.registry.enum_retry import EnumRegistry
 from vtelem.schema.manager import SchemaManager
-
-# internal
-from tests.classes import EnumA
 
 
 def test_enum_registry_basic():

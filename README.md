@@ -1,8 +1,8 @@
 <!--
     =====================================
     generator=datazen
-    version=1.7.11
-    hash=732e7c16e74cb13ab2e51ff42f4cb486
+    version=1.9.4
+    hash=48a22a7827df0b466dd302b17779cf57
     =====================================
 -->
 
@@ -17,13 +17,15 @@
 # Command-line Options
 
 ```
-$ ./venv3.8/bin/vtelem -h
+$ ./venv3.7/bin/vtelem -h
 
-usage: vtelem [-h] [--version] [-v] [-C DIR] [-i {lo,enp0s25,wlo1}] [-p PORT]
-              [--ws-cmd-port WS_CMD_PORT] [--ws-tlm-port WS_TLM_PORT]
-              [--tcp-tlm-port TCP_TLM_PORT] [-t TICK]
-              [--telem-rate TELEM_RATE] [--metrics-rate METRICS_RATE]
-              [--time-scale TIME_SCALE] [-a APP_ID] [-u UPTIME]
+usage: vtelem [-h] [--version] [-v] [-C DIR]
+              [-i {lo,eno1,eno2,docker0,dummy0,eno1.3900,eno1.3910,eno1.3920,vcan-gidneyut-0,vcan-gidneyut-1,veth-test-1,veth-test-0}]
+              [-p PORT] [--ws-cmd-port WS_CMD_PORT]
+              [--ws-tlm-port WS_TLM_PORT] [--tcp-tlm-port TCP_TLM_PORT]
+              [-t TICK] [--telem-rate TELEM_RATE]
+              [--metrics-rate METRICS_RATE] [--time-scale TIME_SCALE]
+              [-a APP_ID] [-u UPTIME]
 
 A real-time telemetry library.
 
@@ -32,7 +34,7 @@ optional arguments:
   --version             show program's version number and exit
   -v, --verbose         set to increase logging verbosity
   -C DIR, --dir DIR     execute from a specific directory
-  -i {lo,enp0s25,wlo1}, --interface {lo,enp0s25,wlo1}
+  -i {lo,eno1,eno2,docker0,dummy0,eno1.3900,eno1.3910,eno1.3920,vcan-gidneyut-0,vcan-gidneyut-1,veth-test-1,veth-test-0}, --interface {lo,eno1,eno2,docker0,dummy0,eno1.3900,eno1.3910,eno1.3920,vcan-gidneyut-0,vcan-gidneyut-1,veth-test-1,veth-test-0}
                         interface to bind to
   -p PORT, --port PORT  http api port
   --ws-cmd-port WS_CMD_PORT

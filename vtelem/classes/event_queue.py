@@ -4,7 +4,7 @@ vtelem - A queue that stores change events that can be completely drained on
 """
 
 # built-in
-from queue import Queue, Full
+from queue import Full, Queue
 import threading
 from typing import List, Tuple
 

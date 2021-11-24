@@ -5,14 +5,14 @@ vtelem - Test the schema-manager module.
 # internal
 from pathlib import Path
 
+# internal
+from tests.classes.test_serdes import is_serializable
+from tests.resources import get_resource, get_test_schema
+
 # built-in
 from vtelem.classes.serdes import Serializable
 from vtelem.classes.user_enum import user_enum
 from vtelem.schema.manager import SchemaManager
-
-# internal
-from tests.classes.test_serdes import is_serializable
-from tests.resources import get_test_schema, get_resource
 
 
 def test_user_enum_schema():

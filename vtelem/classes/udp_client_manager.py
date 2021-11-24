@@ -5,11 +5,12 @@ vtelem - An interface for setting up and tearing down outgoing udp streams.
 # built-in
 import logging
 import socket
-from typing import Dict, List, Tuple, Any
+from typing import Any, Dict, List, Tuple
 
 # internal
-from vtelem.mtu import create_udp_socket, discover_mtu, Host
+from vtelem.mtu import Host, create_udp_socket, discover_mtu
 from vtelem.stream.writer import StreamWriter
+
 from .time_entity import LockEntity
 
 LOG = logging.getLogger(__name__)

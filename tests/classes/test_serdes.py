@@ -5,11 +5,11 @@ vtelem - Test the Serializable class's correctness.
 # third-party
 from cerberus import Validator
 
-# module under test
-from vtelem.classes.serdes import Serializable, SerializableParams
-
 # internal
 from tests.classes import KEYS, default_object
+
+# module under test
+from vtelem.classes.serdes import Serializable, SerializableParams
 
 
 def is_serializable(obj: Serializable) -> Serializable:

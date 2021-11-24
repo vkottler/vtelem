@@ -6,11 +6,11 @@ vtelem - Parsing specific frame payloads.
 import logging
 
 # internal
+from vtelem.channel.registry import ChannelRegistry
 from vtelem.classes import DEFAULTS
 from vtelem.classes.byte_buffer import ByteBuffer
-from vtelem.channel.registry import ChannelRegistry
-from vtelem.types.frame import FrameHeader
 from vtelem.frame.fields import MESSAGE_FIELDS
+from vtelem.types.frame import FrameHeader
 
 LOG = logging.getLogger(__name__)
 

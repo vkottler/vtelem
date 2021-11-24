@@ -8,15 +8,15 @@ from contextlib import contextmanager
 import logging
 import threading
 import time
-from typing import Any, Callable, Dict, Optional, Iterator
+from typing import Any, Callable, Dict, Iterator, Optional
 
 # internal
-from vtelem.enums.daemon import DaemonState, DaemonOperation, str_to_operation
-from vtelem.enums.primitive import Primitive
-from vtelem.names import class_to_snake
 from vtelem.classes import DEFAULTS
 from vtelem.classes.time_entity import TimeEntity
 from vtelem.classes.user_enum import from_enum
+from vtelem.enums.daemon import DaemonOperation, DaemonState, str_to_operation
+from vtelem.enums.primitive import Primitive
+from vtelem.names import class_to_snake
 from vtelem.telemetry.environment import TelemetryEnvironment
 
 LOG = logging.getLogger(__name__)
