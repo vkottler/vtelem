@@ -40,7 +40,7 @@ jobs:
           mk PYTHON_VERSION=${{matrix.python-version}} python-sa-types
       - name: sa
         run: |
-          mk PYTHON_VERSION=${{matrix.python-version}} python-sa
+          mk PYTHON_VERSION=${{matrix.python-version}} python-sa PY_LINT_EXTRA_ARGS="--no-incremental"
       - name: dist
         run: |
           mk PYTHON_VERSION=${{matrix.python-version}} python-dist

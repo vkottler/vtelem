@@ -1,34 +1,35 @@
+---
 renders:
-- name: "defaults.py"
-  output_dir: "{{project}}/classes"
-  output_path: "__init__.py"
-  dependencies:
-  - "compiles-local"
-- name: "primitive.py"
-  output_dir: "{{project}}/enums"
-  dependencies:
-  - "compiles-enums"
-- name: "frame.py"
-  output_dir: "{{project}}/enums"
-  dependencies:
-  - "compiles-enums"
-- name: "frame_types.py"
-  output_dir: "{{project}}/types"
-  output_path: "frame.py"
-  dependencies:
-  - "compiles-enums"
+  - name: "defaults.py"
+    output_dir: "{{project}}/classes"
+    output_path: "__init__.py"
+    dependencies:
+      - "compiles-local"
+  - name: "primitive.py"
+    output_dir: "{{project}}/enums"
+    dependencies:
+      - "compiles-enums"
+  - name: "frame.py"
+    output_dir: "{{project}}/enums"
+    dependencies:
+      - "compiles-enums"
+  - name: "frame_types.py"
+    output_dir: "{{project}}/types"
+    output_path: "frame.py"
+    dependencies:
+      - "compiles-enums"
 
-- name: "post_json.sh"
-  output_path: "release.sh"
-  dependencies:
-  - "compiles-release-post-data"
+  - name: "post_json.sh"
+    output_path: "release.sh"
+    dependencies:
+      - "compiles-release-post-data"
 
 groups:
-- name: "local-python"
-  dependencies:
-  - "renders-defaults.py"
-  - "renders-primitive.py"
-  - "renders-frame.py"
-  - "renders-frame_types.py"
-  - "renders-post_json.sh"
-  - "groups-python"
+  - name: "local-python"
+    dependencies:
+      - "renders-defaults.py"
+      - "renders-primitive.py"
+      - "renders-frame.py"
+      - "renders-frame_types.py"
+      - "renders-post_json.sh"
+      - "groups-python"

@@ -1,3 +1,4 @@
+---
 description: |
   The `name` value should be
   [snake case](https://en.wikipedia.org/wiki/Snake_case). Note that although
@@ -12,7 +13,7 @@ cerberus:
   type:
     type: string
     regex: "^user_enum$"
-  default: 
+  default:
     type: string
   mappings:
     type: dict

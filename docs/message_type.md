@@ -2,7 +2,7 @@
     =====================================
     generator=datazen
     version=1.9.4
-    hash=943116cbc50f3ad89bb285b9de51a831
+    hash=638974aba08f65e4cd23cb0c69197485
     =====================================
 -->
 
@@ -42,37 +42,38 @@ application-defined encapsulation.
 
 ### Text
 
-This message type contains text. It is discouraged to encode an additional
-layer of decoding assistance (such as a String identifier) within this
-generic message. It is also discouraged to perform "logging" with this
-message as [`stream`](message.md#stream) frames are intended for such
-use-cases. If and when text-based messages serve practical purposes for
-the protocol itself, they should exist as message types distinct from this
-one despite also containing text.
+This message type contains text. It is discouraged to encode an
+additional layer of decoding assistance (such as a String identifier)
+within this generic message. It is also discouraged to perform "logging"
+with this message as [`stream`](message.md#stream) frames are intended
+for such use-cases. If and when text-based messages serve practical
+purposes for the protocol itself, they should exist as message types
+distinct from this one despite also containing text.
 
 ### Json
 
 This message contains [JSON](https://www.json.org/json-en.html)-encoded
-data. Like the [`text`](message_type.md#text) message, if and when delivery
-of protocol or application metadata commonly bootstraps functionality, a
-new message type shall be defined and shall offer a supplementing schema.
+data. Like the [`text`](message_type.md#text) message, if and when
+delivery of protocol or application metadata commonly bootstraps
+functionality, a new message type shall be defined and shall offer a
+supplementing schema.
 
-Application's may use this message to send application data, but they must
-implement logic for determining the data's purpose.
+Application's may use this message to send application data, but they
+must implement logic for determining the data's purpose.
 
 ### Enum
 
-This message contains runtime enumeration data. Whether by using the `name`
-attribute (to identify a protocol-significant enumeration) or defining
-further protocol-specific messages, a runtime enumeration may have
-significance at the protocol level. Other enumerations may only be
+This message contains runtime enumeration data. Whether by using the
+`name` attribute (to identify a protocol-significant enumeration) or
+defining further protocol-specific messages, a runtime enumeration may
+have significance at the protocol level. Other enumerations may only be
 significant to the application or runtime context.
 
 ### Enum Registry
 
-This message contains a registry of runtime enumerations. Enumerations are
-mapped to integer identifiers so they can be referenced as integers when a
-type reference should be packed into a frame or message.
+This message contains a registry of runtime enumerations. Enumerations
+are mapped to integer identifiers so they can be referenced as integers
+when a type reference should be packed into a frame or message.
 
 ### Primitive
 

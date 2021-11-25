@@ -1,3 +1,4 @@
+---
 version: "uint8"
 enum: "uint8"
 timestamp: "uint64"

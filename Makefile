@@ -8,7 +8,7 @@ $(error target this Makefile with 'mk', not '$(MAKE)' ($(MK_INFO)))
 endif
 ###############################################################################
 
-.PHONY: all clean edit run run-help readme check-env release
+.PHONY: all clean edit lint run run-help readme check-env release
 
 .DEFAULT_GOAL := all
 
@@ -17,6 +17,8 @@ all: python-lint python-sa python-test mk-todo
 RUN_ARGS := -v -p 9000 -a 0.5
 
 edit: $(PY_PREFIX)edit
+
+lint: $(YAML_PREFIX)lint-local $(YAML_PREFIX)lint-manifest.yaml
 
 run: $(VENV_CONC)
 	@$(PYTHON_BIN)/python $($(PROJ)_DIR)/dev.py $(RUN_ARGS)

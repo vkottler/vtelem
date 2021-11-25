@@ -1,88 +1,79 @@
+---
 entries:
-- name: "boolean"
-  bytes: 1
-  signed: false
-  integer: false
-  python:
-    type: "bool"
-    serdes: "?"
-
-- name: "int8"
-  bytes: 1
-  signed: true
-  integer: true
-  python:
-    type: "int"
-    serdes: "b"
-
-- name: "uint8"
-  bytes: 1
-  signed: false
-  integer: true
-  python:
-    type: "int"
-    serdes: "B"
-
-- name: "int16"
-  bytes: 2
-  signed: true
-  integer: true
-  python:
-    type: "int"
-    serdes: "h"
-
-- name: "uint16"
-  bytes: 2
-  signed: false
-  integer: true
-  python:
-    type: "int"
-    serdes: "H"
-
-- name: "int32"
-  bytes: 4
-  signed: true
-  integer: true
-  python:
-    type: "int"
-    serdes: "i"
-
-- name: "uint32"
-  bytes: 4
-  signed: false
-  integer: true
-  python:
-    type: "int"
-    serdes: "I"
-
-- name: "int64"
-  bytes: 8
-  signed: true
-  integer: true
-  python:
-    type: "int"
-    serdes: "q"
-
-- name: "uint64"
-  bytes: 8
-  signed: false
-  integer: true
-  python:
-    type: "int"
-    serdes: "Q"
-
-- name: "float"
-  bytes: 4
-  signed: true
-  integer: false
-  python:
-    type: "float"
-    serdes: "f"
-
-- name: "double"
-  bytes: 8
-  signed: true
-  integer: false
-  python:
-    type: "float"
-    serdes: "d"
+  - name: "boolean"
+    bytes: 1
+    signed: false
+    integer: false
+    python:
+      type: "bool"
+      serdes: "?"
+  - name: "int8"
+    bytes: 1
+    signed: true
+    integer: true
+    python:
+      type: "int"
+      serdes: "b"
+  - name: "uint8"
+    bytes: 1
+    signed: false
+    integer: true
+    python:
+      type: "int"
+      serdes: "B"
+  - name: "int16"
+    bytes: 2
+    signed: true
+    integer: true
+    python:
+      type: "int"
+      serdes: "h"
+  - name: "uint16"
+    bytes: 2
+    signed: false
+    integer: true
+    python:
+      type: "int"
+      serdes: "H"
+  - name: "int32"
+    bytes: 4
+    signed: true
+    integer: true
+    python:
+      type: "int"
+      serdes: "i"
+  - name: "uint32"
+    bytes: 4
+    signed: false
+    integer: true
+    python:
+      type: "int"
+      serdes: "I"
+  - name: "int64"
+    bytes: 8
+    signed: true
+    integer: true
+    python:
+      type: "int"
+      serdes: "q"
+  - name: "uint64"
+    bytes: 8
+    signed: false
+    integer: true
+    python:
+      type: "int"
+      serdes: "Q"
+  - name: "float"
+    bytes: 4
+    signed: true
+    integer: false
+    python:
+      type: "float"
+      serdes: "f"
+  - name: "double"
+    bytes: 8
+    signed: true
+    integer: false
+    python:
+      type: "float"
+      serdes: "d"

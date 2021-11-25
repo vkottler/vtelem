@@ -1,3 +1,4 @@
+---
 description: |
   A registry for storing runtime enumerations (see also [UserEnum](#userenum)).
   A mapping of integers to enumeration names is provided so that a specific
