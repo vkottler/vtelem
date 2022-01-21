@@ -12,6 +12,7 @@ from queue import Queue
 from threading import Semaphore
 from typing import (
     Any,
+    BinaryIO,
     Callable,
     DefaultDict,
     Dict,
@@ -19,6 +20,7 @@ from typing import (
     List,
     Optional,
     Tuple,
+    Union,
     cast,
 )
 
@@ -33,6 +35,7 @@ from vtelem.mtu import Host
 from vtelem.telemetry.environment import TelemetryEnvironment
 
 LOG = logging.getLogger(__name__)
+Stream = Union[BinaryIO, BytesIO]
 
 
 class StreamWriter(QueueDaemon):
@@ -53,7 +56,7 @@ class StreamWriter(QueueDaemon):
 
         self.curr_id: int = 0
         self.queue_id: int = 0
-        self.streams: Dict[int, BytesIO] = {}
+        self.streams: Dict[int, Stream] = {}
         self.stream_attrs: Dict[int, Dict[str, bool]] = DefaultDict(
             lambda: DefaultDict(bool)
         )
@@ -158,7 +161,7 @@ class StreamWriter(QueueDaemon):
 
     def add_stream(
         self,
-        stream: BytesIO,
+        stream: Stream,
         stream_closer: Callable = None,
         flush: bool = False,
     ) -> int:
@@ -176,7 +179,7 @@ class StreamWriter(QueueDaemon):
     @contextmanager
     def stream_added(
         self,
-        stream: BytesIO,
+        stream: Stream,
         stream_closer: Callable = None,
         flush: bool = False,
     ) -> Iterator[None]:
@@ -196,11 +199,10 @@ class StreamWriter(QueueDaemon):
 
         mode = f"{'a' if append else 'w'}b"
         with path.open(mode) as stream:
-            stream = cast(BytesIO, stream)
-            with self.stream_added(stream, flush=flush):
+            with self.stream_added(cast(BinaryIO, stream), flush=flush):
                 yield
 
-    def add_semaphore_stream(self, stream: BytesIO) -> Tuple[int, Semaphore]:
+    def add_semaphore_stream(self, stream: Stream) -> Tuple[int, Semaphore]:
         """
         Add a stream that waits for a semaphore to increment when closing.
         """

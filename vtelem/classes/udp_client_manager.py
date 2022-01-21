@@ -5,7 +5,7 @@ vtelem - An interface for setting up and tearing down outgoing udp streams.
 # built-in
 import logging
 import socket
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Tuple, cast
 
 # internal
 from vtelem.mtu import Host, create_udp_socket, discover_mtu
@@ -71,7 +71,7 @@ class UdpClientManager(LockEntity):
         sock = create_udp_socket(host)
         mtu = discover_mtu(sock)
         mtu -= 60 + 8  # subtract ip and udp header space
-        sock_file = sock.makefile("wb")
+        sock_file = cast(socket.socket, sock).makefile("wb")
         sock_file.flush()
 
         with self.lock:

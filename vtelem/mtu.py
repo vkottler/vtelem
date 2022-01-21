@@ -43,7 +43,9 @@ class SocketConstants(IntEnum):
     IP_PMTUDISC_DO = 2
 
 
-def create_udp_socket(host: Host, is_client: bool = True) -> socket.SocketType:
+def create_udp_socket(
+    host: Host, is_client: bool = True, reuse: bool = True
+) -> socket.SocketType:
     """Create a UDP socket, set to a requested peer address."""
 
     assert sys.platform == "linux"
@@ -58,7 +60,10 @@ def create_udp_socket(host: Host, is_client: bool = True) -> socket.SocketType:
             sock.connect(("localhost", host[1]))
     else:
         sock.bind(host)
-    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
+    if reuse:
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
     return sock
 
 
@@ -100,7 +105,10 @@ def discover_mtu(
 
 
 def get_free_port(
-    kind: IntEnum, interface_ip: str = "0.0.0.0", test_port: int = 0
+    kind: IntEnum,
+    interface_ip: str = "0.0.0.0",
+    test_port: int = 0,
+    reuse: bool = True,
 ) -> int:
     """
     Create a socket to determine an arbitrary port number that's available.
@@ -111,7 +119,8 @@ def get_free_port(
 
     sock = socket.socket(socket.AF_INET, kind)
     sock.bind((host.address, host.port))
-    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    if reuse:
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     _, port = sock.getsockname()
     sock.close()
     return port
