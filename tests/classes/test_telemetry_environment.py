@@ -21,7 +21,7 @@ def test_environment_commanding():
     """Test that channels can be commanded when expected to be."""
 
     start_time = time.time()
-    env = TelemetryEnvironment(2 ** 8, start_time, 1.0)
+    env = TelemetryEnvironment(2**8, start_time, 1.0)
 
     env.add_channel("a", Primitive.FLOAT, 0.1)
     env.add_channel("b", Primitive.FLOAT, 0.1)
@@ -47,7 +47,7 @@ def test_environment_with_metrics():
     """Test that metrics channels are present when initialized."""
 
     start_time = time.time()
-    env = TelemetryEnvironment(2 ** 8, start_time, 1.0)
+    env = TelemetryEnvironment(2**8, start_time, 1.0)
     env.dispatch_now()
     env.advance_time(1.0)
     env.dispatch_now()
@@ -86,14 +86,14 @@ def test_create_environment():
     """Test that an environment can be created successfully."""
 
     start_time = time.time()
-    TelemetryEnvironment(2 ** 8, start_time)
+    TelemetryEnvironment(2**8, start_time)
 
 
 def test_create_many_channels():
     """Test an environment with many channels."""
 
     start_time = time.time()
-    env = TelemetryEnvironment(2 ** 8, start_time)
+    env = TelemetryEnvironment(2**8, start_time)
 
     chan_ids = []
     for i in range(1000):
@@ -114,7 +114,7 @@ def test_telemetry_environment_basic():
     start_time = time.time()
     chan_1 = Channel("chan_1", Primitive.BOOLEAN, 0.5)
     chan_2 = Channel("chan_2", Primitive.FLOAT, 0.25)
-    env = TelemetryEnvironment(2 ** 8, start_time, None, [chan_1, chan_2])
+    env = TelemetryEnvironment(2**8, start_time, None, [chan_1, chan_2])
 
     # add some basic enums
     env.add_enum(user_enum("a", {0: "a", 1: "b", 2: "c"}))

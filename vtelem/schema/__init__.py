@@ -8,8 +8,8 @@ from typing import Dict
 
 # third-party
 from cerberus import Validator
+from datazen.code import ARBITER
 from datazen.load import load_dir
-from datazen.parsing import load
 
 SchemaMap = Dict[str, Validator]
 
@@ -17,10 +17,7 @@ SchemaMap = Dict[str, Validator]
 def load_schema(path: Path, **kwargs) -> Validator:
     """Load data from a file and create a schema validator from it."""
 
-    assert path.is_file()
-    data, loaded = load(str(path), {}, {}, is_template=False)
-    assert loaded
-    return Validator(data, **kwargs)
+    return Validator(ARBITER.decode(path, require_success=True).data, **kwargs)
 
 
 def load_schema_dir(path: Path, **kwargs) -> SchemaMap:

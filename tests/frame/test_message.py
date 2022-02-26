@@ -13,7 +13,7 @@ def test_message_frame_basic():
     """Test simple message-frame operations."""
 
     basis = 0.5
-    env = TelemetryEnvironment(2 ** 8, 0.0, app_id_basis=basis, use_crc=False)
+    env = TelemetryEnvironment(2**8, 0.0, app_id_basis=basis, use_crc=False)
     framer = Framer(64, basis, False)
     frame = framer.new_frame("message", 0.0)
     assert isinstance(frame, MessageFrame)

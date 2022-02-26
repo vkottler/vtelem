@@ -15,7 +15,7 @@ def test_read_frame_basic():
     """Test that frames can be correctly read."""
 
     start_time = time.time()
-    env = TelemetryEnvironment(2 ** 8, start_time)
+    env = TelemetryEnvironment(2**8, start_time)
 
     chan_ids = []
     for i in range(10):
@@ -28,7 +28,7 @@ def test_read_frame_basic():
         if i > 8:
             env.write_crc = False
         for chan in chan_ids:
-            env.set_now(chan, i * (-(1 ** i)))
+            env.set_now(chan, i * (-(1**i)))
         env.advance_time(0.1)
         total_frames += env.dispatch_now()
     assert total_frames > 0

@@ -35,7 +35,7 @@ def dummy_thread(*args, **kwargs) -> int:
     try:
         while True:
             # just use native time since we're not doing any time-keeping
-            time.sleep(2 ** 32)
+            time.sleep(2**32)
     except KeyboardInterrupt:
         pass
     return 0

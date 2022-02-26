@@ -14,7 +14,7 @@ from . import EnumA
 def test_channel_group_basic():
     """Test basic channel-group operations."""
 
-    env = TelemetryEnvironment(2 ** 8)
+    env = TelemetryEnvironment(2**8)
     group = ChannelGroup("test_group", env)
     assert env.add_from_enum(EnumA) >= 0
     assert group.add_channel("test_chan", Primitive.UINT32, 1.0)

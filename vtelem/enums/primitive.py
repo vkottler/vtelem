@@ -1,6 +1,6 @@
 # =====================================
 # generator=datazen
-# version=1.9.4
+# version=1.13.3
 # hash=5563c8184eff3fca4638a2a6432ace8e
 # =====================================
 """
@@ -37,7 +37,7 @@ def integer_bounds(byte_count: int, signed: bool) -> Tuple[int, int]:
 
     min_val = 0 if not signed else -1 * (2 ** (byte_count * 8 - 1))
     width = 8 * byte_count if not signed else 8 * byte_count - 1
-    return min_val, (2 ** width) - 1
+    return min_val, (2**width) - 1
 
 
 def integer_can_hold(prim: BasePrimitive, val: int) -> bool:

@@ -2,8 +2,6 @@
 vtelem - Test the frame processor's correctness.
 """
 
-# built-in
-
 # module under test
 from vtelem.classes.type_primitive import new_default
 from vtelem.frame.framer import build_dummy_frame

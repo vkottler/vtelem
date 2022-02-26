@@ -13,9 +13,9 @@ def test_mtu_discovery_basic():
     """Test that mtu discovery works for given clients."""
 
     assert discover_ipv4_mtu((socket.getfqdn(), 0)) > 0
-    assert discover_ipv4_mtu((socket.getfqdn(), 0), 2 ** 15 - 1) > 0
+    assert discover_ipv4_mtu((socket.getfqdn(), 0), 2**15 - 1) > 0
     assert discover_ipv4_mtu(("google.com", 0)) > 0
-    assert discover_ipv4_mtu(("google.com", 0), 2 ** 15 - 1) > 0
+    assert discover_ipv4_mtu(("google.com", 0), 2**15 - 1) > 0
 
 
 def test_unreachable_host():

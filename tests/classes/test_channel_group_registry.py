@@ -14,7 +14,7 @@ from . import EnumA
 def test_group_registry_basic():
     """Test simple functionality of a group registry."""
 
-    env = TelemetryEnvironment(2 ** 8)
+    env = TelemetryEnvironment(2**8)
     assert env.add_from_enum(EnumA) >= 0
     reg = ChannelGroupRegistry(env)
     groups = [
