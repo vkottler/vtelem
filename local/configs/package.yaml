@@ -2,3 +2,11 @@
 name: "{{global['github']['repository']}}"
 version: "{{major}}.{{minor}}.{{patch}}"
 description: "A real-time telemetry library."
+requirements:
+  - cerberus
+  - datazen
+  - netifaces
+  - requests
+  - websockets
+dev_requirements:
+  - vmklib

@@ -3,11 +3,12 @@ default_target: "groups-all"
 
 params:
   project: "vtelem"
-  python_version: "3.8"
+  python_version: "$PYTHON_VERSION"
   entry: "vtelem"
 
 includes:
   - "config/includes/python.yaml"
+  - "config/includes/license.yaml"
   - "config/includes/help.yaml"
   - "config/includes/git.yaml"
   - "local/docs.yaml"
@@ -47,18 +48,13 @@ renders:
     output_path: "README.md"
     dependencies:
       - "compiles-local"
-  - name: "LICENSE"
-    key: "LICENSE_MIT"
-    output_dir: "."
-    dependencies:
-      - "compiles-local"
 
 groups:
   - name: "all"
     dependencies:
+      - groups-license
       - "renders-README.md"
       - "renders-docs_README.md"
-      - "renders-LICENSE"
       - "groups-local-python"
       - "groups-local-docs"
       - "groups-serializables"

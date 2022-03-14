@@ -6,6 +6,8 @@ vtelem - Test the program's entry-point.
 from multiprocessing import Process
 import os
 import signal
+from subprocess import check_output
+from sys import executable
 import time
 
 # third-party
@@ -22,6 +24,12 @@ def test_entry():
     assert vt_main([PKG_NAME, "-u", "1"]) == 0
     assert vt_main([PKG_NAME, "-u", "1", "-i", netifaces.interfaces()[0]]) == 0
     assert vt_main([PKG_NAME, "bad_arg"]) != 0
+
+
+def test_package_entry():
+    """Test the command-line entry through the 'python -m' invocation."""
+
+    check_output([executable, "-m", PKG_NAME, "-h"])
 
 
 def test_entry_sigint():
