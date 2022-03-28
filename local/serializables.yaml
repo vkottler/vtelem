@@ -1,14 +1,14 @@
 ---
 compiles:
-  - name: "serializables"
+  - name: serializables
     configs:
-      - "local/serializables"
+      - serializables
   - name: "serializables-{slug}"
     index_path: "{slug}.cerberus"
     output_path: "{slug}"
     output_dir: "{{project}}/data/serializables"
     configs:
-      - "local/serializables"
+      - serializables
 
 renders:
   - name: "serializable.md"
