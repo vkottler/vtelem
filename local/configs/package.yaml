@@ -2,6 +2,7 @@
 name: "{{global['github']['repository']}}"
 version: "{{major}}.{{minor}}.{{patch}}"
 description: "A real-time telemetry library."
+entry: "{{global['github']['repository']}}"
 requirements:
   - cerberus
   - datazen

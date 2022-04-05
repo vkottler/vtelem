@@ -1,8 +1,8 @@
 ---
-version: "uint8"
-enum: "uint8"
-timestamp: "uint64"
-metric: "uint32"
-count: "uint32"
-crc: "uint32"
-id: "uint16"
+version: uint8
+enum: uint8
+timestamp: uint64
+metric: uint32
+count: uint32
+crc: uint32
+id: uint16

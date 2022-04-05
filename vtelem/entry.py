@@ -1,11 +1,11 @@
 # =====================================
 # generator=datazen
-# version=1.14.0
-# hash=0f4f72ed91e120e9919bec51eb390ca3
+# version=2.0.0
+# hash=28fd6482080866cf573e75fb8b5f46ad
 # =====================================
 
 """
-vtelem - This package's command-line entry-point (boilerplate).
+This package's command-line entry-point (boilerplate).
 """
 
 # built-in

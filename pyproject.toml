@@ -3,7 +3,7 @@ requires = ["vmklib", "wheel", "trove-classifiers"]
 
 [project]
 name = "vtelem"
-version = "0.3.2"
+version = "0.3.3"
 description = "A real-time telemetry library."
 readme = "README.md"
 requires-python = ">=3.7"
