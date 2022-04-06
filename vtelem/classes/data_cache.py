@@ -10,7 +10,7 @@ from typing import List
 # third-party
 from datazen.compile import write_dir
 from datazen.load import load_dir_only
-from datazen.parsing import merge
+from vcorelib.dict import merge
 
 
 class DataCache:
@@ -32,7 +32,7 @@ class DataCache:
 
         os.makedirs(self.cache_dir, exist_ok=True)
         self.data = merge(
-            self.data, load_dir_only(directory, are_templates=False)
+            self.data, load_dir_only(directory, are_templates=False)[0]
         )
         self.loaded.append(directory)
 

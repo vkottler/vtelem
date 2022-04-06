@@ -1,8 +1,8 @@
 <!--
     =====================================
     generator=datazen
-    version=2.0.0
-    hash=da6d2a473573e5f220c1e6d675fcfc15
+    version=2.1.0
+    hash=2bdb9c23eef792e21cf13eca567fdf18
     =====================================
 -->
 
@@ -67,3 +67,12 @@ directory.
 * [Message Types](docs/message_type.md)
 * [Channel Identifiers](docs/channel_identifier.md)
 * [Serializable Data Structures](docs/serializable.md)
+
+# Internal Dependency Graph
+
+A coarse view of the internal structure and scale of
+`vtelem`'s source.
+Generated using [pydeps](https://github.com/thebjorn/pydeps) (via
+`mk python-deps`).
+
+![vtelem's Dependency Graph](im/pydeps.svg)

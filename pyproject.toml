@@ -25,7 +25,8 @@ dependencies = [
   "datazen",
   "netifaces",
   "requests",
-  "websockets"
+  "websockets",
+  "vcorelib"
 ]
 
 [project.optional-dependencies]

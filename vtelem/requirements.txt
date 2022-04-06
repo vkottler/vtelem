@@ -3,3 +3,4 @@ datazen
 netifaces
 requests
 websockets
+vcorelib

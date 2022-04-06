@@ -9,5 +9,6 @@ requirements:
   - netifaces
   - requests
   - websockets
+  - vcorelib
 dev_requirements:
   - vmklib

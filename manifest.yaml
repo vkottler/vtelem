@@ -1,59 +1,60 @@
 ---
-default_target: "groups-all"
+default_target: groups-all
 
 params:
-  project: "vtelem"
+  project: vtelem
   python_version: "$PYTHON_VERSION"
-  entry: "vtelem"
+  entry: vtelem
 
 includes:
-  - "config/includes/python.yaml"
-  - "config/includes/license.yaml"
-  - "config/includes/git.yaml"
-  - "local/docs.yaml"
-  - "local/python.yaml"
-  - "local/serializables.yaml"
+  - config/includes/python.yaml
+  - config/includes/license.yaml
+  - config/includes/git.yaml
+  - local/docs.yaml
+  - local/python.yaml
+  - local/serializables.yaml
 
 schemas:
-  - "local/schemas"
+  - local/schemas
 
 schema_types:
-  - "local/schema_types"
+  - local/schema_types
 
 configs:
-  - "local/configs"
+  - local/configs
 
 variables:
-  - "local/variables"
+  - local/variables
 
 templates:
-  - "local/templates"
+  - local/templates
 
 compiles:
-  - name: "local"
-  - name: "enums"
+  - name: local
+  - name: enums
     configs:
-      - "local/enums"
+      - local/enums
 
 renders:
-  - name: "README.md"
+  - name: README.md
     output_dir: "."
     dependencies:
-      - "compiles-local"
-      - "commands-help"
-      - "renders-python_readme_header.md"
-  - name: "docs_README.md"
-    output_dir: "docs"
-    output_path: "README.md"
+      - compiles-local
+      - commands-help
+      - renders-python_readme_header.md
+      - renders-python_readme_dep_graph.md
+  - name: docs_README.md
+    output_dir: docs
+    output_path: README.md
     dependencies:
-      - "compiles-local"
+      - compiles-local
 
 groups:
-  - name: "all"
+  - name: all
     dependencies:
       - groups-license
-      - "renders-README.md"
-      - "renders-docs_README.md"
-      - "groups-local-python"
-      - "groups-local-docs"
-      - "groups-serializables"
+      - renders-README.md
+      - renders-docs_README.md
+      - groups-local-python
+      - groups-local-docs
+      - groups-serializables

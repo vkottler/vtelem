@@ -26,7 +26,7 @@ def load_schema_dir(path: Path, **kwargs) -> SchemaMap:
     """
 
     assert path.is_dir()
-    data = load_dir(str(path), {}, are_templates=False)
+    data = load_dir(str(path), {}, are_templates=False)[0]
 
     schemas: SchemaMap = {}
     for key, value in data.items():
