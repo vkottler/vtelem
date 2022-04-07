@@ -22,7 +22,7 @@ def test_stream_writer_file():
     writer, env = writer_environment()
     with writer.booted():
         with tempfile.NamedTemporaryFile() as output:
-            with writer.add_file(Path(output.name)):
+            with writer.add_file(Path(output.name), True):
                 for _ in range(100):
                     env.advance_time(10)
                     env.dispatch_now()

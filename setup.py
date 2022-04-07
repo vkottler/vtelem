@@ -1,7 +1,7 @@
 # =====================================
 # generator=datazen
-# version=2.1.0
-# hash=4e49ea9730f8b8f8ccaeb609d4150a75
+# version=2.1.1
+# hash=ee7392455a67da09dd09e91097a33ac2
 # =====================================
 
 """
@@ -10,7 +10,7 @@ vtelem - Package definition for distribution.
 
 # third-party
 try:
-    from vmklib.setup import setup
+    from setuptools_wrapper.setup import setup
 except (ImportError, ModuleNotFoundError):
     from vtelem_bootstrap.setup import setup  # type: ignore
 

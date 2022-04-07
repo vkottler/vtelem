@@ -1,4 +1,4 @@
-vmklib
+setuptools-wrapper
 pylint
 flake8
 pytest

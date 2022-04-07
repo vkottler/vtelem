@@ -11,4 +11,4 @@ requirements:
   - websockets
   - vcorelib
 dev_requirements:
-  - vmklib
+  - setuptools-wrapper

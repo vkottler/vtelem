@@ -1,15 +1,15 @@
 <!--
     =====================================
     generator=datazen
-    version=2.1.0
-    hash=2bdb9c23eef792e21cf13eca567fdf18
+    version=2.1.1
+    hash=b39dcaac7c3a2b6644bf8781665a6366
     =====================================
 -->
 
-# vtelem ([0.3.3](https://pypi.org/project/vtelem/))
+# vtelem ([0.3.4](https://pypi.org/project/vtelem/))
 
 [![python](https://img.shields.io/pypi/pyversions/vtelem.svg)](https://pypi.org/project/vtelem/)
-![Build Status](https://github.com/vkottler/vtelem/workflows/Python%20package/badge.svg)
+![Build Status](https://github.com/vkottler/vtelem/workflows/Python%20Package/badge.svg)
 [![codecov](https://codecov.io/gh/vkottler/vtelem/branch/master/graphs/badge.svg?branch=master)](https://codecov.io/github/vkottler/vtelem)
 
 *A real-time telemetry library.*

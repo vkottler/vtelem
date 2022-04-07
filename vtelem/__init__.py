@@ -1,7 +1,7 @@
 # =====================================
 # generator=datazen
-# version=2.1.0
-# hash=f33b38f6f42f831fc8eba4ae2e8214ca
+# version=2.1.1
+# hash=abf20f7c7c8bd78d2f4180862aae111e
 # =====================================
 
 """
@@ -10,4 +10,4 @@ Useful defaults and other package metadata.
 
 DESCRIPTION = "A real-time telemetry library."
 PKG_NAME = "vtelem"
-VERSION = "0.3.3"
+VERSION = "0.3.4"

@@ -1,9 +1,9 @@
 [build-system]
-requires = ["vmklib", "wheel", "trove-classifiers"]
+requires = ["setuptools-wrapper", "trove-classifiers"]
 
 [project]
 name = "vtelem"
-version = "0.3.3"
+version = "0.3.4"
 description = "A real-time telemetry library."
 readme = "README.md"
 requires-python = ">=3.7"
@@ -31,7 +31,7 @@ dependencies = [
 
 [project.optional-dependencies]
 test = [
-  "vmklib",
+  "setuptools-wrapper",
   "pylint",
   "flake8",
   "pytest",
