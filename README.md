@@ -1,12 +1,12 @@
 <!--
     =====================================
     generator=datazen
-    version=2.1.1
-    hash=b39dcaac7c3a2b6644bf8781665a6366
+    version=3.0.0
+    hash=b7bc281c82e5ab7decd8c5359c138160
     =====================================
 -->
 
-# vtelem ([0.3.4](https://pypi.org/project/vtelem/))
+# vtelem ([0.3.5](https://pypi.org/project/vtelem/))
 
 [![python](https://img.shields.io/pypi/pyversions/vtelem.svg)](https://pypi.org/project/vtelem/)
 ![Build Status](https://github.com/vkottler/vtelem/workflows/Python%20Package/badge.svg)

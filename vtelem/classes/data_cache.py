@@ -8,9 +8,8 @@ import shutil
 from typing import List
 
 # third-party
-from datazen.compile import write_dir
-from datazen.load import load_dir_only
 from vcorelib.dict import merge
+from vcorelib.io import ARBITER
 
 
 class DataCache:
@@ -32,14 +31,17 @@ class DataCache:
 
         os.makedirs(self.cache_dir, exist_ok=True)
         self.data = merge(
-            self.data, load_dir_only(directory, are_templates=False)[0]
+            self.data,
+            ARBITER.decode_directory(
+                directory, require_success=True, recurse=True
+            ).data,
         )
         self.loaded.append(directory)
 
     def write(self) -> None:
         """Write cache contents to disk."""
 
-        write_dir(self.cache_dir, self.data, "yaml")
+        ARBITER.encode_directory(self.cache_dir, self.data, "yaml")
 
     def clean(self) -> None:
         """Clean the cache contents from disk."""

@@ -5,7 +5,6 @@ description: "A real-time telemetry library."
 entry: "{{global['github']['repository']}}"
 requirements:
   - cerberus
-  - datazen
   - netifaces
   - requests
   - websockets

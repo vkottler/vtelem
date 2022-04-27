@@ -8,8 +8,8 @@ from typing import Type
 
 # third-party
 from cerberus import Validator
-from datazen.paths import get_file_name
 from pkg_resources import resource_filename
+from vcorelib.paths import get_file_name
 
 # internal
 from vtelem import PKG_NAME
