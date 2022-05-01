@@ -2,7 +2,7 @@
     =====================================
     generator=datazen
     version=3.0.0
-    hash=b7bc281c82e5ab7decd8c5359c138160
+    hash=654d0d9c050abb6a9b38863cdb7c12cc
     =====================================
 -->
 
@@ -13,6 +13,9 @@
 [![codecov](https://codecov.io/gh/vkottler/vtelem/branch/master/graphs/badge.svg?branch=master)](https://codecov.io/github/vkottler/vtelem)
 
 *A real-time telemetry library.*
+
+See also: [generated documentation](https://vkottler.github.io/python/pydoc/vtelem.html)
+(created with [`pydoc`](https://docs.python.org/3/library/pydoc.html)).
 
 # Command-line Options
 
