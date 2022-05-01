@@ -15,7 +15,7 @@ from vtelem.classes.http_request_mapper import (
     get_multipart_boundary,
     parse_content_type,
 )
-from vtelem.daemon.base_http import HttpDaemon
+from vtelem.daemon.http import HttpDaemon
 
 
 def error_handle(request: BaseHTTPRequestHandler, _: dict) -> Tuple[bool, str]:

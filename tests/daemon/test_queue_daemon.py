@@ -7,7 +7,7 @@ from typing import Any
 
 # module under test
 from vtelem.classes.metered_queue import create
-from vtelem.daemon.base_queue import QueueDaemon
+from vtelem.daemon.queue import QueueDaemon
 
 
 def test_queue_daemon_basic():

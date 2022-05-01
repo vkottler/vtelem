@@ -13,7 +13,7 @@ from vtelem.channel.environment import ChannelEnvironment
 from vtelem.classes import DEFAULTS
 from vtelem.classes.user_enum import UserEnum, from_enum
 from vtelem.enums.primitive import Primitive
-from vtelem.registry.enums import EnumRegistry
+from vtelem.registry.enum import EnumRegistry
 from vtelem.registry.type import get_default
 from vtelem.types.frame import MESSAGE_TYPES
 

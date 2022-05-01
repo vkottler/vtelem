@@ -8,9 +8,10 @@ import socket
 from typing import Any, Dict, List, Tuple, cast
 
 # internal
-from vtelem.classes.time_entity import LockEntity
 from vtelem.mtu import Host, create_udp_socket, discover_mtu
 from vtelem.stream.writer import StreamWriter
+
+from .time_entity import LockEntity
 
 LOG = logging.getLogger(__name__)
 

@@ -10,10 +10,11 @@ from typing import Dict, Iterator, List, Optional, Tuple
 
 # internal
 from vtelem.channel.group import ChannelGroup
-from vtelem.classes import DEFAULTS
-from vtelem.classes.state import State
-from vtelem.classes.time_entity import LockEntity
 from vtelem.telemetry.environment import TelemetryEnvironment
+
+from . import DEFAULTS
+from .state import State
+from .time_entity import LockEntity
 
 LOG = logging.getLogger(__name__)
 

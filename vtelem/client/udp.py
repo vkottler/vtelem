@@ -13,7 +13,7 @@ from typing import Iterator, Tuple
 from vtelem.channel.registry import ChannelRegistry
 from vtelem.classes.type_primitive import TypePrimitive
 from vtelem.classes.udp_client_manager import UdpClientManager
-from vtelem.client.sockets import SocketClient
+from vtelem.client.socket import SocketClient
 from vtelem.mtu import (
     DEFAULT_MTU,
     Host,

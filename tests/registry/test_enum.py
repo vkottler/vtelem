@@ -2,6 +2,8 @@
 vtelem - Tests for the enum registry module.
 """
 
+# built-in
+
 # internal
 from tests.classes import EnumA
 

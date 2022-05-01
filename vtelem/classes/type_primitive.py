@@ -7,9 +7,6 @@ import logging
 import struct
 from typing import Callable, Tuple
 
-from vtelem.classes import DEFAULTS
-from vtelem.classes.byte_buffer import ByteBuffer
-
 # internal
 from vtelem.enums.primitive import (
     Primitive,
@@ -17,6 +14,9 @@ from vtelem.enums.primitive import (
     default_val,
     get_size,
 )
+
+from . import DEFAULTS
+from .byte_buffer import ByteBuffer
 
 LOG = logging.getLogger(__name__)
 ChangeCallback = Callable[
