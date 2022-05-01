@@ -29,7 +29,7 @@ from vtelem.classes import DEFAULTS
 from vtelem.classes.metered_queue import MAX_SIZE, create
 from vtelem.classes.time_entity import LockEntity
 from vtelem.classes.type_primitive import new_default
-from vtelem.daemon.queue import QueueDaemon
+from vtelem.daemon.base_queue import QueueDaemon
 from vtelem.frame.channel import ChannelFrame
 from vtelem.mtu import Host
 from vtelem.telemetry.environment import TelemetryEnvironment

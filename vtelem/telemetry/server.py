@@ -15,8 +15,8 @@ from vtelem.classes.http_request_mapper import MapperAwareRequestHandler
 from vtelem.classes.time_keeper import TimeKeeper
 from vtelem.classes.udp_client_manager import UdpClientManager
 from vtelem.daemon import DaemonOperation
+from vtelem.daemon.base_http import HttpDaemon
 from vtelem.daemon.command_queue import CommandQueueDaemon
-from vtelem.daemon.http import HttpDaemon
 from vtelem.daemon.manager import DaemonManager
 from vtelem.daemon.synchronous import Daemon
 from vtelem.daemon.tcp_telemetry import TcpTelemetryDaemon

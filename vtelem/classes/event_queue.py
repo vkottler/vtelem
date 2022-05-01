@@ -9,8 +9,8 @@ import threading
 from typing import List, Tuple
 
 # internal
-from . import EventType
-from .metered_queue import create
+from vtelem.classes import EventType
+from vtelem.classes.metered_queue import create
 
 
 class EventQueue:

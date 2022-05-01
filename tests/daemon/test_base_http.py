@@ -16,7 +16,7 @@ import requests
 from tests.resources import get_resource
 
 # module under test
-from vtelem.daemon.http import HttpDaemon
+from vtelem.daemon.base_http import HttpDaemon
 
 WARN = "urllib3.exceptions.InsecureRequestWarning"
 

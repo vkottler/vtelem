@@ -12,7 +12,7 @@ from typing import Any, Dict, List, Optional, Tuple
 
 # internal
 from vtelem.classes.metered_queue import create
-from vtelem.daemon.queue import QueueDaemon
+from vtelem.daemon.base_queue import QueueDaemon
 from vtelem.registry import DEFAULT_INDENT
 from vtelem.telemetry.environment import TelemetryEnvironment
 from vtelem.types.command_queue_daemon import (

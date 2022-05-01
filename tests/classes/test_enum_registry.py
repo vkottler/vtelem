@@ -10,7 +10,7 @@ from tests.classes.test_serdes import is_serializable
 
 # module under test
 from vtelem.classes.user_enum import from_enum, user_enum
-from vtelem.registry.enum import EnumRegistry
+from vtelem.registry.enums import EnumRegistry
 from vtelem.registry.type import get_default
 
 
