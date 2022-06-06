@@ -2,7 +2,7 @@
     =====================================
     generator=datazen
     version=3.0.0
-    hash=654d0d9c050abb6a9b38863cdb7c12cc
+    hash=9a703d2e3cb28bbf546d9cdcf965e469
     =====================================
 -->
 
@@ -11,11 +11,30 @@
 [![python](https://img.shields.io/pypi/pyversions/vtelem.svg)](https://pypi.org/project/vtelem/)
 ![Build Status](https://github.com/vkottler/vtelem/workflows/Python%20Package/badge.svg)
 [![codecov](https://codecov.io/gh/vkottler/vtelem/branch/master/graphs/badge.svg?branch=master)](https://codecov.io/github/vkottler/vtelem)
+![PyPI - Status](https://img.shields.io/pypi/status/vtelem)
+![Dependents (via libraries.io)](https://img.shields.io/librariesio/dependents/pypi/vtelem)
 
 *A real-time telemetry library.*
 
 See also: [generated documentation](https://vkottler.github.io/python/pydoc/vtelem.html)
 (created with [`pydoc`](https://docs.python.org/3/library/pydoc.html)).
+
+## Python Version Support
+
+This package is tested with the following Python minor versions:
+
+* [`python3.7`](https://docs.python.org/3.7/)
+* [`python3.8`](https://docs.python.org/3.8/)
+* [`python3.9`](https://docs.python.org/3.9/)
+* [`python3.10`](https://docs.python.org/3.10/)
+
+## Platform Support
+
+This package is tested on the following platforms:
+
+* `ubuntu-latest`
+
+# Introduction
 
 # Command-line Options
 

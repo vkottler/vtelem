@@ -127,7 +127,7 @@
 <!-- vcorelib -->
 <g id="node6" class="node">
 <title>vcorelib</title><style>.edge>path:hover{stroke-width:8}</style>
-<ellipse fill="#2f5adb" stroke="black" cx="511.41" cy="-2932" rx="30.19" ry="18"/>
+<ellipse fill="#2253e7" stroke="black" cx="511.41" cy="-2932" rx="30.19" ry="18"/>
 <text text-anchor="middle" x="511.41" y="-2929" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#ffffff">vcorelib</text>
 </g>
 <!-- vtelem_classes_data_cache -->
@@ -144,7 +144,7 @@
 <path fill="none" stroke="black" d="M1671.41,-2845.89C1970.62,-2751.42 2073.9,-2879.78 2375.41,-2792.89 2402.94,-2784.96 2404.15,-2767.53 2432.41,-2762.78"/>
 <path fill="none" stroke="black" d="M2432.41,-2760.78C2507.27,-2748.19 3045.69,-2730.89 3112.41,-2694.66 3127.45,-2686.5 3119.5,-2667.18 3136.41,-2664.55"/>
 <path fill="none" stroke="black" d="M3136.41,-2662.55C3613.78,-2588.27 3754.09,-2719 4221.41,-2596.44 4227.12,-2594.94 4232.93,-2592.9 4238.59,-2590.59"/>
-<polygon fill="#2f5adb" stroke="black" points="4240.19,-2593.71 4247.93,-2586.48 4237.37,-2587.3 4240.19,-2593.71"/>
+<polygon fill="#2253e7" stroke="black" points="4240.19,-2593.71 4247.93,-2586.48 4237.37,-2587.3 4240.19,-2593.71"/>
 </g>
 <!-- vcorelib&#45;&gt;vtelem_schema -->
 <g id="edge10" class="edge">
@@ -152,7 +152,7 @@
 <path fill="none" stroke="black" d="M541.73,-2929.67C713.5,-2922.03 1560.76,-2882.83 1671.41,-2847.89"/>
 <path fill="none" stroke="black" d="M1671.41,-2845.89C1864.29,-2784.99 1396.2,-2891.15 1219.41,-2792.89 1204.45,-2784.58 1212.37,-2765.04 1195.41,-2762.78"/>
 <path fill="none" stroke="black" d="M1195.41,-2760.78C952.67,-2728.46 883.75,-2762.35 648.41,-2694.66 638.77,-2691.89 628.77,-2687.83 619.62,-2683.57"/>
-<polygon fill="#2f5adb" stroke="black" points="620.97,-2680.34 610.44,-2679.12 617.91,-2686.63 620.97,-2680.34"/>
+<polygon fill="#2253e7" stroke="black" points="620.97,-2680.34 610.44,-2679.12 617.91,-2686.63 620.97,-2680.34"/>
 </g>
 <!-- vcorelib&#45;&gt;vtelem_schema_manager -->
 <g id="edge11" class="edge">
@@ -195,14 +195,14 @@
 <!-- vcorelib_paths -->
 <g id="node9" class="node">
 <title>vcorelib_paths</title><style>.edge>path:hover{stroke-width:8}</style>
-<ellipse fill="#4766c2" stroke="black" cx="1312.41" cy="-2932" rx="46.95" ry="18"/>
+<ellipse fill="#405fc0" stroke="black" cx="1312.41" cy="-2932" rx="46.95" ry="18"/>
 <text text-anchor="middle" x="1312.41" y="-2929" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#ffffff">vcorelib.paths</text>
 </g>
 <!-- vcorelib_paths&#45;&gt;vcorelib_io -->
 <g id="edge16" class="edge">
 <title>vcorelib_paths&#45;&gt;vcorelib_io</title><style>.edge>path:hover{stroke-width:8}</style>
 <path fill="none" stroke="black" d="M1357.75,-2927.3C1526.04,-2913.54 2113.89,-2865.5 2283.35,-2851.65"/>
-<polygon fill="#4766c2" stroke="black" points="2283.76,-2855.13 2293.44,-2850.83 2283.19,-2848.16 2283.76,-2855.13"/>
+<polygon fill="#405fc0" stroke="black" points="2283.76,-2855.13 2293.44,-2850.83 2283.19,-2848.16 2283.76,-2855.13"/>
 </g>
 <!-- vcorelib_paths&#45;&gt;vtelem_schema_manager -->
 <g id="edge17" class="edge">
