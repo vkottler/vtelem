@@ -13,7 +13,7 @@ env:
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: ${{matrix.system}}
     strategy:
       matrix:
         python-version:
@@ -21,6 +21,8 @@ jobs:
           - "3.8"
           - "3.9"
           - "3.10"
+        system:
+          - ubuntu-latest
     env:
       PYTHON_VERSION: ${{matrix.python-version}}
     steps:
@@ -36,27 +38,37 @@ jobs:
 
       - run: pip${{matrix.python-version}} install vmklib
 
-      - run: mk venv
-      - run: mk python-sa-types
+      - run: mk venv python-install-yamllint python-sa-types
+        if: |
+          matrix.python-version != '3.7'
+          || matrix.system != 'windows-latest'
 
       - name: lint and build
-        run: mk -- -j python-lint yaml python-build-once
-
-      - run: mk python-sa
+        run: mk python-lint python-sa yaml python-build-once
         env:
-          PY_LINT_EXTRA_ARGS: --no-incremental
+          PY_LINT_MYPY_EXTRA_ARGS: --no-incremental
+        if: |
+          matrix.python-version != '3.7'
+          || matrix.system != 'windows-latest'
 
       - run: mk python-test
         env:
-          PYTEST_EXTRA_ARGS: --cov-report=xml
+          PY_TEST_EXTRA_ARGS: --cov-report=xml
+        if: |
+          matrix.python-version != '3.7'
+          || matrix.system != 'windows-latest'
 
       - uses: codecov/codecov-action@master
+        if: |
+          matrix.python-version != '3.7'
+          || matrix.system != 'windows-latest'
 
       - uses: secrethub/actions/env-export@master
         env:
           TWINE_PASSWORD: secrethub://vkottler/pypi/api-keys/personal-upload
         if: |
           matrix.python-version == '3.8'
+          && matrix.system == 'ubuntu-latest'
           && env.SECRETHUB_CREDENTIAL != ''
           && github.ref_name == 'master'
 
@@ -65,5 +77,6 @@ jobs:
           TWINE_USERNAME: __token__
         if: |
           matrix.python-version == '3.8'
+          && matrix.system == 'ubuntu-latest'
           && env.SECRETHUB_CREDENTIAL != ''
           && github.ref_name == 'master'
