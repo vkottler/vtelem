@@ -1,7 +1,7 @@
 # =====================================
 # generator=datazen
-# version=3.0.0
-# hash=77baa5ca2a51e9f98cc07ccb83b63f2b
+# version=3.0.7
+# hash=31d56e781a202e85dcf2e40fd98ee307
 # =====================================
 """
 vtelem - Package's default entry-point.

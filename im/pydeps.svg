@@ -2590,7 +2590,7 @@
 <!-- vtelem_stream -->
 <g id="node81" class="node">
 <title>vtelem_stream</title><style>.edge>path:hover{stroke-width:8}</style>
-<ellipse fill="#8516f3" stroke="black" cx="3181.41" cy="-821.49" rx="47.26" ry="18"/>
+<ellipse fill="#7f0cf3" stroke="black" cx="3181.41" cy="-821.49" rx="47.26" ry="18"/>
 <text text-anchor="middle" x="3181.41" y="-818.49" font-family="Helvetica,sans-Serif" font-size="10.00" fill="#ffffff">vtelem.stream</text>
 </g>
 <!-- vtelem_stream&#45;&gt;vtelem_classes_udp_client_manager -->
@@ -2598,7 +2598,7 @@
 <title>vtelem_stream&#45;&gt;vtelem_classes_udp_client_manager</title><style>.edge>path:hover{stroke-width:8}</style>
 <path fill="none" stroke="black" d="M3187.94,-803.56C3195.04,-781.96 3202.85,-744.93 3182.41,-724.27"/>
 <path fill="none" stroke="black" d="M3182.41,-722.27C3135.47,-674.83 3062.89,-650.47 3006.99,-638.16"/>
-<polygon fill="#8516f3" stroke="black" points="3007.62,-634.71 2997.11,-636.07 3006.17,-641.56 3007.62,-634.71"/>
+<polygon fill="#7f0cf3" stroke="black" points="3007.62,-634.71 2997.11,-636.07 3006.17,-641.56 3007.62,-634.71"/>
 </g>
 <!-- vtelem_stream&#45;&gt;vtelem_client_file -->
 <g id="edge317" class="edge">
@@ -2609,14 +2609,14 @@
 <g id="edge318" class="edge">
 <title>vtelem_stream&#45;&gt;vtelem_daemon_tcp_telemetry</title><style>.edge>path:hover{stroke-width:8}</style>
 <path fill="none" stroke="black" d="M3164.59,-804.31C3135.08,-776.87 3070.95,-721.32 3006.41,-692.16 2938.4,-661.43 2910.49,-686.7 2842.41,-656.16 2788.54,-631.99 2734.8,-589.82 2700.91,-560.44"/>
-<polygon fill="#8516f3" stroke="black" points="2702.97,-557.6 2693.15,-553.63 2698.36,-562.86 2702.97,-557.6"/>
+<polygon fill="#7f0cf3" stroke="black" points="2702.97,-557.6 2693.15,-553.63 2698.36,-562.86 2702.97,-557.6"/>
 </g>
 <!-- vtelem_stream&#45;&gt;vtelem_daemon_websocket_telemetry -->
 <g id="edge319" class="edge">
 <title>vtelem_stream&#45;&gt;vtelem_daemon_websocket_telemetry</title><style>.edge>path:hover{stroke-width:8}</style>
 <path fill="none" stroke="black" d="M3229.07,-821.22C3302.72,-819.63 3443.87,-805.34 3522.41,-724.27"/>
 <path fill="none" stroke="black" d="M3522.41,-722.27C3539.36,-704.77 3555.26,-682.71 3567.42,-664.14"/>
-<polygon fill="#8516f3" stroke="black" points="3570.44,-665.91 3572.9,-655.61 3564.55,-662.13 3570.44,-665.91"/>
+<polygon fill="#7f0cf3" stroke="black" points="3570.44,-665.91 3572.9,-655.61 3564.55,-662.13 3570.44,-665.91"/>
 </g>
 <!-- vtelem_stream&#45;&gt;vtelem_telemetry_server -->
 <g id="edge320" class="edge">

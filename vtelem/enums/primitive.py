@@ -1,7 +1,7 @@
 # =====================================
 # generator=datazen
-# version=3.0.0
-# hash=7c89665785a07fe94540cfcfd27437a8
+# version=3.0.7
+# hash=032c71f68572f4af5b6b23fa3cba1cc4
 # =====================================
 """
 vtelem - A definition of the supported primitive types for this library.

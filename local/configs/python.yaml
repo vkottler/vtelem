@@ -5,3 +5,6 @@ author_info:
   username: "{{global['github']['username']}}"
 
 versions: ["3.7", "3.8", "3.9", "3.10"]
+
+systems:
+  - windows-latest

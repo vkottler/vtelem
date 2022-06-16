@@ -1,7 +1,7 @@
 # =====================================
 # generator=datazen
-# version=3.0.0
-# hash=626c46af383ec2f55f44539038229131
+# version=3.0.7
+# hash=ebc34b85dd95c96374ec0a35991898e7
 # =====================================
 """
 vtelem - A definition of the supported frame types for this library.

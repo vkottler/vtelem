@@ -6,7 +6,6 @@ vtelem - Utilities for calculating maximum transmission-unit sizes.
 from enum import IntEnum
 import logging
 import socket
-import sys
 from typing import NamedTuple
 
 # internal
@@ -47,8 +46,6 @@ def create_udp_socket(
     host: Host, is_client: bool = True, reuse: bool = True
 ) -> socket.SocketType:
     """Create a UDP socket, set to a requested peer address."""
-
-    assert sys.platform == "linux"
 
     # create a udp socket and set it to the host
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
