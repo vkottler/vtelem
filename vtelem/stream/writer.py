@@ -73,46 +73,47 @@ class StreamWriter(QueueDaemon):
                 array, size = frame.with_size_header(frame_size)
 
                 with self.lock:
-                    to_remove = []
-                    for stream_id, stream in self.streams.items():
-                        try:
-                            assert stream.write(array) == size
-                            if self.stream_attrs[stream_id]["flush"]:
-                                stream.flush()
-                            self.increment_metric("stream_writes")
-                            self.increment_metric("bytes_written", size)
-                        except OSError as exc:
-                            msg = (
-                                "stream '%s' (%d) error writing %d "
-                                + "bytes: %s (%d)"
-                            )
-                            LOG.error(
-                                msg,
-                                stream.name,
-                                stream_id,
-                                len(array),
-                                exc.strerror,
-                                exc.errno,
-                            )
-                            to_remove.append((stream_id, stream))
+                    queues = list(self.queues.values())
+                    streams = self.streams.copy()
 
-                    # remove streams that errored when writing
-                    for stream_id, stream in to_remove:
-                        LOG.warning(
-                            "removing stream '%s' (%d) errors writing",
+                to_remove = []
+                for stream_id, stream in streams.items():
+                    try:
+                        assert stream.write(array) == size
+                        if self.stream_attrs[stream_id]["flush"]:
+                            stream.flush()
+                        self.increment_metric("stream_writes")
+                        self.increment_metric("bytes_written", size)
+                    except OSError as exc:
+                        msg = (
+                            "stream '%s' (%d) error writing %d "
+                            + "bytes: %s (%d)"
+                        )
+                        LOG.error(
+                            msg,
                             stream.name,
                             stream_id,
+                            len(array),
+                            exc.strerror,
+                            exc.errno,
                         )
+                        to_remove.append((stream_id, stream))
 
-                        # signal parent that their stream may be broken
-                        if self.error_handle is not None:
-                            self.error_handle(stream_id)
+                # remove streams that errored when writing
+                for stream_id, stream in to_remove:
+                    LOG.warning(
+                        "removing stream '%s' (%d) errors writing",
+                        stream.name,
+                        stream_id,
+                    )
 
-                        assert self.remove_stream(stream_id)
+                    # signal parent that their stream may be broken
+                    if self.error_handle is not None:
+                        self.error_handle(stream_id)
+
+                    assert self.remove_stream(stream_id)
 
             # add to queues
-            with self.lock:
-                queues = list(self.queues.values())
             for queue in queues:
                 queue.put(frame)
             self.increment_metric("queue_writes", len(queues))
@@ -201,6 +202,7 @@ class StreamWriter(QueueDaemon):
         with path.open(mode) as stream:
             with self.stream_added(cast(BinaryIO, stream), flush=flush):
                 yield
+            stream.flush()
 
     def add_semaphore_stream(self, stream: Stream) -> Tuple[int, Semaphore]:
         """
@@ -230,14 +232,17 @@ class StreamWriter(QueueDaemon):
         """Remove a stream, if one is present with this identifier."""
 
         with self.lock:
-            result = queue_id in self.queues
-            if result:
-                if inject_none:
-                    self.queues[queue_id].put(None)
+            queue = self.queues.get(queue_id)
+            removed = queue is not None
+            if removed:
                 del self.queues[queue_id]
-        if result:
+
+        if removed:
+            if inject_none:
+                assert queue is not None
+                queue.put(None)
             self.decrement_metric("queue_count")
-        return result
+        return removed
 
 
 class QueueClientManager(LockEntity):
