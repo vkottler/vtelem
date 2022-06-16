@@ -208,8 +208,7 @@ class TelemetryServer(HttpDaemon):
             assert self.perform(DaemonOperation.START, **kwargs)
         self.first_start = False
 
-        with self.lock:
-            self.state_sem.release()
+        self.state_sem.release()
 
     def stop_all(self) -> None:
         """Stop everything."""
@@ -221,8 +220,7 @@ class TelemetryServer(HttpDaemon):
         self.close()
 
         self.udp_clients.remove_all()
-        with self.lock:
-            self.state_sem.release()
+        self.state_sem.release()
 
     @contextmanager
     def booted(self, *_, **__) -> Iterator[None]:

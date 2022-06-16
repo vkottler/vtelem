@@ -11,3 +11,5 @@ requirements:
   - vcorelib
 dev_requirements:
   - setuptools-wrapper
+init_local: |
+  DEFAULT_TIMEOUT = 2

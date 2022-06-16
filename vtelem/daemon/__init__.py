@@ -11,6 +11,7 @@ import time
 from typing import Any, Callable, Dict, Iterator, Optional
 
 # internal
+from vtelem import DEFAULT_TIMEOUT
 from vtelem.classes import DEFAULTS
 from vtelem.classes.time_entity import TimeEntity
 from vtelem.classes.user_enum import from_enum
@@ -89,6 +90,7 @@ class DaemonBase(TimeEntity):
         self.reset_metric("pauses")
         self.reset_metric("unpauses")
         self.reset_metric("count")
+        self.reset_metric("errors")
 
         def default_state_change(
             prev_state: DaemonState, state: DaemonState, time_val: float
@@ -174,10 +176,12 @@ class DaemonBase(TimeEntity):
         """Assigns a new run-state to this daemon."""
 
         with self.lock:
-            if self.state == state:
-                return False
-            self.function["state_change"](self.state, state, self.get_time())
+            old_state = self.state
+            transition = old_state != state
             self.state = state
+
+        if transition:
+            self.function["state_change"](old_state, state, self.get_time())
 
             # set the metric channel
             if self.env is not None:
@@ -187,7 +191,7 @@ class DaemonBase(TimeEntity):
                     self.get_time(),
                 )
 
-        return True
+        return transition
 
     def set_env_metric(
         self, name: str, value: Any, prim: Primitive = DEFAULTS["metric"]
@@ -202,36 +206,35 @@ class DaemonBase(TimeEntity):
                 )
             self.env.set_metric(metric_name, value, self.get_time())
 
-    def reset_metric(self, name: str) -> None:
+    def reset_metric(self, name: str, val: int = 0) -> None:
         """Set a metric back to zero."""
 
         with self.lock:
-            self.function["metrics_data"][name] = 0
-            self.set_env_metric(name, self.function["metrics_data"][name])
+            self.function["metrics_data"][name] = val
+        self.set_env_metric(name, val)
 
     def increment_metric(self, name: str, value: Any = 1) -> None:
         """Increment a named metric."""
 
         with self.lock:
-            self.function["metrics_data"][name] += value
-            self.set_env_metric(name, self.function["metrics_data"][name])
+            val = self.function["metrics_data"][name] + value
+            self.function["metrics_data"][name] = val
+        self.set_env_metric(name, val)
 
     def decrement_metric(self, name: str, value: Any = 1) -> None:
         """Decrement a named metric."""
 
         with self.lock:
-            self.function["metrics_data"][name] -= value
-            self.set_env_metric(name, self.function["metrics_data"][name])
+            val = self.function["metrics_data"][name] - value
+            self.function["metrics_data"][name] = val
+        self.set_env_metric(name, val)
 
     def get_state(self) -> DaemonState:
         """Query this daemon's current state."""
-
-        with self.lock:
-            return self.state
+        return self.state
 
     def get_state_str(self) -> str:
         """Get the current state as a String."""
-
         return self.get_state().name.lower()
 
     def run_harness(self, *args, **kwargs) -> None:
@@ -359,7 +362,7 @@ class DaemonBase(TimeEntity):
             return self.start(*args, **kwargs)
         return False
 
-    def stop(self) -> bool:
+    def stop(self, timeout: int = DEFAULT_TIMEOUT) -> bool:
         """Attempt to stop the daemon."""
 
         if not self.begin_stop():
@@ -367,10 +370,11 @@ class DaemonBase(TimeEntity):
 
         # if we should stop, wait for the thread to be joined
         assert self.thread is not None
-        self.thread.join()
+        self.thread.join(timeout=timeout)
         with self.lock:
             self.thread = None
-            assert self.state == DaemonState.IDLE
-        self.increment_metric("stops")
+            self.increment_metric(
+                "stops" if self.state == DaemonState.IDLE else "errors"
+            )
 
         return True
