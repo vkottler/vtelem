@@ -1,7 +1,7 @@
 # =====================================
 # generator=datazen
-# version=3.0.0
-# hash=e82122bb683e32a9f7a7add208f34950
+# version=3.0.9
+# hash=f43ae94964cec845b63c27004f25d15e
 # =====================================
 """
 vtelem - Useful type definitions for working with frames.

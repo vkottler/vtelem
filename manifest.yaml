@@ -28,6 +28,7 @@ variables:
 
 templates:
   - local/templates
+  - config/templates
 
 compiles:
   - name: local
@@ -43,9 +44,15 @@ renders:
       - commands-help
       - renders-python_readme_header.md
       - renders-python_readme_dep_graph.md
+
   - name: docs_README.md
     output_dir: docs
     output_path: README.md
+    dependencies:
+      - compiles-local
+
+  - name: FUNDING.yml
+    output_dir: ".github"
     dependencies:
       - compiles-local
 
@@ -58,3 +65,4 @@ groups:
       - groups-local-python
       - groups-local-docs
       - groups-serializables
+      - renders-FUNDING.yml
