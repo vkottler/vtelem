@@ -40,18 +40,24 @@ def test_telemetry_server_get_types():
 
         # get app id
         cmd_str = "types?indent=4"
-        result = requests.get(server.get_base_url() + cmd_str).json()
+        result = requests.get(
+            server.get_base_url() + cmd_str, timeout=1.0
+        ).json()
         assert all(key in result for key in ["mappings", "types"])
 
         # run the 'help' command
         cmd_str = "command"
-        requests.get(server.get_base_url() + cmd_str)
+        requests.get(server.get_base_url() + cmd_str, timeout=1.0)
         cmd_str = "command?command=help&indent=4"
-        result = requests.get(server.get_base_url() + cmd_str).json()
+        result = requests.get(
+            server.get_base_url() + cmd_str, timeout=1.0
+        ).json()
         assert result
 
         # get registries
-        result = requests.get(server.get_base_url() + "registries").json()
+        result = requests.get(
+            server.get_base_url() + "registries", timeout=1.0
+        ).json()
         assert result
 
 
@@ -216,22 +222,26 @@ def test_telemetry_server_stop_http():
     )
     with server.booted():
         # get app id
-        result = requests.get(server.get_base_url() + "id")
+        result = requests.get(server.get_base_url() + "id", timeout=1.0)
         assert result.status_code == requests.codes["ok"]
         app_id = int(result.text)
 
         # should fail, no 'app_id'
-        result = requests.post(server.get_base_url() + "shutdown")
+        result = requests.post(server.get_base_url() + "shutdown", timeout=1.0)
         assert not result.status_code == requests.codes["ok"]
 
         # should fail, 'app_id' incorrect
         result = requests.post(
-            server.get_base_url() + "shutdown", data={"app_id": 1234}
+            server.get_base_url() + "shutdown",
+            data={"app_id": 1234},
+            timeout=1.0,
         )
         assert not result.status_code == requests.codes["ok"]
 
         # should succeed, 'app_id' correct
         result = requests.post(
-            server.get_base_url() + "shutdown", data={"app_id": app_id}
+            server.get_base_url() + "shutdown",
+            data={"app_id": app_id},
+            timeout=1.0,
         )
         assert result.status_code == requests.codes["ok"]

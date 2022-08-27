@@ -42,6 +42,7 @@ def test_http_reqest_mapper_post():
         result = requests.post(
             daemon.get_base_url() + "example",
             files={"a": "a", "b": "b", "c": "c"},
+            timeout=1.0,
         )
         assert result.status_code == requests.codes["ok"]
 
@@ -62,23 +63,23 @@ def test_http_request_mapper_basic():
     )
 
     with daemon.booted():
-        result = requests.get(daemon.get_base_url() + "bad")
+        result = requests.get(daemon.get_base_url() + "bad", timeout=1.0)
         assert result.status_code == requests.codes["not_found"]
 
-        result = requests.get(daemon.get_base_url())
+        result = requests.get(daemon.get_base_url(), timeout=1.0)
         assert result.status_code == requests.codes["ok"]
 
-        result = requests.post(daemon.get_base_url())
+        result = requests.post(daemon.get_base_url(), timeout=1.0)
         assert result.status_code == requests.codes["not_found"]
 
-        result = requests.head(daemon.get_base_url())
+        result = requests.head(daemon.get_base_url(), timeout=1.0)
         assert result.status_code == requests.codes["ok"]
 
-        result = requests.head(daemon.get_base_url() + "example")
+        result = requests.head(daemon.get_base_url() + "example", timeout=1.0)
         assert result.status_code == requests.codes["bad_request"]
 
         del daemon.server.mapper
-        result = requests.get(daemon.get_base_url() + "bad")
+        result = requests.get(daemon.get_base_url() + "bad", timeout=1.0)
         assert result.status_code == requests.codes["not_implemented"]
 
     assert daemon.close()

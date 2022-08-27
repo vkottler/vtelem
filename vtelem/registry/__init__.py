@@ -11,14 +11,14 @@ from typing import Any, Dict, Generic, List, Optional, Tuple, TypeVar
 # internal
 from vtelem.classes.serdes import DEFAULT_INDENT
 
-TYP = TypeVar("TYP")
+T = TypeVar("T")
 
 
-class Registry(Generic[TYP]):
+class Registry(Generic[T]):
     """A base class for building type-specific registries."""
 
     def __init__(
-        self, type_name: str, initial_data: List[Tuple[str, TYP]] = None
+        self, type_name: str, initial_data: List[Tuple[str, T]] = None
     ) -> None:
         """
         Construct a new registry of a provided type, optionally add initial
@@ -27,7 +27,7 @@ class Registry(Generic[TYP]):
 
         self.type_name = type_name
         self.data: Dict[str, dict] = {}
-        custom: Dict[int, Optional[TYP]] = defaultdict(lambda: None)
+        custom: Dict[int, Optional[T]] = defaultdict(lambda: None)
         mappings: Dict[str, Optional[int]] = defaultdict(lambda: None)
         self.data[self.type_name] = custom
         self.data["mappings"] = mappings
@@ -45,7 +45,7 @@ class Registry(Generic[TYP]):
 
         return self.curr_id
 
-    def get_item(self, item_id: int) -> Optional[TYP]:
+    def get_item(self, item_id: int) -> Optional[T]:
         """Obtain an item's data by its integer identifier."""
 
         with self.lock:
@@ -61,7 +61,7 @@ class Registry(Generic[TYP]):
             result = self.data["mappings"][name]
         return result
 
-    def add(self, name: str, data: TYP) -> Tuple[bool, int]:
+    def add(self, name: str, data: T) -> Tuple[bool, int]:
         """
         Register a named item, rejects duplicate names. Returns status
         of success and the integer identifier associated with this item.
