@@ -55,7 +55,7 @@ def test_http_daemon_with_tls():
     daemon = HttpDaemon("test_daemon")
     daemon.use_tls(get_resource("test.key"), get_resource("test.cert"))
     with daemon.booted():
-        result = requests.get(daemon.get_base_url(), verify=False)
+        result = requests.get(daemon.get_base_url(), verify=False, timeout=1.0)
         assert result.status_code == requests.codes["ok"]
     assert daemon.close()
 
@@ -65,7 +65,7 @@ def test_http_daemon_basic():
 
     daemon = HttpDaemon("test_daemon")
     assert daemon.start()
-    result = requests.get(daemon.get_base_url())
+    result = requests.get(daemon.get_base_url(), timeout=1.0)
     assert result.status_code == requests.codes["ok"]
     assert daemon.stop()
     assert daemon.close()
