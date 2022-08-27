@@ -1,7 +1,7 @@
 # =====================================
 # generator=datazen
-# version=3.0.0
-# hash=8037b097b2a931af74e265e2bba7f402
+# version=3.0.9
+# hash=5d53990330fd2c38af37be5803465692
 # =====================================
 """
 vtelem - Class defaults.

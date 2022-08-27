@@ -1,8 +1,8 @@
 <!--
     =====================================
     generator=datazen
-    version=3.0.0
-    hash=9a703d2e3cb28bbf546d9cdcf965e469
+    version=3.0.9
+    hash=e2b634299f7e920a2e765b42b4a29dcb
     =====================================
 -->
 
@@ -41,11 +41,12 @@ This package is tested on the following platforms:
 ```
 $ ./venv3.8/bin/vtelem -h
 
-usage: vtelem [-h] [--version] [-v] [-C DIR] [-i {lo,enp0s25,wlo1}] [-p PORT]
-              [--ws-cmd-port WS_CMD_PORT] [--ws-tlm-port WS_TLM_PORT]
-              [--tcp-tlm-port TCP_TLM_PORT] [-t TICK]
-              [--telem-rate TELEM_RATE] [--metrics-rate METRICS_RATE]
-              [--time-scale TIME_SCALE] [-a APP_ID] [-u UPTIME]
+usage: vtelem [-h] [--version] [-v] [-C DIR] [-i {lo,bond0,dummy0,sit0,eth0}]
+              [-p PORT] [--ws-cmd-port WS_CMD_PORT]
+              [--ws-tlm-port WS_TLM_PORT] [--tcp-tlm-port TCP_TLM_PORT]
+              [-t TICK] [--telem-rate TELEM_RATE]
+              [--metrics-rate METRICS_RATE] [--time-scale TIME_SCALE]
+              [-a APP_ID] [-u UPTIME]
 
 A real-time telemetry library.
 
@@ -54,7 +55,7 @@ optional arguments:
   --version             show program's version number and exit
   -v, --verbose         set to increase logging verbosity
   -C DIR, --dir DIR     execute from a specific directory
-  -i {lo,enp0s25,wlo1}, --interface {lo,enp0s25,wlo1}
+  -i {lo,bond0,dummy0,sit0,eth0}, --interface {lo,bond0,dummy0,sit0,eth0}
                         interface to bind to
   -p PORT, --port PORT  http api port
   --ws-cmd-port WS_CMD_PORT
