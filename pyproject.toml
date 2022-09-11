@@ -41,7 +41,8 @@ test = [
   "pytest-cov",
   "mypy",
   "black",
-  "isort"
+  "isort",
+  "setuptools-wrapper"
 ]
 
 [project.scripts]
