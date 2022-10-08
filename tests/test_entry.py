@@ -11,7 +11,7 @@ from sys import executable
 import time
 
 # third-party
-import netifaces  # type: ignore
+import netifaces
 
 # module under test
 from vtelem import PKG_NAME
@@ -38,5 +38,6 @@ def test_entry_sigint():
     proc = Process(target=vt_main, args=[PKG_NAME, "-u", "10"])
     proc.start()
     time.sleep(1.0)
+    assert proc.pid is not None
     os.kill(proc.pid, signal.SIGINT)
     proc.join()

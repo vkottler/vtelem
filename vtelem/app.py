@@ -7,7 +7,7 @@ import argparse
 import socket
 
 # third-party
-import netifaces  # type: ignore
+import netifaces
 
 # internal
 from vtelem.mtu import Host

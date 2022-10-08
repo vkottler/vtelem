@@ -23,7 +23,7 @@ NAME_DENYLIST = ["all"]
 class DaemonManager(LockEntity):
     """A class for managing a group of daemon tasks."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Construct a new daemon manager."""
 
         super().__init__()

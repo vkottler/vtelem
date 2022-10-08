@@ -10,7 +10,10 @@ from typing import Any, Optional
 from vtelem import DEFAULT_TIMEOUT
 
 
-def queue_get(queue: Queue, timeout: int = DEFAULT_TIMEOUT) -> Optional[Any]:
+def queue_get(
+    queue: Queue,  # type: ignore
+    timeout: int = DEFAULT_TIMEOUT,
+) -> Optional[Any]:
     """
     Wrap a de-queue operation into one that will return None if the timeout
     is met.
@@ -22,7 +25,10 @@ def queue_get(queue: Queue, timeout: int = DEFAULT_TIMEOUT) -> Optional[Any]:
         return None
 
 
-def queue_get_none(queue: Queue, timeout: int = DEFAULT_TIMEOUT) -> None:
+def queue_get_none(
+    queue: Queue,  # type: ignore
+    timeout: int = DEFAULT_TIMEOUT,
+) -> None:
     """Attempt to get a literal 'None' from the queue."""
 
     result = queue.get(timeout=timeout)

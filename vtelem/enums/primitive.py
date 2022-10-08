@@ -1,7 +1,7 @@
 # =====================================
 # generator=datazen
 # version=3.1.0
-# hash=032c71f68572f4af5b6b23fa3cba1cc4
+# hash=b83847f9627b8e84266cd6022da48e1a
 # =====================================
 """
 vtelem - A definition of the supported primitive types for this library.
@@ -11,7 +11,7 @@ vtelem - A definition of the supported primitive types for this library.
 from enum import Enum
 from json import JSONEncoder
 import random
-from typing import Any, Callable, NamedTuple, Tuple, Type, Union
+from typing import Any, Callable, NamedTuple, Tuple, Type, Union, cast
 
 # internal
 from vtelem.types.serializable import ObjectData
@@ -23,7 +23,7 @@ class BasePrimitive(NamedTuple):
     """A schema for primitive enum values."""
 
     fmt: str
-    type: Type
+    type: Type[Any]
     size: int
     name: str
     signed: bool
@@ -163,7 +163,7 @@ def get_size(inst: Primitive) -> int:
 def default_val(inst: Primitive) -> PrimitiveValue:
     """Get the default value for a specific primitive."""
 
-    return inst.value.type()
+    return cast(PrimitiveValue, inst.value.type())
 
 
 INTEGER_PRIMITIVES = [
@@ -197,7 +197,7 @@ def to_dict(prim: Primitive) -> ObjectData:
 class PrimitiveEncoder(JSONEncoder):
     """A JSON encoder for a primitive enum."""
 
-    def default(self, o) -> dict:
+    def default(self, o) -> ObjectData:
         """Implement serialization for the primitive enum value."""
 
         assert isinstance(o, Primitive)

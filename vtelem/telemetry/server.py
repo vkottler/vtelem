@@ -14,7 +14,6 @@ from vtelem.channel.group_registry import ChannelGroupRegistry
 from vtelem.classes.http_request_mapper import MapperAwareRequestHandler
 from vtelem.classes.time_keeper import TimeKeeper
 from vtelem.classes.udp_client_manager import UdpClientManager
-from vtelem.daemon import DaemonOperation
 from vtelem.daemon.command_queue import CommandQueueDaemon
 from vtelem.daemon.http import HttpDaemon
 from vtelem.daemon.manager import DaemonManager
@@ -22,6 +21,7 @@ from vtelem.daemon.synchronous import Daemon
 from vtelem.daemon.tcp_telemetry import TcpTelemetryDaemon
 from vtelem.daemon.telemetry import TelemetryDaemon
 from vtelem.daemon.websocket_telemetry import WebsocketTelemetryDaemon
+from vtelem.enums.daemon import DaemonOperation
 from vtelem.factories.daemon_manager import create_daemon_manager_commander
 from vtelem.factories.telemetry_environment import create_channel_commander
 from vtelem.factories.telemetry_server import register_http_handlers

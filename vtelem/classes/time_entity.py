@@ -10,7 +10,7 @@ from typing import Any, Optional, Type
 from typing_extensions import Literal
 
 
-class OptionalRLock(AbstractContextManager):
+class OptionalRLock(AbstractContextManager):  # type: ignore
     """
     A class allowing easy transitions from using actual locking mechanisms or
     opting out, but keeping the context-manager semantics.

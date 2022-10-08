@@ -4,10 +4,10 @@ vtelem - Common name manipulations.
 
 # built-in
 import re
-from typing import Type
+from typing import Any, Type
 
 
-def class_to_snake(class_obj: Type) -> str:
+def class_to_snake(class_obj: Type[Any]) -> str:
     """Convert a CamelCase named class to a snake_case String."""
 
     return to_snake(class_obj.__name__)

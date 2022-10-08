@@ -13,3 +13,9 @@ dev_requirements:
   - setuptools-wrapper
 init_local: |
   DEFAULT_TIMEOUT = 2
+mypy_local: |
+  [mypy-cerberus.*]
+  ignore_missing_imports = True
+
+  [mypy-netifaces.*]
+  ignore_missing_imports = True
